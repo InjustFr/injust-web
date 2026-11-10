@@ -1,0 +1,60 @@
+{% set description = release.description.in(locale) %}
+<details class="release" id="release-{{ release.slug }}">
+    <summary>
+        <span class="release-cover">
+            {%- if release.cover -%}
+                <img src="{{ path('media_image', {file: release.cover ~ '.webp'}) }}" alt="" width="600" height="600" loading="lazy">
+            {%- else -%}
+                <span class="release-blank" aria-hidden="true">{{ release.title }}</span>
+            {%- endif -%}
+        </span>
+        <span class="release-caption">
+            <span class="release-title">{{ release.title }}</span>
+            <span class="release-meta">{{ ('site.types.' ~ release.type)|trans }} · {{ release.releaseDate|date('Y') }}</span>
+        </span>
+    </summary>
+    <div class="release-panel">
+        <div class="release-about">
+            <p class="release-date">{{ 'site.hero.out'|trans({date: release.releaseDate|date('d.m.Y')}) }}</p>
+            {% if description %}
+                <p class="release-description">{{ description|nl2br }}</p>
+            {% endif %}
+            {% if release.tracks is not empty %}
+                <ol class="tracklist" aria-label="{{ 'site.music.tracklist'|trans }}">
+                    {% for track in release.tracks %}
+                        <li class="track">
+                            <span class="track-no" aria-hidden="true">{{ '%02d'|format(track.position) }}</span>
+                            <span class="track-title">{{ track.title }}</span>
+                            <span class="track-time">
+                                {%- if track.durationSeconds is not null -%}
+                                    {{ track.durationSeconds // 60 }}:{{ '%02d'|format(track.durationSeconds % 60) }}
+                                {%- endif -%}
+                            </span>
+                        </li>
+                    {% endfor %}
+                </ol>
+            {% endif %}
+        </div>
+        {% if release.links is not empty or release.smartLinkUrl or release.spotifyEmbed %}
+            <div class="release-listen">
+                {% if release.spotifyEmbed %}
+                    {% set embed = release.spotifyEmbed %}
+                    <div class="spotify" data-island="SpotifyPlayer" data-props="{{ {kind: embed.kind, id: embed.id, title: release.title, load: 'site.music.spotify_load'|trans, notice: 'site.music.spotify_notice'|trans}|json_encode }}">
+                        <a class="spotify-open" href="{{ embed.url }}" rel="noopener">{{ 'site.music.spotify_open'|trans }}</a>
+                    </div>
+                {% endif %}
+                {% if release.links is not empty %}
+                    <p class="release-listen-title">{{ 'site.music.listen_on'|trans }}</p>
+                    <ul class="release-links">
+                        {% for link in release.links %}
+                            <li><a href="{{ link.url }}" rel="noopener">{{ ('site.platforms.' ~ link.platform.value)|trans }}</a></li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+                {% if release.smartLinkUrl %}
+                    <a class="button" href="{{ release.smartLinkUrl }}" rel="noopener">{{ (release.upcoming ? 'site.hero.presave' : 'site.music.everywhere')|trans }}</a>
+                {% endif %}
+            </div>
+        {% endif %}
+    </div>
+</details>

@@ -20,6 +20,7 @@ final readonly class LegalIdentityView
         public string $mediatorUrl,
         public string $hostName,
         public string $hostAddress,
+        public string $hostPhone,
         public bool $complete,
     ) {
     }
@@ -38,6 +39,7 @@ final readonly class LegalIdentityView
             $identity->mediatorUrl,
             $identity->hostName,
             $identity->hostAddress,
+            $identity->hostPhone,
             $identity->isComplete(),
         );
     }

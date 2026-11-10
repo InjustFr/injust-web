@@ -1,5 +1,9 @@
 {% extends 'site.html.twig' %}
 
+{% set og_image = music.featured.cover ?? null %}
+{% set band_image = music.text.portrait %}
+{% set band_same_as = music.socialLinks|map(link => link.url) %}
+
 {% block preload %}
     {% if settings.heroImage %}
         <link rel="preload" as="image" href="{{ path('media_image', {file: settings.heroImage ~ '.webp'}) }}" fetchpriority="high">
@@ -7,16 +11,10 @@
 {% endblock %}
 
 {% block main %}
-    <section class="hero">
-        {% if settings.heroImage %}
-            <img class="hero-photo" src="{{ path('media_image', {file: settings.heroImage ~ '.webp'}) }}" alt="" fetchpriority="high">
-        {% endif %}
-        <div class="hero-content">
-            <h1 class="hero-mark">{{ brand|upper }}</h1>
-            <p class="hero-genre">{{ 'site.description'|trans }}</p>
-            <div class="hero-release" data-featured-release>
-                <p>{{ 'site.hero.release'|trans }}</p>
-            </div>
-        </div>
-    </section>
+    {% include 'site/_hero.html.twig' %}
+    {% include 'site/_hooks.html.twig' %}
+    {% include 'site/_releases.html.twig' %}
+    {% include 'site/_videos.html.twig' %}
+    {% include 'site/_manifesto.html.twig' %}
+    {% include 'site/_links.html.twig' %}
 {% endblock %}

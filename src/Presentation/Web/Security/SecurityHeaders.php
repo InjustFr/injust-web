@@ -68,6 +68,7 @@ final readonly class SecurityHeaders
             "img-src 'self' data:",
             "font-src 'self'",
             "connect-src 'self'",
+            'frame-src https://www.youtube-nocookie.com https://open.spotify.com',
             "object-src 'none'",
             "base-uri 'none'",
             "frame-ancestors 'none'",

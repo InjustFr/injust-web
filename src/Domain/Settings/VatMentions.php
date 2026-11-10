@@ -22,13 +22,18 @@ final readonly class VatMentions
 
     public function __construct(string $consumer, string $euBusiness, string $nonEuBusiness)
     {
-        $this->consumer = trim($consumer);
-        $this->euBusiness = trim($euBusiness);
-        $this->nonEuBusiness = trim($nonEuBusiness);
+        $this->consumer = self::withoutFinalPeriod($consumer);
+        $this->euBusiness = self::withoutFinalPeriod($euBusiness);
+        $this->nonEuBusiness = self::withoutFinalPeriod($nonEuBusiness);
     }
 
     public static function defaults(): self
     {
         return new self('TVA non applicable – art. 293 B du CGI', 'Autoliquidation', 'TVA non applicable – art. 259-1 du CGI');
+    }
+
+    private static function withoutFinalPeriod(string $mention): string
+    {
+        return rtrim(trim($mention), '. ');
     }
 }

@@ -19,7 +19,7 @@ final class LegalPagesTest extends WebTestCase
         ## Éditeur
 
         {name}, {businessForm}, SIREN {siren}, {address}, {email}, {phone}.
-        Directeur : {publicationDirector}. Hébergeur : {hostName}, {hostAddress}.
+        Directeur : {publicationDirector}. Hébergeur : {hostName}, {hostAddress}, {hostPhone}.
         Médiateur : [{mediatorName}]({mediatorUrl}). TVA : {vatMention}. Site : {siteUrl}. Mise à jour : {updatedAt}.
         MD;
 
@@ -36,7 +36,7 @@ final class LegalPagesTest extends WebTestCase
         self::assertSame('Mentions légales', $crawler->filter('main h1')->text());
         self::assertSame('Éditeur', $crawler->filter('.legal-body h2')->text());
         self::assertSame(
-            'Louis Injust, EI, SIREN 443061841, 1 rue du Son, 75000 Paris, louis@injust.test, +33 6 00 00 00 00. Directeur : Louis Injust. Hébergeur : OVH SAS, 2 rue Kellermann, 59100 Roubaix. Médiateur : Médiateur Test. TVA : TVA non applicable – art. 293 B du CGI. Site : http://localhost. Mise à jour : 10 novembre 2026.',
+            'Louis Injust, EI, SIREN 443061841, 1 rue du Son, 75000 Paris, louis@injust.test, +33 6 00 00 00 00. Directeur : Louis Injust. Hébergeur : OVH SAS, 2 rue Kellermann, 59100 Roubaix, +33 9 72 10 10 07. Médiateur : Médiateur Test. TVA : TVA non applicable – art. 293 B du CGI. Site : http://localhost. Mise à jour : 10 novembre 2026.',
             $crawler->filter('.legal-body p')->text(),
         );
         self::assertSame('https://mediator.test', $crawler->filter('.legal-body a')->attr('href'));

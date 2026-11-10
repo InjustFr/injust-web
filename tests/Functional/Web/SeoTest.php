@@ -98,7 +98,7 @@ final class SeoTest extends WebTestCase
         $policy = (string) $client->getResponse()->headers->get('Content-Security-Policy');
         self::assertStringContainsString("default-src 'self'", $policy);
         self::assertStringContainsString("script-src 'self';", $policy);
-        self::assertStringNotContainsString('frame-src', $policy);
+        self::assertStringContainsString('frame-src https://www.youtube-nocookie.com https://open.spotify.com;', $policy);
         self::assertStringContainsString("frame-ancestors 'none'", $policy);
         self::assertResponseHeaderSame('X-Content-Type-Options', 'nosniff');
         self::assertResponseHeaderSame('X-Frame-Options', 'DENY');

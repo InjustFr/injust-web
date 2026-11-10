@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Domain\Settings;
 
 use App\Domain\Settings\Exception\LegalIdentityIncomplete;
+use App\Domain\Shared\HttpsUrl;
 use App\Domain\Shared\LocalizedText;
 use Doctrine\ORM\Mapping as ORM;
 

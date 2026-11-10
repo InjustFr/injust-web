@@ -132,87 +132,6 @@ img { display: block; max-width: 100%; }
 
 .lang-switch:hover { background: var(--bone); color: var(--ink); border-color: var(--bone); }
 
-.hero {
-    position: relative;
-    isolation: isolate;
-    display: flex;
-    align-items: flex-end;
-    min-height: calc(100svh - var(--header-height));
-    overflow: hidden;
-    background:
-        radial-gradient(ellipse 80% 60% at 70% 30%, #2a3540 0%, transparent 70%),
-        linear-gradient(180deg, #1a2129 0%, var(--ink) 100%);
-}
-
-.hero-photo {
-    position: absolute;
-    inset: 0;
-    z-index: -2;
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    filter: saturate(0.6) contrast(1.08);
-}
-
-.hero::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    z-index: -1;
-    background:
-        radial-gradient(ellipse 75% 70% at 50% 40%, transparent 35%, rgb(0 0 0 / 0.8) 100%),
-        linear-gradient(180deg, transparent 45%, var(--ink) 100%);
-}
-
-.hero-content {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 1.25rem;
-    width: 100%;
-    padding: 0 var(--gutter) var(--gutter);
-}
-
-.hero-mark {
-    margin: 0 0 0 -0.03em;
-    font-family: var(--font-display);
-    font-weight: 400;
-    font-size: min(calc((100vw - 2 * var(--gutter)) / 2.47), 58svh);
-    line-height: 0.86;
-    letter-spacing: -0.005em;
-}
-
-.hero-genre {
-    margin: 0;
-    color: var(--fog);
-    font-family: var(--font-mono);
-    font-size: 0.875rem;
-}
-
-.hero-release {
-    border: var(--rule);
-    border-color: var(--fog);
-    padding: 1rem 1.25rem;
-    background: rgb(11 13 16 / 0.6);
-}
-
-.hero-release p {
-    margin: 0;
-    font-family: var(--font-display);
-    font-size: 1.5rem;
-    line-height: 1.1;
-    text-transform: uppercase;
-    letter-spacing: 0.03em;
-}
-
-@media (min-width: 48rem) {
-    .hero-content {
-        grid-template-columns: 1fr minmax(16rem, 24rem);
-        align-items: end;
-    }
-
-    .hero-mark { grid-column: 1 / -1; }
-}
-
 .placeholder {
     display: grid;
     align-content: center;
@@ -262,6 +181,28 @@ img { display: block; max-width: 100%; }
 }
 
 .button:hover { background: var(--bone); color: var(--ink); }
+
+.button-ghost {
+    display: inline-block;
+    padding: calc(0.95rem - 2px) 1.5rem;
+    border: 2px solid var(--bone);
+    color: var(--bone);
+    font-weight: 750;
+    font-stretch: 100%;
+    letter-spacing: 0.02em;
+    text-decoration: none;
+}
+
+.button-ghost:hover { background: var(--bone); color: var(--ink); }
+
+.visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+}
 
 .legal {
     width: 100%;

@@ -1,0 +1,10 @@
+{% if music.releases is not empty %}
+    <section class="releases" id="releases" aria-labelledby="releases-title">
+        {% include 'site/_section_head.html.twig' with {id: 'releases-title', title: 'site.music.releases'|trans} only %}
+        <div class="release-grid">
+            {% for release in music.releases %}
+                {% include 'site/_release.html.twig' %}
+            {% endfor %}
+        </div>
+    </section>
+{% endif %}

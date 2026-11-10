@@ -1,4 +1,5 @@
 shared:
+    invalid_url: '“{url}” is not a secure web address: it must start with https://.'
     not_found: 'This {subject, select, user {account} other {item}} no longer exists.'
     unsupported_image: 'This file is not an image the site can show: use JPEG, PNG, WebP or AVIF.'
     negative_price: 'A price cannot be negative.'
@@ -9,7 +10,13 @@ identity:
     access_denied: 'Your mossyleaf account does not have access to the Injust admin.'
 settings:
     invalid_siren: '“{siren}” is not a valid SIREN: it has 9 digits and passes the Luhn check.'
-    invalid_url: '“{url}” is not a secure web address: it must start with https://.'
     legal_identity_incomplete: 'Fill in every field of the legal identity before switching online checkout on.'
 legal:
     empty_document: 'A legal text needs at least one language filled in.'
+music:
+    invalid_youtube_url: '“{url}” is not a YouTube video link: paste the address of the video page, a youtu.be link or the 11-character video id.'
+    invalid_spotify_url: '“{url}” is not a Spotify album, track or playlist link: paste the open.spotify.com address or the spotify: URI.'
+    invalid_slug: '“{slug}” cannot become a web address: use at least one letter or digit.'
+    slug_taken: 'Another release already uses the address “{slug}”: choose another slug.'
+    invalid_hooks: 'Keep up to {max} hooks, each {length} characters at most.'
+    order_mismatch: 'The new order must list every item exactly once: reload the page and try again.'

@@ -35,8 +35,17 @@
     <meta property="og:title" content="{{ title }}">
     <meta property="og:description" content="{{ site_description }}">
     <meta property="og:url" content="{{ alternates[locale] }}">
-    {% if settings.heroImage %}
-        <meta property="og:image" content="{{ url('media_image', {file: settings.heroImage ~ '.webp'}) }}">
+    {% set share_image = og_image ?? settings.heroImage %}
+    {% set band_photo = band_image ?? settings.heroImage %}
+    {% set band = {'@type': 'MusicGroup', '@id': home ~ '#band', name: brand, url: home, genre: brand_genres} %}
+    {% if band_photo %}
+        {% set band = band|merge({image: url('media_image', {file: band_photo ~ '.webp'})}) %}
+    {% endif %}
+    {% if (band_same_as ?? []) is not empty %}
+        {% set band = band|merge({sameAs: band_same_as}) %}
+    {% endif %}
+    {% if share_image %}
+        <meta property="og:image" content="{{ url('media_image', {file: share_image ~ '.webp'}) }}">
         <meta name="twitter:card" content="summary_large_image">
     {% else %}
         <meta name="twitter:card" content="summary">
@@ -44,9 +53,9 @@
     <script type="application/ld+json">{{ {
         '@context': 'https://schema.org',
         '@graph': [
-            {'@type': 'MusicGroup', '@id': home ~ '#band', name: brand, url: home, genre: brand_genres},
+            band,
             {'@type': 'WebSite', '@id': home ~ '#website', url: home, name: brand, inLanguage: locale, publisher: {'@id': home ~ '#band'}},
-        ],
+        ]|merge(music_graph ?? []),
     }|json_encode(constant('JSON_HEX_TAG') b-or constant('JSON_HEX_AMP') b-or constant('JSON_UNESCAPED_SLASHES') b-or constant('JSON_UNESCAPED_UNICODE'))|raw }}</script>
     {% block preload %}{% endblock %}
 {% endblock %}

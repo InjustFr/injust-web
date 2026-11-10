@@ -30,6 +30,7 @@ final class SettingsApiTest extends WebTestCase
         'mediatorUrl' => 'https://mediator.test',
         'hostName' => 'OVH SAS',
         'hostAddress' => '2 rue Kellermann, 59100 Roubaix',
+        'hostPhone' => '+33 9 72 10 10 07',
     ];
 
     private const array GENERAL = [
@@ -84,12 +85,23 @@ final class SettingsApiTest extends WebTestCase
         self::assertStringContainsString('legal identity', Json::string(Json::decode((string) $client->getResponse()->getContent()), 'detail'));
     }
 
+    public function testCheckoutNeedsTheHostPhone(): void
+    {
+        $client = self::signedInClient();
+        $settings = self::send($client, 'PUT', '/api/admin/settings/legal-identity', array_diff_key(self::IDENTITY, ['hostPhone' => true]));
+        self::assertSame(['', false], [Json::string($settings, 'legal', 'hostPhone'), Json::at($settings, 'legal', 'complete')]);
+
+        $client->jsonRequest('PUT', '/api/admin/settings/checkout', ['enabled' => true]);
+
+        self::assertResponseStatusCodeSame(422);
+    }
+
     public function testCheckoutIsSwitchedOnOnceTheIdentityIsFilled(): void
     {
         $client = self::signedInClient();
 
         $settings = self::send($client, 'PUT', '/api/admin/settings/legal-identity', self::IDENTITY);
-        self::assertSame('443061841', Json::string($settings, 'legal', 'siren'));
+        self::assertSame(['443061841', '+33 9 72 10 10 07', true], [Json::string($settings, 'legal', 'siren'), Json::string($settings, 'legal', 'hostPhone'), Json::at($settings, 'legal', 'complete')]);
 
         $settings = self::send($client, 'PUT', '/api/admin/settings/checkout', ['enabled' => true]);
         self::assertTrue(Json::at($settings, 'onlineCheckout'));
@@ -179,10 +191,13 @@ final class SettingsApiTest extends WebTestCase
         $client->jsonRequest('PUT', '/api/admin/settings/legal-identity', ['phone' => str_repeat('1', 41)] + self::IDENTITY);
         self::assertResponseStatusCodeSame(422);
 
+        $client->jsonRequest('PUT', '/api/admin/settings/legal-identity', ['hostPhone' => str_repeat('1', 41)] + self::IDENTITY);
+        self::assertResponseStatusCodeSame(422);
+
         $client->jsonRequest('PUT', '/api/admin/settings/general', ['vatMentions' => ['consumer' => str_repeat('a', 256), 'euBusiness' => 'B', 'nonEuBusiness' => 'C']] + self::GENERAL);
         self::assertResponseStatusCodeSame(422);
 
-        self::send($client, 'PUT', '/api/admin/settings/legal-identity', ['phone' => str_repeat('1', 40), 'hostName' => str_repeat('h', 255)] + self::IDENTITY);
+        self::send($client, 'PUT', '/api/admin/settings/legal-identity', ['phone' => str_repeat('1', 40), 'hostName' => str_repeat('h', 255), 'hostPhone' => str_repeat('1', 40)] + self::IDENTITY);
     }
 
     public function testAnUploadWithoutAFileIsRefused(): void

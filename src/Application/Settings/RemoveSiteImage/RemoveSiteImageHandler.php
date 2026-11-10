@@ -5,8 +5,7 @@ declare(strict_types=1);
 namespace App\Application\Settings\RemoveSiteImage;
 
 use App\Application\Settings\SettingsView;
-use App\Application\Shared\ImageStorage;
-use App\Application\Shared\ResizedImage;
+use App\Application\Shared\Images;
 use App\Application\Transaction;
 use App\Domain\Settings\SettingsRepository;
 
@@ -14,7 +13,7 @@ final readonly class RemoveSiteImageHandler
 {
     public function __construct(
         private SettingsRepository $settings,
-        private ImageStorage $storage,
+        private Images $images,
         private Transaction $transaction,
     ) {
     }
@@ -24,9 +23,7 @@ final readonly class RemoveSiteImageHandler
         $settings = $this->settings->current();
         $previous = $settings->removeImage($command->slot);
         $this->transaction->commit();
-        if (null !== $previous) {
-            $this->storage->delete($previous.'.'.ResizedImage::EXTENSION);
-        }
+        $this->images->discard($previous);
 
         return SettingsView::of($settings);
     }

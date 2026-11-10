@@ -32,6 +32,7 @@ final readonly class EditLegalIdentityHandler
             $command->mediatorUrl,
             $command->hostName,
             $command->hostAddress,
+            $command->hostPhone,
         ));
         $this->settings->save($settings);
         $this->transaction->commit();

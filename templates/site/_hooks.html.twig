@@ -1,0 +1,7 @@
+{% if music.text.hooks is not empty %}
+    <section class="hooks" id="hooks" lang="en" aria-label="{{ 'site.music.hooks'|trans }}">
+        {% for hook in music.text.hooks %}
+            <p class="hook hook-{{ loop.index0 % 4 }}{{ hook|length > 36 ? ' hook-long' }}">{{ hook }}</p>
+        {% endfor %}
+    </section>
+{% endif %}

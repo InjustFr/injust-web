@@ -5,7 +5,8 @@
         "site": "Public site",
         "signOut": "Sign out",
         "settings": "Settings",
-        "legal": "Legal texts"
+        "legal": "Legal texts",
+        "music": "Music"
     },
     "dashboard": {
         "title": "Dashboard",
@@ -44,7 +45,8 @@
             "mediatorName": "Consumer mediator",
             "mediatorUrl": "Mediator website",
             "hostName": "Host",
-            "hostAddress": "Host address"
+            "hostAddress": "Host address",
+            "hostPhone": "Host phone"
         },
         "general": {
             "title": "General",
@@ -91,5 +93,101 @@
         "save": "Save",
         "saved": "Text saved.",
         "missing": "This document has not been created yet."
+    },
+    "music": {
+        "title": "Music",
+        "subtitle": "Releases, videos, texts and links shown on the music home.",
+        "tabs": {
+            "releases": "Releases",
+            "videos": "Videos",
+            "texts": "Texts",
+            "links": "Social links"
+        },
+        "saved": "Saved.",
+        "save": "Save",
+        "add": "Add",
+        "edit": "Edit",
+        "delete": "Delete",
+        "remove": "Remove",
+        "upload": "Upload",
+        "moveUp": "Move up",
+        "moveDown": "Move down",
+        "releases": {
+            "new": "New release",
+            "edit": "Edit release",
+            "empty": "No release yet.",
+            "upcoming": "upcoming",
+            "featured": "Feature on the home",
+            "types": {
+                "single": "Single",
+                "ep": "EP",
+                "album": "Album"
+            },
+            "titleField": "Title",
+            "slug": "Slug",
+            "slugHint": "Leave empty to derive it from the title.",
+            "type": "Type",
+            "date": "Release date",
+            "description": "Description ({language})",
+            "tracks": "Tracks",
+            "paste": "Paste a track list",
+            "pasteHint": "One track per line, e.g. \"1. Title 3:45\".",
+            "fill": "Fill the tracks",
+            "trackTitle": "Track title",
+            "trackDuration": "Duration (m:ss)",
+            "addTrack": "Add a track",
+            "links": "Platform links",
+            "addLink": "Add a link",
+            "smartLink": "Smart link",
+            "spotify": "Spotify URL or URI",
+            "cover": "Cover"
+        },
+        "platforms": {
+            "spotify": "Spotify",
+            "apple-music": "Apple Music",
+            "deezer": "Deezer",
+            "youtube-music": "YouTube Music",
+            "youtube": "YouTube",
+            "bandcamp": "Bandcamp",
+            "tidal": "Tidal",
+            "amazon-music": "Amazon Music",
+            "soundcloud": "SoundCloud",
+            "other": "Other"
+        },
+        "networks": {
+            "instagram": "Instagram",
+            "tiktok": "TikTok",
+            "youtube": "YouTube",
+            "spotify": "Spotify",
+            "facebook": "Facebook",
+            "bandcamp": "Bandcamp",
+            "soundcloud": "SoundCloud",
+            "linktree": "Linktree",
+            "x": "X",
+            "threads": "Threads",
+            "other": "Other"
+        },
+        "videos": {
+            "url": "YouTube link or id",
+            "title": "Title",
+            "empty": "No video yet."
+        },
+        "links": {
+            "network": "Network",
+            "url": "URL",
+            "label": "Label",
+            "empty": "No social link yet."
+        },
+        "texts": {
+            "tagline": "Tagline ({language})",
+            "manifesto": "Manifesto, Markdown ({language})",
+            "bio": "Bio, Markdown ({language})",
+            "hooks": "Lyric hooks",
+            "hooksHint": "One English line per row, 12 lines max."
+        },
+        "portrait": {
+            "title": "Portrait",
+            "none": "No portrait."
+        }
     }
 }

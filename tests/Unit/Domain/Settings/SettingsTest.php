@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace App\Tests\Unit\Domain\Settings;
 
-use App\Domain\Settings\Exception\InvalidUrl;
 use App\Domain\Settings\Exception\LegalIdentityIncomplete;
 use App\Domain\Settings\Section;
 use App\Domain\Settings\Settings;
 use App\Domain\Settings\SiteImage;
 use App\Domain\Settings\VatMentions;
+use App\Domain\Shared\Exception\InvalidUrl;
 use App\Domain\Shared\LocalizedText;
 use PHPUnit\Framework\TestCase;
 
@@ -49,6 +49,16 @@ final class SettingsTest extends TestCase
         $this->expectException(LegalIdentityIncomplete::class);
 
         Settings::initial()->enableOnlineCheckout();
+    }
+
+    public function testCheckoutNeedsTheHostPhone(): void
+    {
+        $settings = Settings::initial();
+        $settings->editLegalIdentity(LegalIdentityTest::complete(hostPhone: ''));
+
+        $this->expectException(LegalIdentityIncomplete::class);
+
+        $settings->enableOnlineCheckout();
     }
 
     public function testCheckoutIsSwitchedOnOnceTheIdentityIsComplete(): void

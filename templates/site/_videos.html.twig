@@ -1,0 +1,22 @@
+{% if music.videos is not empty %}
+    <section class="videos" id="videos" aria-labelledby="videos-title">
+        {% include 'site/_section_head.html.twig' with {id: 'videos-title', title: 'site.music.videos'|trans} only %}
+        <ul class="video-grid">
+            {% for video in music.videos %}
+                {% set thumbnail = video.thumbnail ? path('media_image', {file: video.thumbnail ~ '.webp'}) : null %}
+                <li class="video">
+                    <div class="video-facade" data-island="VideoFacade" data-props="{{ {youtubeId: video.youtubeId, title: video.title, thumbnail: thumbnail, play: 'site.music.play'|trans({title: video.title})}|json_encode }}">
+                        <a class="video-button" href="{{ video.watchUrl }}" rel="noopener">
+                            {% if thumbnail %}
+                                <img src="{{ thumbnail }}" alt="" width="1280" height="720" loading="lazy">
+                            {% endif %}
+                            <span class="video-play" aria-hidden="true"></span>
+                            <span class="visually-hidden">{{ 'site.music.youtube_open'|trans }}</span>
+                        </a>
+                    </div>
+                    <p class="video-title">{{ video.title }}</p>
+                </li>
+            {% endfor %}
+        </ul>
+    </section>
+{% endif %}

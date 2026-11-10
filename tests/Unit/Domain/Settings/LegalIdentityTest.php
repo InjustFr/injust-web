@@ -5,23 +5,23 @@ declare(strict_types=1);
 namespace App\Tests\Unit\Domain\Settings;
 
 use App\Domain\Settings\Exception\InvalidSiren;
-use App\Domain\Settings\Exception\InvalidUrl;
 use App\Domain\Settings\LegalIdentity;
+use App\Domain\Shared\Exception\InvalidUrl;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 final class LegalIdentityTest extends TestCase
 {
-    public static function complete(string $siren = '443061841', string $phone = '+33 6 00 00 00 00', string $mediatorUrl = 'https://mediator.test'): LegalIdentity
+    public static function complete(string $siren = '443061841', string $phone = '+33 6 00 00 00 00', string $mediatorUrl = 'https://mediator.test', string $hostPhone = '+33 9 72 10 10 07'): LegalIdentity
     {
-        return new LegalIdentity('Louis Injust', 'EI', $siren, '1 rue du Son, 75000 Paris', 'louis@injust.test', $phone, 'Louis Injust', 'Médiateur Test', $mediatorUrl, 'OVH SAS', '2 rue Kellermann, 59100 Roubaix');
+        return new LegalIdentity('Louis Injust', 'EI', $siren, '1 rue du Son, 75000 Paris', 'louis@injust.test', $phone, 'Louis Injust', 'Médiateur Test', $mediatorUrl, 'OVH SAS', '2 rue Kellermann, 59100 Roubaix', $hostPhone);
     }
 
     public function testABlankIdentityIsAnIndividualBusinessWithNothingElse(): void
     {
         $identity = LegalIdentity::blank();
 
-        self::assertSame(['EI', '', ''], [$identity->businessForm, $identity->name, $identity->siren]);
+        self::assertSame(['EI', '', '', ''], [$identity->businessForm, $identity->name, $identity->siren, $identity->hostPhone]);
         self::assertFalse($identity->isComplete());
     }
 
@@ -34,13 +34,14 @@ final class LegalIdentityTest extends TestCase
     {
         self::assertFalse(self::complete(phone: ' ')->isComplete());
         self::assertFalse(self::complete(siren: '')->isComplete());
+        self::assertFalse(self::complete(hostPhone: ' ')->isComplete());
     }
 
     public function testEveryFieldIsTrimmed(): void
     {
-        $identity = new LegalIdentity(' N ', ' EI ', ' 443061841 ', ' A ', ' e@x.test ', ' P ', ' D ', ' M ', ' https://m.test ', ' H ', ' HA ');
+        $identity = new LegalIdentity(' N ', ' EI ', ' 443061841 ', ' A ', ' e@x.test ', ' P ', ' D ', ' M ', ' https://m.test ', ' H ', ' HA ', ' HP ');
 
-        self::assertSame(['N', 'EI', '443061841', 'A', 'e@x.test', 'P', 'D', 'M', 'https://m.test', 'H', 'HA'], array_values(get_object_vars($identity)));
+        self::assertSame(['N', 'EI', '443061841', 'A', 'e@x.test', 'P', 'D', 'M', 'https://m.test', 'H', 'HA', 'HP'], array_values(get_object_vars($identity)));
     }
 
     public function testTheSirenIsKeptWithoutSpaces(): void

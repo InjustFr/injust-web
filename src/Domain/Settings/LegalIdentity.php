@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Domain\Settings;
 
 use App\Domain\Settings\Exception\InvalidSiren;
+use App\Domain\Shared\HttpsUrl;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Embeddable]
@@ -47,6 +48,9 @@ final readonly class LegalIdentity
     #[ORM\Column(type: 'text')]
     public string $hostAddress;
 
+    #[ORM\Column(length: self::MAX_PHONE)]
+    public string $hostPhone;
+
     public function __construct(
         string $name,
         string $businessForm,
@@ -59,6 +63,7 @@ final readonly class LegalIdentity
         string $mediatorUrl,
         string $hostName,
         string $hostAddress,
+        string $hostPhone,
     ) {
         $this->name = trim($name);
         $this->businessForm = trim($businessForm);
@@ -71,11 +76,12 @@ final readonly class LegalIdentity
         $this->mediatorUrl = HttpsUrl::orBlank($mediatorUrl);
         $this->hostName = trim($hostName);
         $this->hostAddress = trim($hostAddress);
+        $this->hostPhone = trim($hostPhone);
     }
 
     public static function blank(): self
     {
-        return new self('', 'EI', '', '', '', '', '', '', '', '', '');
+        return new self('', 'EI', '', '', '', '', '', '', '', '', '', '');
     }
 
     public function isComplete(): bool

@@ -62,6 +62,7 @@ trait ConfiguresSite
             'https://mediator.test',
             'OVH SAS',
             '2 rue Kellermann, 59100 Roubaix',
+            '+33 9 72 10 10 07',
         ));
     }
 

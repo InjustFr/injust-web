@@ -1,4 +1,5 @@
 shared:
+    invalid_url: '« {url} » n’est pas une adresse web sécurisée : elle doit commencer par https://.'
     not_found: '{subject, select, user {Ce compte n’existe} other {Cet élément n’existe}} plus.'
     unsupported_image: 'Ce fichier n’est pas une image que le site peut afficher : utilisez du JPEG, PNG, WebP ou AVIF.'
     negative_price: 'Un prix ne peut pas être négatif.'
@@ -9,7 +10,13 @@ identity:
     access_denied: 'Votre compte mossyleaf n’a pas accès à l’admin d’Injust.'
 settings:
     invalid_siren: '« {siren} » n’est pas un SIREN valide : il compte 9 chiffres et passe le contrôle de Luhn.'
-    invalid_url: '« {url} » n’est pas une adresse web sécurisée : elle doit commencer par https://.'
     legal_identity_incomplete: 'Remplissez tous les champs de l’identité légale avant d’activer le paiement en ligne.'
 legal:
     empty_document: 'Un texte légal doit être rempli dans au moins une langue.'
+music:
+    invalid_youtube_url: '« {url} » n’est pas un lien de vidéo YouTube : collez l’adresse de la page de la vidéo, un lien youtu.be ou l’identifiant de 11 caractères.'
+    invalid_spotify_url: '« {url} » n’est pas un lien Spotify d’album, de titre ou de playlist : collez l’adresse open.spotify.com ou l’URI spotify:.'
+    invalid_slug: '« {slug} » ne peut pas devenir une adresse web : utilisez au moins une lettre ou un chiffre.'
+    slug_taken: 'Une autre sortie utilise déjà l’adresse « {slug} » : choisissez un autre slug.'
+    invalid_hooks: 'Gardez au plus {max} phrases, de {length} caractères au maximum chacune.'
+    order_mismatch: 'Le nouvel ordre doit lister chaque élément une seule fois : rechargez la page et réessayez.'

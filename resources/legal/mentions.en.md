@@ -15,7 +15,7 @@ The website {siteUrl} is published by {name}, {businessForm} (French sole propri
 
 ## Host
 
-{hostName}, {hostAddress}
+{hostName}, {hostAddress}, {hostPhone}
 
 ## Intellectual property
 

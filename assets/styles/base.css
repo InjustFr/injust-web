@@ -1,6 +1,6 @@
 *, *::before, *::after { box-sizing: border-box; }
 
-html { color-scheme: light; background: var(--color-bg); }
+html { color-scheme: dark; background: var(--color-bg); }
 
 body {
     margin: 0;
@@ -14,7 +14,7 @@ body {
 }
 
 h1, h2, h3 { margin: 0; line-height: 1.2; font-weight: 400; color: var(--color-ink); }
-h1 { font-family: var(--font-display); font-size: 1.9rem; }
+h1 { font-family: var(--font-display); font-size: 2.1rem; letter-spacing: 0.01em; text-transform: uppercase; }
 h2 { font-family: var(--font-body); font-size: var(--font-size); font-weight: 600; }
 h3 { font-size: var(--font-size); font-weight: 600; }
 
@@ -83,7 +83,7 @@ button, input, select, textarea { font: inherit; color: inherit; }
 .modal { position: fixed; inset: 0; z-index: 50; display: grid; place-items: center; padding: var(--space-4); background: var(--color-backdrop); animation: fade-in var(--transition); }
 .modal__panel { display: flex; flex-direction: column; gap: var(--space-4); width: min(32rem, 100%); max-height: calc(100vh - 2rem); overflow: auto; padding: var(--space-6); border: 0.0625rem solid var(--color-border); border-radius: var(--radius); background: var(--color-surface); box-shadow: var(--shadow); }
 .modal__header { display: flex; align-items: center; justify-content: space-between; gap: var(--space-3); }
-.modal__title { margin: 0; font-family: var(--font-display); font-size: 1.5rem; font-weight: 400; }
+.modal__title { margin: 0; font-family: var(--font-display); font-size: 1.5rem; font-weight: 400; text-transform: uppercase; }
 .modal__close { display: inline-flex; padding: var(--space-2); border: none; border-radius: var(--radius-pill); background: none; color: var(--color-muted); cursor: pointer; }
 .modal__close:hover { color: var(--color-ink); background: var(--color-hover); }
 .modal__body { display: flex; flex-direction: column; gap: var(--space-4); }

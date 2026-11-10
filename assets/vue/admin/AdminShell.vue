@@ -1,5 +1,5 @@
 <script setup>
-import { ExternalLink, FileText, LayoutDashboard, LogOut, Settings } from '@lucide/vue';
+import { ExternalLink, FileText, LayoutDashboard, LogOut, Music, Settings } from '@lucide/vue';
 import { ConfigProvider, TooltipProvider } from 'reka-ui';
 import { useI18n } from 'vue-i18n';
 import ToastHost from '../components/ui/ToastHost.vue';
@@ -11,6 +11,7 @@ const session = useSession();
 
 const SECTIONS = [
     { name: 'dashboard', icon: LayoutDashboard },
+    { name: 'music', icon: Music },
     { name: 'settings', icon: Settings },
     { name: 'legal', icon: FileText },
 ];
@@ -71,6 +72,7 @@ const SECTIONS = [
     color: var(--color-ink);
     font-family: var(--font-display);
     font-size: 1.25rem;
+    text-transform: uppercase;
     text-decoration: none;
 }
 

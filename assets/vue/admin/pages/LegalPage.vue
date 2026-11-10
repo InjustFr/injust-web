@@ -59,5 +59,5 @@ async function save() {
 .legal-page__form { display: flex; flex-direction: column; gap: var(--space-3); }
 .legal-page__form > .button { align-self: flex-start; }
 .legal-page__meta { color: var(--color-muted); font-size: var(--font-size-sm); }
-.legal-page__form :deep(textarea) { font-family: ui-monospace, monospace; }
+.legal-page__form :deep(textarea) { font-family: var(--font-mono); }
 </style>

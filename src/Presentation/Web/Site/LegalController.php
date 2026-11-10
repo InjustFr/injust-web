@@ -59,6 +59,7 @@ final readonly class LegalController
             'mediatorUrl' => $legal->mediatorUrl,
             'hostName' => $legal->hostName,
             'hostAddress' => $legal->hostAddress,
+            'hostPhone' => $legal->hostPhone,
             'vatMention' => $settings->vatMentions->consumer,
             'siteUrl' => $request->getSchemeAndHttpHost(),
             'updatedAt' => (string) $date->format($document->updatedAt),

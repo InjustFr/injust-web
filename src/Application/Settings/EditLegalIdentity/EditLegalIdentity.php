@@ -18,6 +18,7 @@ final readonly class EditLegalIdentity
         public string $mediatorUrl,
         public string $hostName,
         public string $hostAddress,
+        public string $hostPhone,
     ) {
     }
 }

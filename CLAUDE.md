@@ -54,6 +54,17 @@ Layer-first: `src/{Domain,Application,Infrastructure,Presentation}/<Context>/`, 
 - Public site: localized routes `home`, `section`, `legal` (EN `/…`, FR `/fr/…`); `SectionGate::hiddenFromVisitors(Section)` gates each section (404 for visitors, banner for a signed-in admin); render through `SitePage::render`. Later sections replace `SectionController`. Islands live in `assets/vue/site/islands/<Name>.vue`, mounted from `[data-island]`.
 - e2e specs use `e2e/tests/support/test.js`, which fails any test on a CSP violation.
 
+## M1 Music
+
+- `Domain/Music`: `Release` (English title, unique slug, `ReleaseType` single|ep|album, date, cover, localized description, `Track` and `PlatformLink` JSON lists, `smartLinkUrl`, `SpotifyEmbed`, one `featured` at most: `FeatureRelease` unfeatures the others), `Video` (`YoutubeId`, thumbnail fetched through the `VideoThumbnails` port, `Infrastructure\Youtube\HttpVideoThumbnails`, failure = no thumbnail), `SocialLink`, single-row `MusicText` (tagline, manifesto, bio, hooks, portrait). `HttpsUrl` lives in `Domain/Shared`.
+- A release comes out at midnight `Release::TIMEZONE` (Europe/Paris): `releaseAt()` is that instant, `isUpcoming($now)` compares to it, `ReleaseView::releaseAt` (ATOM, with offset) is the countdown target.
+- `Application\Music\MusicQueries`: `home($now)` returns `HomeView`; admin reads `releases($now)`, `videos()`, `socialLinks()`, `text()`. Order endpoints demand exactly the existing id set (`OrderMismatch`).
+- Image files go through `Application\Shared\Images` (`store()` a resized image, `discard()` the previous one after commit).
+- `musicForm.js` mirrors the `ReleaseType`, `Platform` and `SocialNetwork` cases; `AdminOptionsParityTest` fails when they drift.
+- Admin API `/api/admin/music[/releases|/videos|/links|/text|/portrait]`, page `/admin/music` (`pages/MusicPage.vue`, logic in `musicForm.js`).
+- Public home: `HomeController` renders `templates/site/home.html.twig` partials; JSON-LD through `Site\MusicStructuredData`. Islands `Countdown`, `SpotifyPlayer`, `VideoFacade`: embeds load only after a click (CSP `frame-src` youtube-nocookie + open.spotify.com, no third-party request on load).
+- Tests: `Tests\Support\FakeYoutube` decorates `http_client`; e2e `e2e/tests/music.spec.js`.
+
 ## Accounts & security
 
 - Sign-in = mossyleaf accounts (Authentik at `accounts.mossyleaf.studio`, project `~/Sites/mossyleaf-studio/accounts`), OIDC code flow + PKCE, client id `injust`. Only accounts whose `groups` claim contains `OIDC_REQUIRED_GROUP` (`injust`) get in; dev leaves it empty.

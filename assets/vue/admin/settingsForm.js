@@ -1,6 +1,6 @@
 export const LEGAL_KINDS = ['mentions', 'privacy', 'cgv-lessons', 'cgv-production', 'cgv-beats', 'licence'];
 
-const IDENTITY_FIELDS = ['name', 'businessForm', 'siren', 'address', 'email', 'phone', 'publicationDirector', 'mediatorName', 'mediatorUrl', 'hostName', 'hostAddress'];
+const IDENTITY_FIELDS = ['name', 'businessForm', 'siren', 'address', 'email', 'phone', 'publicationDirector', 'mediatorName', 'mediatorUrl', 'hostName', 'hostAddress', 'hostPhone'];
 
 export function isSirenValid(value) {
     const digits = String(value).replace(/\s/g, '');

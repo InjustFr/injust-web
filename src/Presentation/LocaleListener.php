@@ -20,11 +20,11 @@ final readonly class LocaleListener
     #[AsEventListener(event: KernelEvents::REQUEST, priority: 30)]
     public function __invoke(RequestEvent $event): void
     {
-        if (!$event->isMainRequest()) {
+        $request = $event->getRequest();
+        if (!$event->isMainRequest() || $request->attributes->has('_locale')) {
             return;
         }
 
-        $request = $event->getRequest();
         $locale = $request->getPreferredLanguage(self::LOCALES) ?? self::LOCALES[0];
         $request->setLocale($locale);
         $this->locales->setLocale($locale);

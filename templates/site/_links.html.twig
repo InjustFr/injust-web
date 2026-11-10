@@ -1,0 +1,15 @@
+{% if music.socialLinks is not empty %}
+    <section class="links" id="links" aria-labelledby="links-title">
+        {% include 'site/_section_head.html.twig' with {id: 'links-title', title: 'site.music.links'|trans} only %}
+        <ul class="link-list">
+            {% for link in music.socialLinks %}
+                <li>
+                    <a class="link" href="{{ link.url }}" rel="me noopener">
+                        <span class="link-name">{{ link.label ?: ('site.networks.' ~ link.network)|trans }}</span>
+                        <span class="link-arrow" aria-hidden="true">↗</span>
+                    </a>
+                </li>
+            {% endfor %}
+        </ul>
+    </section>
+{% endif %}

@@ -5,7 +5,8 @@
         "site": "Site public",
         "signOut": "Se déconnecter",
         "settings": "Réglages",
-        "legal": "Textes légaux"
+        "legal": "Textes légaux",
+        "music": "Musique"
     },
     "dashboard": {
         "title": "Tableau de bord",
@@ -44,7 +45,8 @@
             "mediatorName": "Médiateur de la consommation",
             "mediatorUrl": "Site du médiateur",
             "hostName": "Hébergeur",
-            "hostAddress": "Adresse de l’hébergeur"
+            "hostAddress": "Adresse de l’hébergeur",
+            "hostPhone": "Téléphone de l’hébergeur"
         },
         "general": {
             "title": "Général",
@@ -91,5 +93,101 @@
         "save": "Enregistrer",
         "saved": "Texte enregistré.",
         "missing": "Ce document n’a pas encore été créé."
+    },
+    "music": {
+        "title": "Musique",
+        "subtitle": "Sorties, vidéos, textes et liens affichés sur l'accueil musique.",
+        "tabs": {
+            "releases": "Sorties",
+            "videos": "Vidéos",
+            "texts": "Textes",
+            "links": "Réseaux"
+        },
+        "saved": "Enregistré.",
+        "save": "Enregistrer",
+        "add": "Ajouter",
+        "edit": "Modifier",
+        "delete": "Supprimer",
+        "remove": "Retirer",
+        "upload": "Téléverser",
+        "moveUp": "Monter",
+        "moveDown": "Descendre",
+        "releases": {
+            "new": "Nouvelle sortie",
+            "edit": "Modifier la sortie",
+            "empty": "Aucune sortie.",
+            "upcoming": "à venir",
+            "featured": "Mettre en avant sur l'accueil",
+            "types": {
+                "single": "Single",
+                "ep": "EP",
+                "album": "Album"
+            },
+            "titleField": "Titre",
+            "slug": "Slug",
+            "slugHint": "Laisser vide pour le dériver du titre.",
+            "type": "Type",
+            "date": "Date de sortie",
+            "description": "Description ({language})",
+            "tracks": "Titres",
+            "paste": "Coller une liste de titres",
+            "pasteHint": "Un titre par ligne, ex. « 1. Titre 3:45 ».",
+            "fill": "Remplir les titres",
+            "trackTitle": "Titre du morceau",
+            "trackDuration": "Durée (m:ss)",
+            "addTrack": "Ajouter un titre",
+            "links": "Liens plateformes",
+            "addLink": "Ajouter un lien",
+            "smartLink": "Smart link",
+            "spotify": "URL ou URI Spotify",
+            "cover": "Pochette"
+        },
+        "platforms": {
+            "spotify": "Spotify",
+            "apple-music": "Apple Music",
+            "deezer": "Deezer",
+            "youtube-music": "YouTube Music",
+            "youtube": "YouTube",
+            "bandcamp": "Bandcamp",
+            "tidal": "Tidal",
+            "amazon-music": "Amazon Music",
+            "soundcloud": "SoundCloud",
+            "other": "Autre"
+        },
+        "networks": {
+            "instagram": "Instagram",
+            "tiktok": "TikTok",
+            "youtube": "YouTube",
+            "spotify": "Spotify",
+            "facebook": "Facebook",
+            "bandcamp": "Bandcamp",
+            "soundcloud": "SoundCloud",
+            "linktree": "Linktree",
+            "x": "X",
+            "threads": "Threads",
+            "other": "Autre"
+        },
+        "videos": {
+            "url": "Lien YouTube ou identifiant",
+            "title": "Titre",
+            "empty": "Aucune vidéo."
+        },
+        "links": {
+            "network": "Réseau",
+            "url": "URL",
+            "label": "Libellé",
+            "empty": "Aucun lien."
+        },
+        "texts": {
+            "tagline": "Accroche ({language})",
+            "manifesto": "Manifeste, Markdown ({language})",
+            "bio": "Bio, Markdown ({language})",
+            "hooks": "Phrases d'accroche",
+            "hooksHint": "Une ligne en anglais par ligne, 12 maximum."
+        },
+        "portrait": {
+            "title": "Portrait",
+            "none": "Aucun portrait."
+        }
     }
 }

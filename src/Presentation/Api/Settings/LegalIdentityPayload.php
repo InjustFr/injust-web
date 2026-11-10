@@ -30,6 +30,8 @@ final readonly class LegalIdentityPayload
         #[Assert\Length(max: LegalIdentity::MAX_TEXT)]
         public string $hostName = '',
         public string $hostAddress = '',
+        #[Assert\Length(max: LegalIdentity::MAX_PHONE)]
+        public string $hostPhone = '',
     ) {
     }
 }

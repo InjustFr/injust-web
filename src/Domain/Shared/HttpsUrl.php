@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace App\Domain\Settings;
+namespace App\Domain\Shared;
 
-use App\Domain\Settings\Exception\InvalidUrl;
+use App\Domain\Shared\Exception\InvalidUrl;
 
 final class HttpsUrl
 {
@@ -16,5 +16,12 @@ final class HttpsUrl
         }
 
         return $url;
+    }
+
+    public static function of(string $url): string
+    {
+        $url = self::orBlank($url);
+
+        return '' === $url ? throw new InvalidUrl($url) : $url;
     }
 }

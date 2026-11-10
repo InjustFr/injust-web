@@ -45,6 +45,8 @@ test('identity form copies the legal identity and payload trims it', () => {
 
 test('identity form defaults missing fields to empty strings', () => {
     expect(identityForm({}).hostName).toBe('');
+    expect(identityForm({ hostPhone: '+33 1' }).hostPhone).toBe('+33 1');
+    expect(identityForm({})).toHaveProperty('hostPhone', '');
     expect(identityForm({}).businessForm).toBe('EI');
 });
 

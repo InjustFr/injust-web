@@ -30,6 +30,7 @@ const FIELDS = [
     { name: 'mediatorUrl', type: 'url' },
     { name: 'hostName', type: 'text' },
     { name: 'hostAddress', type: 'text' },
+    { name: 'hostPhone', type: 'tel' },
 ];
 
 async function save() {

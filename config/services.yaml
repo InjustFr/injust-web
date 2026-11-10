@@ -25,3 +25,7 @@ when@test:
         App\Tests\Support\FakeAccounts:
             decorates: http_client
             arguments: ['@.inner']
+
+        App\Tests\Support\FakeYoutube:
+            decorates: http_client
+            arguments: ['@.inner']

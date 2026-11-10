@@ -13,7 +13,7 @@ Le site {siteUrl} est édité par {name}, {businessForm} (entrepreneur individue
 
 ## Hébergeur
 
-{hostName}, {hostAddress}
+{hostName}, {hostAddress}, {hostPhone}
 
 ## Propriété intellectuelle
 

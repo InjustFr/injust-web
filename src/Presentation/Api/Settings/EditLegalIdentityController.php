@@ -28,6 +28,7 @@ final class EditLegalIdentityController extends AbstractController
             $payload->mediatorUrl,
             $payload->hostName,
             $payload->hostAddress,
+            $payload->hostPhone,
         )));
     }
 }

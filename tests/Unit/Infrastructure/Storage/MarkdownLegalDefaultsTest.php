@@ -11,6 +11,7 @@ use PHPUnit\Framework\TestCase;
 final class MarkdownLegalDefaultsTest extends TestCase
 {
     private const string FIXTURES = __DIR__.'/../../../Fixtures/legal';
+    private const string RESOURCES = __DIR__.'/../../../../resources/legal';
 
     public function testEachLanguageIsReadFromItsMarkdownFile(): void
     {
@@ -28,5 +29,22 @@ final class MarkdownLegalDefaultsTest extends TestCase
 
         self::assertSame(['# Politique de confidentialité', ''], [$defaults->body(LegalKind::Privacy)->fr, $defaults->body(LegalKind::Privacy)->en]);
         self::assertTrue($defaults->body(LegalKind::Licence)->isEmpty());
+    }
+
+    public function testTheLegalNoticeNamesTheHostPhone(): void
+    {
+        $body = new MarkdownLegalDefaults(self::RESOURCES)->body(LegalKind::Mentions);
+
+        self::assertStringContainsString('{hostName}, {hostAddress}, {hostPhone}', $body->fr);
+        self::assertStringContainsString('{hostName}, {hostAddress}, {hostPhone}', $body->en);
+    }
+
+    public function testEveryVatMentionEndsItsSentenceOnce(): void
+    {
+        foreach (glob(self::RESOURCES.'/*.md') ?: [] as $file) {
+            $text = (string) file_get_contents($file);
+            self::assertSame(substr_count($text, '{vatMention}'), substr_count($text, '{vatMention}.'), $file);
+            self::assertStringNotContainsString('{vatMention}..', $text, $file);
+        }
     }
 }
