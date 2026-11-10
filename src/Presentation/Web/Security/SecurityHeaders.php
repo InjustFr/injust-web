@@ -64,7 +64,7 @@ final readonly class SecurityHeaders
         return implode('; ', [
             "default-src 'self'",
             "script-src 'self'",
-            "style-src 'self'",
+            "style-src 'self' 'sha256-60LHlRjW/B3CtzIoE/Lf1/NEDvko9efWMFaGVhHu/cs='",
             "img-src 'self' data:",
             "font-src 'self'",
             "connect-src 'self'",

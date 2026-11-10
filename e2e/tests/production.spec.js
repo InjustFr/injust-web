@@ -14,7 +14,7 @@ async function setProduction(page, on) {
     else await expect(toggle).not.toBeChecked();
 }
 
-test('the admin adds a service, the visitor writes from it with it prefilled', async ({ page, visitorPage }) => {
+test('the admin adds a quote service, the visitor requests a quote with it prefilled', async ({ page, visitorPage }) => {
     await signIn(page);
     await setProduction(page, true);
 
@@ -23,14 +23,16 @@ test('the admin adds a service, the visitor writes from it with it prefilled', a
     const dialog = page.getByRole('dialog');
     await dialog.locator('input[name="title-en"]').fill(TITLE);
     await dialog.locator('input[name="title-fr"]').fill('Service E2E');
+    await dialog.locator('[role="combobox"][name="pricing"]').click();
+    await page.getByRole('option', { name: 'On quote' }).click();
     await dialog.locator('input[name="price"]').fill('250');
     await dialog.getByRole('button', { name: 'Save', exact: true }).click();
     await expect(page.locator('.rows__item', { hasText: TITLE })).toBeVisible();
 
     await visitorPage.goto('/production');
     const card = visitorPage.locator('.service', { hasText: TITLE });
-    await expect(card.locator('.offer-price')).toContainText('250');
-    await card.getByRole('link', { name: 'Contact me' }).click();
+    await expect(card.locator('.offer-price')).toContainText('from €250');
+    await card.getByRole('link', { name: 'Request a quote' }).click();
     await expect(visitorPage).toHaveURL(/\/contact\?topic=production&offer=/);
     await expect(visitorPage.locator('.contact-offer-name')).toHaveText(TITLE);
 
