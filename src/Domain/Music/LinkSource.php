@@ -8,4 +8,5 @@ enum LinkSource: string
 {
     case Manual = 'manual';
     case Auto = 'auto';
+    case Search = 'search';
 }

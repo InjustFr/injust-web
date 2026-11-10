@@ -1,6 +1,6 @@
 export const PUBLIC_ORDER = ['spotify', 'apple-music', 'youtube-music', 'deezer', 'tidal', 'amazon-music', 'youtube', 'bandcamp', 'soundcloud', 'other'];
 
-const ENV_KEYS = { spotify: ['SPOTIFY_CLIENT_ID', 'SPOTIFY_CLIENT_SECRET'], tidal: ['TIDAL_CLIENT_ID', 'TIDAL_CLIENT_SECRET'] };
+const ENV_KEYS = { spotify: ['SPOTIFY_CLIENT_ID', 'SPOTIFY_CLIENT_SECRET'], tidal: ['TIDAL_CLIENT_ID', 'TIDAL_CLIENT_SECRET'], 'youtube-music': ['YOUTUBE_API_KEY'], youtube: ['YOUTUBE_API_KEY'] };
 const KINDS = { found: 'success', notFound: 'info', notConfigured: 'info', failed: 'error' };
 
 export const normalizeUpc = (value) => String(value).replace(/[\s-]/g, '');
@@ -35,3 +35,5 @@ export function hiddenAfter(hidden, platform, hide) {
 export const reportKind = (status) => KINDS[status] ?? 'info';
 export const missingFinders = (finders) => finders.filter((finder) => !finder.configured);
 export const finderEnvKeys = (platform) => ENV_KEYS[platform] ?? [];
+export const isFound = (source) => source === 'auto' || source === 'search';
+export const sourceBadge = (source) => ({ label: `admin.music.listen.source.${source}`, hint: source === 'search' ? 'admin.music.listen.searchHint' : null });

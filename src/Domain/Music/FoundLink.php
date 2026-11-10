@@ -10,7 +10,7 @@ final readonly class FoundLink
 {
     public ?string $url;
 
-    public function __construct(public Platform $platform, ?string $url)
+    public function __construct(public Platform $platform, ?string $url, public LinkSource $source = LinkSource::Auto)
     {
         $this->url = null === $url ? null : HttpsUrl::of($url);
     }

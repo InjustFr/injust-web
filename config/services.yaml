@@ -1,5 +1,6 @@
 parameters:
     env(ASSETS_DIR): build
+    brand: 'Injust'
 
 services:
     _defaults:
@@ -8,6 +9,17 @@ services:
 
     App\:
         resource: '../src/'
+
+    App\Infrastructure\Platforms\YoutubeFinder:
+        autoconfigure: false
+        arguments: { $platform: !php/enum App\Domain\Music\Platform::YoutubeMusic }
+        tags: [{ name: App\Application\Music\PlatformFinder, priority: 5 }]
+
+    app.platforms.youtube_finder:
+        class: App\Infrastructure\Platforms\YoutubeFinder
+        autoconfigure: false
+        arguments: { $platform: !php/enum App\Domain\Music\Platform::Youtube }
+        tags: [{ name: App\Application\Music\PlatformFinder, priority: 4 }]
 
     Symfony\Component\HttpFoundation\Session\Storage\Handler\PdoSessionHandler:
         arguments:

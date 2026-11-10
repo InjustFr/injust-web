@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Tests\Unit\Infrastructure\Platforms;
 
+use App\Application\Music\ReleaseLookup;
+use App\Domain\Music\ReleaseType;
 use App\Infrastructure\Platforms\PlatformApi;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\HttpClient\MockHttpClient;
@@ -20,6 +22,9 @@ trait RecordedApi
     /** @var list<?string> */
     private array $accepts = [];
 
+    /** @var list<?string> */
+    private array $apiKeys = [];
+
     /** @param array<string, MockResponse|callable(): MockResponse> $answers */
     private function api(array $answers, ?ArrayAdapter $tokens = null): PlatformApi
     {
@@ -27,6 +32,7 @@ trait RecordedApi
             $this->requests[] = $method.' '.$url;
             $this->authorizations[] = self::header($options, 'authorization');
             $this->accepts[] = self::header($options, 'accept');
+            $this->apiKeys[] = self::header($options, 'x-goog-api-key');
             foreach ($answers as $prefix => $answer) {
                 if (str_starts_with($method.' '.$url, $prefix)) {
                     return $answer instanceof MockResponse ? $answer : $answer();
@@ -45,6 +51,11 @@ trait RecordedApi
         $values = \is_array($headers) ? $headers[$name] ?? null : null;
 
         return \is_array($values) && \is_string($values[0] ?? null) ? $values[0] : null;
+    }
+
+    private static function release(): ReleaseLookup
+    {
+        return new ReleaseLookup('701518909440', 'White Men are the Issue', ReleaseType::Single);
     }
 
     /** @param array<mixed> $body */

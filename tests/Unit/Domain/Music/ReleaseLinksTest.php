@@ -24,11 +24,13 @@ final class ReleaseLinksTest extends TestCase
     private const string DEEZER = 'https://www.deezer.com/album/1061026552';
     private const string APPLE = 'https://music.apple.com/album/6804428384';
     private const string TIDAL = 'https://tidal.com/album/1';
+    private const string YT_MUSIC = 'https://music.youtube.com/playlist?list=OLAK5uy_nbWdzQYfxDeG7ADva9IU5qzaNv-W_ZloE';
+    private const string YT = 'https://www.youtube.com/playlist?list=OLAK5uy_nbWdzQYfxDeG7ADva9IU5qzaNv-W_ZloE';
 
     /** @param list<PlatformLink> $links */
-    private static function details(array $links = [], ?string $upc = self::UPC, string $date = '2026-06-01'): ReleaseDetails
+    private static function details(array $links = [], ?string $upc = self::UPC, string $date = '2026-06-01', string $title = 'White Men are the Issue'): ReleaseDetails
     {
-        return new ReleaseDetails('White Men are the Issue', null, ReleaseType::Single, new \DateTimeImmutable($date), new LocalizedText(), [], $links, null, null, $upc);
+        return new ReleaseDetails($title, null, ReleaseType::Single, new \DateTimeImmutable($date), new LocalizedText(), [], $links, null, null, $upc);
     }
 
     /** @param list<PlatformLink> $links */
@@ -161,6 +163,47 @@ final class ReleaseLinksTest extends TestCase
 
         self::assertSame(['012345678905', null], [$release->upc(), $release->linksCheckedAt()]);
         self::assertSame([['bandcamp', 'https://injust.bandcamp.com', 'manual']], self::links($release));
+    }
+
+    public function testLinksFoundBySearchFollowTheAutoRules(): void
+    {
+        $release = self::release([new PlatformLink(Platform::Youtube, 'https://www.youtube.com/@injust')]);
+
+        $release->applyFoundLinks([new FoundLink(Platform::YoutubeMusic, self::YT_MUSIC, LinkSource::Search), new FoundLink(Platform::Youtube, self::YT, LinkSource::Search)], self::now());
+        self::assertSame([['youtube', 'https://www.youtube.com/@injust', 'manual'], ['youtube-music', self::YT_MUSIC, 'search']], self::links($release));
+
+        $release->applyFoundLinks([], self::now());
+        self::assertSame([['youtube', 'https://www.youtube.com/@injust', 'manual'], ['youtube-music', self::YT_MUSIC, 'search']], self::links($release));
+
+        $release->applyFoundLinks([new FoundLink(Platform::YoutubeMusic, null, LinkSource::Search)], self::now());
+        self::assertSame([['youtube', 'https://www.youtube.com/@injust', 'manual']], self::links($release));
+    }
+
+    public function testAHiddenPlatformLosesItsSearchLinkAndANewUpcDropsThem(): void
+    {
+        $release = self::release();
+        $release->applyFoundLinks([new FoundLink(Platform::YoutubeMusic, self::YT_MUSIC, LinkSource::Search), new FoundLink(Platform::Youtube, self::YT, LinkSource::Search)], self::now());
+
+        $release->hidePlatforms([Platform::Youtube]);
+        $release->applyFoundLinks([new FoundLink(Platform::YoutubeMusic, self::YT_MUSIC, LinkSource::Search), new FoundLink(Platform::Youtube, self::YT, LinkSource::Search)], self::now());
+        self::assertSame([['youtube-music', self::YT_MUSIC, 'search']], self::links($release));
+
+        $release->edit(self::details());
+        self::assertSame([['youtube-music', self::YT_MUSIC, 'search']], self::links($release));
+
+        $release->edit(self::details(upc: '012345678905'));
+        self::assertSame([], self::links($release));
+    }
+
+    public function testANewTitleDropsTheSearchLinksKeepsTheAutoOnesAndAsksForANewCheck(): void
+    {
+        $release = self::release();
+        $release->applyFoundLinks([new FoundLink(Platform::Deezer, self::DEEZER), new FoundLink(Platform::YoutubeMusic, self::YT_MUSIC, LinkSource::Search)], self::now());
+
+        $release->edit(self::details(title: 'White Men are the Issue (Remaster)'));
+
+        self::assertSame([['deezer', self::DEEZER, 'auto']], self::links($release));
+        self::assertNull($release->linksCheckedAt());
     }
 
     public function testTwoManualLinksOnOnePlatformAreRefused(): void

@@ -44,8 +44,8 @@ final class SpotifyFinderTest extends TestCase
             self::SEARCH => self::json(['albums' => ['items' => [['id' => '4aawyAB9vmqN3uQ7FjRGTy', 'external_urls' => ['spotify' => 'https://open.spotify.com/album/4aawyAB9vmqN3uQ7FjRGTy']]]]]),
         ]), 'id', 'secret');
 
-        self::assertEquals(FinderResult::found('https://open.spotify.com/album/4aawyAB9vmqN3uQ7FjRGTy'), $finder->find('701518909440'));
-        self::assertEquals(FinderResult::found('https://open.spotify.com/album/4aawyAB9vmqN3uQ7FjRGTy'), $finder->find('701518909440'));
+        self::assertEquals(FinderResult::found('https://open.spotify.com/album/4aawyAB9vmqN3uQ7FjRGTy'), $finder->find(self::release()));
+        self::assertEquals(FinderResult::found('https://open.spotify.com/album/4aawyAB9vmqN3uQ7FjRGTy'), $finder->find(self::release()));
         self::assertSame([self::TOKEN, self::SEARCH, self::SEARCH], $this->requests);
     }
 
@@ -56,7 +56,7 @@ final class SpotifyFinderTest extends TestCase
             self::SEARCH => self::json(['albums' => ['items' => []]]),
         ]), 'id', 'secret');
 
-        self::assertEquals(FinderResult::notFound(), $finder->find('701518909440'));
+        self::assertEquals(FinderResult::notFound(), $finder->find(self::release()));
         self::assertSame(['Authorization: Basic '.base64_encode('id:secret'), 'Authorization: Bearer spotify-token'], $this->authorizations);
     }
 
@@ -67,7 +67,7 @@ final class SpotifyFinderTest extends TestCase
             self::SEARCH => self::json(['albums' => ['items' => [['id' => '4aawyAB9vmqN3uQ7FjRGTy', 'external_urls' => ['spotify' => 'https://evil.example/album/x']]]]]),
         ]), 'id', 'secret');
 
-        self::assertEquals(FinderResult::found('https://open.spotify.com/album/4aawyAB9vmqN3uQ7FjRGTy'), $finder->find('701518909440'));
+        self::assertEquals(FinderResult::found('https://open.spotify.com/album/4aawyAB9vmqN3uQ7FjRGTy'), $finder->find(self::release()));
     }
 
     /** @return iterable<string, array{mixed}> */
@@ -91,7 +91,7 @@ final class SpotifyFinderTest extends TestCase
 
         $this->expectException(\UnexpectedValueException::class);
 
-        $finder->find('701518909440');
+        $finder->find(self::release());
     }
 
     public function testAnAnswerWithoutAlbumsIsAFailure(): void
@@ -103,7 +103,7 @@ final class SpotifyFinderTest extends TestCase
 
         $this->expectException(\UnexpectedValueException::class);
 
-        $finder->find('701518909440');
+        $finder->find(self::release());
     }
 
     public function testRefusedCredentialsAreAFailure(): void
@@ -112,7 +112,7 @@ final class SpotifyFinderTest extends TestCase
 
         $this->expectException(ClientExceptionInterface::class);
 
-        $finder->find('701518909440');
+        $finder->find(self::release());
     }
 
     public function testATimeoutIsAFailure(): void
@@ -124,6 +124,6 @@ final class SpotifyFinderTest extends TestCase
 
         $this->expectException(TransportExceptionInterface::class);
 
-        $finder->find('701518909440');
+        $finder->find(self::release());
     }
 }

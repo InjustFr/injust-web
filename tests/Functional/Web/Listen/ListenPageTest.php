@@ -54,12 +54,12 @@ final class ListenPageTest extends WebTestCase
         self::assertNotNull($cover->attr('height'));
         $buttons = $crawler->filter('.listen-links a');
         self::assertSame(
-            ['/listen/white-men-are-the-issue/spotify', '/listen/white-men-are-the-issue/apple-music', '/listen/white-men-are-the-issue/deezer', '/listen/white-men-are-the-issue/tidal', '/listen/white-men-are-the-issue/youtube', '/listen/white-men-are-the-issue/bandcamp'],
+            ['/listen/white-men-are-the-issue/spotify', '/listen/white-men-are-the-issue/apple-music', '/listen/white-men-are-the-issue/youtube-music', '/listen/white-men-are-the-issue/deezer', '/listen/white-men-are-the-issue/tidal', '/listen/white-men-are-the-issue/youtube', '/listen/white-men-are-the-issue/bandcamp'],
             $buttons->each(static fn (Crawler $button): ?string => $button->attr('href')),
         );
-        self::assertSame(['Spotify', 'Apple Music', 'Deezer', 'TIDAL', 'YouTube', 'Bandcamp'], $buttons->filter('.listen-platform')->each(static fn (Crawler $name): string => $name->text()));
-        self::assertSame(['Play', 'Play', 'Play', 'Play', 'Watch', 'Play'], $buttons->filter('.listen-cta')->each(static fn (Crawler $cta): string => $cta->text()));
-        self::assertCount(6, $buttons->filter('svg[aria-hidden="true"]'));
+        self::assertSame(['Spotify', 'Apple Music', 'YouTube Music', 'Deezer', 'TIDAL', 'YouTube', 'Bandcamp'], $buttons->filter('.listen-platform')->each(static fn (Crawler $name): string => $name->text()));
+        self::assertSame(['Play', 'Play', 'Play', 'Play', 'Play', 'Watch', 'Play'], $buttons->filter('.listen-cta')->each(static fn (Crawler $cta): string => $cta->text()));
+        self::assertCount(7, $buttons->filter('svg[aria-hidden="true"]'));
         self::assertSame('Listen on', $crawler->filter('#listen-on')->text());
         self::assertCount(0, $crawler->filter('[data-island="Countdown"], .listen-presave, .listen-soon'));
         self::assertSame('/', $crawler->filter('.listen-more')->attr('href'));
@@ -72,7 +72,7 @@ final class ListenPageTest extends WebTestCase
         $graph = Json::array(Json::decode($crawler->filter('script[type="application/ld+json"]')->text()), '@graph');
         self::assertSame('BreadcrumbList', Json::string($graph, 1, '@type'));
         self::assertSame('MusicRecording', Json::string($graph, 2, '@type'));
-        self::assertSame(['https://open.spotify.com/album/'.FakePlatforms::SPOTIFY_ID, 'https://music.apple.com/album/6804428384', 'https://www.deezer.com/album/1061026552', 'https://tidal.com/album/'.FakePlatforms::TIDAL_ID, 'https://www.youtube.com/watch?v=dQw4w9WgXcQ', 'https://injust.bandcamp.com/track/white-men'], Json::at($graph, 2, 'sameAs'));
+        self::assertSame(['https://open.spotify.com/album/'.FakePlatforms::SPOTIFY_ID, 'https://music.apple.com/album/6804428384', 'https://music.youtube.com/playlist?list='.FakePlatforms::YOUTUBE_ID, 'https://www.deezer.com/album/1061026552', 'https://tidal.com/album/'.FakePlatforms::TIDAL_ID, 'https://www.youtube.com/watch?v=dQw4w9WgXcQ', 'https://injust.bandcamp.com/track/white-men'], Json::at($graph, 2, 'sameAs'));
     }
 
     public function testTheFrenchPageIsTranslatedAndAnEpIsAnAlbum(): void
@@ -128,7 +128,7 @@ final class ListenPageTest extends WebTestCase
         $listen = self::getContainer()->get(MusicQueries::class)->listen('white-men-are-the-issue', new \DateTimeImmutable('2026-11-10'));
 
         self::assertSame('White Men are the Issue', $listen->release->title);
-        self::assertSame(['apple-music', 'deezer', 'bandcamp'], array_map(static fn (PlatformLink $link): string => $link->platform->value, $listen->links));
+        self::assertSame(['apple-music', 'youtube-music', 'deezer', 'youtube', 'bandcamp'], array_map(static fn (PlatformLink $link): string => $link->platform->value, $listen->links));
     }
 
     public function testAnUnknownSlugIsNotFound(): void

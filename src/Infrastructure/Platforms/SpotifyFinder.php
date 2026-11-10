@@ -6,6 +6,7 @@ namespace App\Infrastructure\Platforms;
 
 use App\Application\Music\FinderResult;
 use App\Application\Music\PlatformFinder;
+use App\Application\Music\ReleaseLookup;
 use App\Domain\Music\Platform;
 use Symfony\Component\DependencyInjection\Attribute\AsTaggedItem;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
@@ -36,10 +37,10 @@ final readonly class SpotifyFinder implements PlatformFinder
         return '' !== $this->clientId && '' !== $this->clientSecret;
     }
 
-    public function find(string $upc): FinderResult
+    public function find(ReleaseLookup $release): FinderResult
     {
         $token = $this->api->token('spotify', self::TOKEN, $this->clientId, $this->clientSecret);
-        $answer = $this->api->json('GET', self::SEARCH, ['query' => ['q' => 'upc:'.$upc, 'type' => 'album', 'limit' => 1], 'auth_bearer' => $token]);
+        $answer = $this->api->json('GET', self::SEARCH, ['query' => ['q' => 'upc:'.$release->upc, 'type' => 'album', 'limit' => 1], 'auth_bearer' => $token]);
         if (!\is_array(PlatformApi::at($answer, 'albums.items'))) {
             throw new \UnexpectedValueException('Spotify answered without albums.');
         }

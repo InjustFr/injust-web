@@ -66,7 +66,7 @@ describe('releaseForm and releasePayload', () => {
             title: 'Riot', slug: 'riot', type: 'ep', releaseDate: '2026-05-01',
             description: { fr: 'a', en: 'b' },
             tracks: [{ position: 1, title: 'One', durationSeconds: 225 }, { position: 2, title: 'Two', durationSeconds: null }],
-            links: [{ platform: 'spotify', url: 'https://s.test', source: 'manual' }, { platform: 'deezer', url: 'https://d.test', source: 'auto' }],
+            links: [{ platform: 'spotify', url: 'https://s.test', source: 'manual' }, { platform: 'deezer', url: 'https://d.test', source: 'auto' }, { platform: 'youtube', url: 'https://y.test', source: 'search' }],
             upc: '701518909440',
             smartLinkUrl: 'https://ffm.to/x',
             spotifyEmbed: { url: 'https://open.spotify.com/album/abc' },

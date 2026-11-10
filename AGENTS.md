@@ -109,4 +109,4 @@ things up in the project instead of relying on memory:
 - Docs: https://symfony.com/doc/current/ (switch to the version matching
   `composer.json` if it differs).
 
-The M8 section of `CLAUDE.md` describes the release smart links (`/listen/{slug}`, UPC lookup on Deezer, Apple Music, Spotify and Tidal, daily `app:music:refresh-links`).
+The M8 section of `CLAUDE.md` describes the release smart links (`/listen/{slug}`, UPC lookup on Deezer, Apple Music, Spotify and Tidal, YouTube Music and YouTube found by title search, daily `app:music:refresh-links`).

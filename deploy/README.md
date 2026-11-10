@@ -42,16 +42,19 @@ Messages are kept three years, as the privacy text says: the entrypoint runs `ap
 
 ## Release smart links (`/listen/<slug>`)
 
-Set the UPC of a release in the admin (Music): the server looks the release up on Deezer and Apple Music (no key needed) and, when configured, Spotify and Tidal, then stores the links and shows them on `/listen/<slug>`. `app:music:refresh-links` (the cron above) refreshes every due release daily: recent or upcoming releases every day, older ones weekly while a platform is still missing. It is not run on start-up. YouTube Music, YouTube, Amazon Music, Bandcamp and SoundCloud have no UPC lookup: paste them as manual links. Empty keys mean the platform is skipped.
+Set the UPC of a release in the admin (Music): the server looks the release up on Deezer and Apple Music (no key needed) and, when configured, Spotify and Tidal (by UPC) and YouTube Music and YouTube (by title search), then stores the links and shows them on `/listen/<slug>`. `app:music:refresh-links` (the cron above) refreshes every due release daily: recent or upcoming releases every day, older ones weekly while a platform is still missing. It is not run on start-up. Amazon Music, Bandcamp and SoundCloud have no lookup: paste them as manual links. YouTube links are matched by title (the auto-generated album playlist of the "Injust - Topic" channel): check them in the admin (badge "Found by search"), hide a wrong one or paste a manual link, which always wins. Renaming a release drops its YouTube links and searches again at the next cron. The channel is matched by name only, so another artist also called Injust with a release of the same title would match: that is what the badge is for. Empty keys mean the platform is skipped.
 
 | Variable | Purpose |
 | --- | --- |
 | `SPOTIFY_CLIENT_ID`, `SPOTIFY_CLIENT_SECRET` | Spotify app (client credentials, catalogue search by UPC) |
 | `TIDAL_CLIENT_ID`, `TIDAL_CLIENT_SECRET` | TIDAL developer app (client credentials, album lookup by barcode) |
+| `YOUTUBE_API_KEY` | Google Cloud API key for the YouTube Data API v3 (playlist search by title, YouTube Music and YouTube) |
 
 Spotify: sign in at developer.spotify.com/dashboard (the account owner needs Spotify Premium to use an app), Create app, any redirect URI (for example `https://injustmusic.com`), tick Web API. Development Mode is enough: copy the Client ID and Client secret.
 
 TIDAL: register an app at developer.tidal.com, create a client, copy the Client ID and Client secret (no user scopes needed).
+
+YouTube: in console.cloud.google.com create (or pick) a project, APIs & Services > Library > enable **YouTube Data API v3**, then APIs & Services > Credentials > Create credentials > API key. Edit the key: API restrictions > Restrict key > YouTube Data API v3 only (no application restriction is needed for a server key; an IP restriction to the server address is fine). Put it in `YOUTUBE_API_KEY`. Quota: each refresh of a release costs 100 units (one search answers both YouTube Music and YouTube) out of the free 10,000 a day, so about 100 refreshes a day; the daily cron only refreshes due releases. Over quota the API answers 403 quotaExceeded: the refresh reports YouTube as failed and keeps the previous links until the quota resets (midnight Pacific time).
 
 ## Online payments (Stripe)
 

@@ -40,15 +40,15 @@ final class TidalFinderTest extends TestCase
     {
         $finder = self::finder($this, self::json(['data' => [['id' => '470366521', 'type' => 'albums', 'attributes' => ['title' => 'White Men are the Issue', 'barcodeId' => '701518909440']]], 'links' => ['self' => '/albums']]));
 
-        self::assertEquals(FinderResult::found('https://tidal.com/album/470366521'), $finder->find('701518909440'));
-        self::assertEquals(FinderResult::found('https://tidal.com/album/470366521'), $finder->find('701518909440'));
+        self::assertEquals(FinderResult::found('https://tidal.com/album/470366521'), $finder->find(self::release()));
+        self::assertEquals(FinderResult::found('https://tidal.com/album/470366521'), $finder->find(self::release()));
         self::assertSame([self::TOKEN, self::SEARCH, self::SEARCH], $this->requests);
         self::assertSame(['Authorization: Bearer tidal-token', 'Accept: application/vnd.api+json'], [$this->authorizations[1], $this->accepts[1]]);
     }
 
     public function testNoAlbumIsNotFound(): void
     {
-        self::assertEquals(FinderResult::notFound(), self::finder($this, self::json(['data' => []]))->find('701518909440'));
+        self::assertEquals(FinderResult::notFound(), self::finder($this, self::json(['data' => []]))->find(self::release()));
     }
 
     /** @return iterable<string, array{array<mixed>}> */
@@ -67,21 +67,21 @@ final class TidalFinderTest extends TestCase
     {
         $this->expectException(\UnexpectedValueException::class);
 
-        self::finder($this, self::json($body))->find('701518909440');
+        self::finder($this, self::json($body))->find(self::release());
     }
 
     public function testAnHttpErrorIsAFailure(): void
     {
         $this->expectException(ServerExceptionInterface::class);
 
-        self::finder($this, new MockResponse('', ['http_code' => 500]))->find('701518909440');
+        self::finder($this, new MockResponse('', ['http_code' => 500]))->find(self::release());
     }
 
     public function testATimeoutIsAFailure(): void
     {
         $this->expectException(TransportExceptionInterface::class);
 
-        self::finder($this, new MockResponse('', ['error' => 'Idle timeout reached']))->find('701518909440');
+        self::finder($this, new MockResponse('', ['error' => 'Idle timeout reached']))->find(self::release());
     }
 
     private static function finder(self $test, MockResponse $search): TidalFinder

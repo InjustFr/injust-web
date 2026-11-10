@@ -7,6 +7,7 @@ namespace App\Tests\Unit\Application\Music;
 use App\Application\Music\FinderResult;
 use App\Application\Music\LookupOutcome;
 use App\Domain\Music\FoundLink;
+use App\Domain\Music\LinkSource;
 use App\Domain\Music\Platform;
 use App\Domain\Shared\Exception\InvalidUrl;
 use PHPUnit\Framework\TestCase;
@@ -19,6 +20,14 @@ final class FinderResultTest extends TestCase
 
         self::assertSame([LookupOutcome::Found, 'https://www.deezer.com/album/1'], [$result->outcome, $result->url]);
         self::assertEquals(new FoundLink(Platform::Deezer, 'https://www.deezer.com/album/1'), $result->link(Platform::Deezer));
+    }
+
+    public function testALinkFoundBySearchKeepsItsSource(): void
+    {
+        $result = FinderResult::found('https://www.youtube.com/playlist?list=x', LinkSource::Search);
+
+        self::assertSame(LinkSource::Auto, FinderResult::found('https://www.deezer.com/album/1')->source);
+        self::assertEquals(new FoundLink(Platform::Youtube, 'https://www.youtube.com/playlist?list=x', LinkSource::Search), $result->link(Platform::Youtube));
     }
 
     public function testAMissIsAnAnswerWithoutLink(): void

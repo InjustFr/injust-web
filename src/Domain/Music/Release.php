@@ -84,6 +84,7 @@ class Release implements Positioned
         $this->id = new Ulid();
         $this->clicks = new ArrayCollection();
         $this->position = $position;
+        $this->title = $details->title;
         $this->edit($details);
     }
 
@@ -94,13 +95,17 @@ class Release implements Positioned
 
     public function edit(ReleaseDetails $details): void
     {
+        $auto = $this->foundLinks();
+        if ($details->title !== $this->title) {
+            $auto = array_filter($auto, static fn (PlatformLink $link): bool => LinkSource::Search !== $link->source);
+            $this->linksCheckedAt = null;
+        }
         $this->title = $details->title;
         $this->slug = $details->slug;
         $this->type = $details->type;
         $this->releaseDate = $details->releaseDate;
         $this->description = $details->description;
         $this->tracks = array_map(static fn (Track $track): array => ['position' => $track->position, 'title' => $track->title, 'durationSeconds' => $track->durationSeconds], $details->tracks);
-        $auto = $this->linksFrom(LinkSource::Auto);
         if ($details->upc !== $this->upc) {
             $this->upc = $details->upc;
             $this->linksCheckedAt = null;
@@ -115,13 +120,13 @@ class Release implements Positioned
     public function applyFoundLinks(array $found, \DateTimeImmutable $now): void
     {
         $answered = array_map(static fn (FoundLink $link): Platform => $link->platform, $found);
-        $auto = array_filter($this->linksFrom(LinkSource::Auto), static fn (PlatformLink $link): bool => !\in_array($link->platform, $answered, true));
+        $auto = array_filter($this->foundLinks(), static fn (PlatformLink $link): bool => !\in_array($link->platform, $answered, true));
         foreach ($found as $link) {
             if (null !== $link->url && !\in_array($link->platform, $this->hiddenPlatforms(), true)) {
-                $auto[] = new PlatformLink($link->platform, $link->url, LinkSource::Auto);
+                $auto[] = new PlatformLink($link->platform, $link->url, $link->source);
             }
         }
-        $this->storeLinks($this->linksFrom(LinkSource::Manual), $auto);
+        $this->storeLinks($this->manualLinks(), $auto);
         $this->linksCheckedAt = $now;
     }
 
@@ -129,7 +134,7 @@ class Release implements Positioned
     public function hidePlatforms(array $platforms): void
     {
         $this->hiddenPlatforms = array_values(array_unique(array_map(static fn (Platform $platform): string => $platform->value, $platforms)));
-        $this->storeLinks($this->linksFrom(LinkSource::Manual), array_filter($this->linksFrom(LinkSource::Auto), static fn (PlatformLink $link): bool => !\in_array($link->platform, $platforms, true)));
+        $this->storeLinks($this->manualLinks(), array_filter($this->foundLinks(), static fn (PlatformLink $link): bool => !\in_array($link->platform, $platforms, true)));
     }
 
     /** @param list<Platform> $findable */
@@ -236,9 +241,15 @@ class Release implements Positioned
     }
 
     /** @return array<int, PlatformLink> */
-    private function linksFrom(LinkSource $source): array
+    private function manualLinks(): array
     {
-        return array_filter($this->links(), static fn (PlatformLink $link): bool => $link->source === $source);
+        return array_filter($this->links(), static fn (PlatformLink $link): bool => LinkSource::Manual === $link->source);
+    }
+
+    /** @return array<int, PlatformLink> */
+    private function foundLinks(): array
+    {
+        return array_filter($this->links(), static fn (PlatformLink $link): bool => LinkSource::Manual !== $link->source);
     }
 
     /**

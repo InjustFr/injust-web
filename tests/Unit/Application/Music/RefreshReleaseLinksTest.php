@@ -8,9 +8,11 @@ use App\Application\Music\FinderResult;
 use App\Application\Music\PlatformFinder;
 use App\Application\Music\RefreshReleaseLinks\RefreshReleaseLinks;
 use App\Application\Music\RefreshReleaseLinks\RefreshReleaseLinksHandler;
+use App\Application\Music\ReleaseLookup;
 use App\Application\Music\ReleaseView;
 use App\Application\Transaction;
 use App\Domain\Music\Exception\MissingUpc;
+use App\Domain\Music\LinkSource;
 use App\Domain\Music\Platform;
 use App\Domain\Music\PlatformLink;
 use App\Domain\Music\Release;
@@ -68,6 +70,18 @@ final class RefreshReleaseLinksTest extends TestCase
         self::assertSame(['warning', 'Platform lookup failed.', ['platform' => 'deezer', 'exception' => \RuntimeException::class]], $logs[0]);
     }
 
+    public function testALinkFoundBySearchIsStoredAsSuchAndKeptWhenTheSearchFails(): void
+    {
+        $release = self::release('701518909440');
+        $url = 'https://www.youtube.com/playlist?list=OLAK5uy_nbWdzQYfxDeG7ADva9IU5qzaNv-W_ZloE';
+        $this->handler($release, [self::finder(Platform::Youtube, FinderResult::found($url, LinkSource::Search))])(new RefreshReleaseLinks($release->id()));
+
+        $report = $this->handler($release, [self::finder(Platform::Youtube, new \RuntimeException('quotaExceeded'))])(new RefreshReleaseLinks($release->id()));
+
+        self::assertSame(['youtube' => 'failed'], $report->report);
+        self::assertSame([['youtube', $url, 'search']], array_map(static fn (PlatformLink $link): array => [$link->platform->value, $link->url, $link->source->value], $release->links()));
+    }
+
     public function testAFinderAnsweringAnUnsafeUrlCountsAsFailed(): void
     {
         $release = self::release('701518909440');
@@ -114,10 +128,10 @@ final class RefreshReleaseLinksTest extends TestCase
                 return $this->configured;
             }
 
-            public function find(string $upc): FinderResult
+            public function find(ReleaseLookup $release): FinderResult
             {
                 return match (true) {
-                    '701518909440' !== $upc => throw new \LogicException('Wrong UPC '.$upc),
+                    $release != new ReleaseLookup('701518909440', 'White Men are the Issue', ReleaseType::Single) => throw new \LogicException('Wrong release '.$release->upc),
                     $this->answer instanceof FinderResult => $this->answer,
                     $this->answer instanceof \Throwable => throw $this->answer,
                     \is_string($this->answer) => FinderResult::found($this->answer),

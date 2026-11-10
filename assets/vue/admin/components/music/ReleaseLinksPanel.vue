@@ -6,7 +6,7 @@ import BaseButton from '../../../components/ui/BaseButton.vue';
 import IconButton from '../../../components/ui/IconButton.vue';
 import { useApi } from '../../../composables/useApi.js';
 import { useToast } from '../../../composables/useToast.js';
-import { finderEnvKeys, hiddenAfter, linkRows, missingFinders, reportKind } from '../../releaseLinks.js';
+import { finderEnvKeys, hiddenAfter, isFound, linkRows, missingFinders, reportKind, sourceBadge } from '../../releaseLinks.js';
 
 const props = defineProps({ release: { type: Object, required: true }, finders: { type: Array, required: true } });
 const { t, locale } = useI18n();
@@ -50,9 +50,9 @@ const copy = () => toast.attempt(() => navigator.clipboard.writeText(props.relea
                 <span class="listen__platform">{{ t(`admin.music.platforms.${row.platform}`) }}</span>
                 <a v-if="row.url" class="listen__link" :href="row.url" target="_blank" rel="noopener noreferrer">{{ row.url }}</a>
                 <span v-else class="listen__link listen__link--none">{{ row.hidden ? t('admin.music.listen.hidden') : t('admin.music.listen.none') }}</span>
-                <span v-if="row.source" class="listen__badge">{{ t(`admin.music.listen.source.${row.source}`) }}</span>
+                <span v-if="row.source" class="listen__badge" :title="sourceBadge(row.source).hint ? t(sourceBadge(row.source).hint) : undefined">{{ t(sourceBadge(row.source).label) }}</span>
                 <span class="listen__clicks tabular">{{ t('admin.music.listen.clicks', { count: row.clicks }) }}</span>
-                <IconButton v-if="row.source === 'auto'" :icon="EyeOff" :label="t('admin.music.listen.hide')" @click="setHidden(row.platform, true)" />
+                <IconButton v-if="isFound(row.source)" :icon="EyeOff" :label="t('admin.music.listen.hide')" @click="setHidden(row.platform, true)" />
                 <IconButton v-else-if="row.hidden" :icon="Eye" :label="t('admin.music.listen.restore')" @click="setHidden(row.platform, false)" />
             </li>
         </ul>

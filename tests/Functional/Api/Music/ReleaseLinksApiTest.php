@@ -65,13 +65,15 @@ final class ReleaseLinksApiTest extends WebTestCase
 
         $answer = self::send($client, 'POST', '/api/admin/music/releases/'.$id.'/links/refresh');
 
-        self::assertSame(['spotify' => 'found', 'apple-music' => 'found', 'deezer' => 'found', 'tidal' => 'found'], Json::array($answer, 'report'));
+        self::assertSame(['spotify' => 'found', 'apple-music' => 'found', 'deezer' => 'found', 'tidal' => 'found', 'youtube-music' => 'found', 'youtube' => 'found'], Json::array($answer, 'report'));
         self::assertSame([
             ['platform' => 'bandcamp', 'url' => 'https://injust.bandcamp.com/track/white-men', 'source' => 'manual'],
             ['platform' => 'spotify', 'url' => 'https://open.spotify.com/album/'.FakePlatforms::SPOTIFY_ID, 'source' => 'auto'],
             ['platform' => 'apple-music', 'url' => 'https://music.apple.com/album/6804428384', 'source' => 'auto'],
             ['platform' => 'deezer', 'url' => 'https://www.deezer.com/album/1061026552', 'source' => 'auto'],
             ['platform' => 'tidal', 'url' => 'https://tidal.com/album/'.FakePlatforms::TIDAL_ID, 'source' => 'auto'],
+            ['platform' => 'youtube-music', 'url' => 'https://music.youtube.com/playlist?list='.FakePlatforms::YOUTUBE_ID, 'source' => 'search'],
+            ['platform' => 'youtube', 'url' => 'https://www.youtube.com/playlist?list='.FakePlatforms::YOUTUBE_ID, 'source' => 'search'],
         ], Json::array($answer, 'release', 'links'));
         self::assertSame('2026-11-10T09:00:00+00:00', Json::string($answer, 'release', 'linksCheckedAt'));
         self::assertSame('http://localhost/listen/white-men-are-the-issue', Json::string($answer, 'release', 'listenUrl'));
@@ -80,11 +82,11 @@ final class ReleaseLinksApiTest extends WebTestCase
     public function testFailuresKeepThePreviousLinksAndAreReported(): void
     {
         $client = self::signedInClient();
-        $id = Json::string(self::send($client, 'POST', '/api/admin/music/releases', ['upc' => FakePlatforms::FAILING] + self::RELEASE), 'id');
+        $id = Json::string(self::send($client, 'POST', '/api/admin/music/releases', ['title' => 'Failing', 'upc' => FakePlatforms::FAILING] + self::RELEASE), 'id');
 
         $answer = self::send($client, 'POST', '/api/admin/music/releases/'.$id.'/links/refresh');
 
-        self::assertSame(['spotify' => 'failed', 'apple-music' => 'notFound', 'deezer' => 'failed', 'tidal' => 'notFound'], Json::array($answer, 'report'));
+        self::assertSame(['spotify' => 'failed', 'apple-music' => 'notFound', 'deezer' => 'failed', 'tidal' => 'notFound', 'youtube-music' => 'failed', 'youtube' => 'failed'], Json::array($answer, 'report'));
         self::assertCount(1, Json::array($answer, 'release', 'links'));
     }
 
@@ -105,14 +107,14 @@ final class ReleaseLinksApiTest extends WebTestCase
 
         $hidden = self::send($client, 'PUT', '/api/admin/music/releases/'.$id.'/hidden-platforms', ['platforms' => ['tidal', 'deezer']]);
         self::assertSame(['tidal', 'deezer'], Json::array($hidden, 'hiddenPlatforms'));
-        self::assertSame(['bandcamp', 'spotify', 'apple-music'], array_column(Json::array($hidden, 'links'), 'platform'));
+        self::assertSame(['bandcamp', 'spotify', 'apple-music', 'youtube-music', 'youtube'], array_column(Json::array($hidden, 'links'), 'platform'));
 
         $refreshed = self::send($client, 'POST', '/api/admin/music/releases/'.$id.'/links/refresh');
-        self::assertSame(['bandcamp', 'spotify', 'apple-music'], array_column(Json::array($refreshed, 'release', 'links'), 'platform'));
+        self::assertSame(['bandcamp', 'spotify', 'apple-music', 'youtube-music', 'youtube'], array_column(Json::array($refreshed, 'release', 'links'), 'platform'));
 
-        self::send($client, 'PUT', '/api/admin/music/releases/'.$id.'/hidden-platforms', ['platforms' => []]);
+        self::send($client, 'PUT', '/api/admin/music/releases/'.$id.'/hidden-platforms', ['platforms' => ['youtube']]);
         $shown = self::send($client, 'POST', '/api/admin/music/releases/'.$id.'/links/refresh');
-        self::assertSame(['bandcamp', 'spotify', 'apple-music', 'deezer', 'tidal'], array_column(Json::array($shown, 'release', 'links'), 'platform'));
+        self::assertSame(['bandcamp', 'spotify', 'apple-music', 'deezer', 'tidal', 'youtube-music'], array_column(Json::array($shown, 'release', 'links'), 'platform'));
     }
 
     /** @return iterable<string, array{array<mixed>}> */
@@ -158,7 +160,7 @@ final class ReleaseLinksApiTest extends WebTestCase
         $content = (string) $client->getResponse()->getContent();
         $music = Json::decode($content);
 
-        self::assertSame([['platform' => 'spotify', 'configured' => true], ['platform' => 'apple-music', 'configured' => true], ['platform' => 'deezer', 'configured' => true], ['platform' => 'tidal', 'configured' => true]], Json::array($music, 'finders'));
+        self::assertSame([['platform' => 'spotify', 'configured' => true], ['platform' => 'apple-music', 'configured' => true], ['platform' => 'deezer', 'configured' => true], ['platform' => 'tidal', 'configured' => true], ['platform' => 'youtube-music', 'configured' => true], ['platform' => 'youtube', 'configured' => true]], Json::array($music, 'finders'));
         self::assertSame(['bandcamp' => 1, 'deezer' => 2], Json::array($music, 'releases', 0, 'clicks'));
     }
 

@@ -30,7 +30,7 @@ final class AppleMusicFinderTest extends TestCase
     {
         $finder = new AppleMusicFinder($this->api([self::URL => self::json(['resultCount' => 1, 'results' => [['wrapperType' => 'collection', 'collectionId' => 6804428384, 'collectionViewUrl' => 'https://music.apple.com/us/album/white-men-are-the-issue-single/6804428384?uo=4']]])]));
 
-        self::assertEquals(FinderResult::found('https://music.apple.com/album/6804428384'), $finder->find('701518909440'));
+        self::assertEquals(FinderResult::found('https://music.apple.com/album/6804428384'), $finder->find(self::release()));
         self::assertSame([self::URL], $this->requests);
     }
 
@@ -38,7 +38,7 @@ final class AppleMusicFinderTest extends TestCase
     {
         $finder = new AppleMusicFinder($this->api([self::URL => self::json(['resultCount' => 0, 'results' => []])]));
 
-        self::assertEquals(FinderResult::notFound(), $finder->find('701518909440'));
+        self::assertEquals(FinderResult::notFound(), $finder->find(self::release()));
     }
 
     /** @return iterable<string, array{array<mixed>}> */
@@ -57,7 +57,7 @@ final class AppleMusicFinderTest extends TestCase
 
         $this->expectException(\UnexpectedValueException::class);
 
-        $finder->find('701518909440');
+        $finder->find(self::release());
     }
 
     public function testAResultWithoutNumericIdIsAFailure(): void
@@ -66,7 +66,7 @@ final class AppleMusicFinderTest extends TestCase
 
         $this->expectException(\UnexpectedValueException::class);
 
-        $finder->find('701518909440');
+        $finder->find(self::release());
     }
 
     public function testAnHttpErrorIsAFailure(): void
@@ -75,7 +75,7 @@ final class AppleMusicFinderTest extends TestCase
 
         $this->expectException(ClientExceptionInterface::class);
 
-        $finder->find('701518909440');
+        $finder->find(self::release());
     }
 
     public function testATimeoutIsAFailure(): void
@@ -84,6 +84,6 @@ final class AppleMusicFinderTest extends TestCase
 
         $this->expectException(TransportExceptionInterface::class);
 
-        $finder->find('701518909440');
+        $finder->find(self::release());
     }
 }

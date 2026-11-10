@@ -30,7 +30,7 @@ final class DeezerFinderTest extends TestCase
     {
         $finder = new DeezerFinder($this->api([self::URL => self::json(['id' => 1061026552, 'title' => 'White Men are the Issue', 'link' => 'https://www.deezer.com/album/1061026552', 'cover_xl' => 'https://cdn-images.dzcdn.net/x.jpg', 'release_date' => '2026-06-01'])]));
 
-        self::assertEquals(FinderResult::found('https://www.deezer.com/album/1061026552'), $finder->find('701518909440'));
+        self::assertEquals(FinderResult::found('https://www.deezer.com/album/1061026552'), $finder->find(self::release()));
         self::assertSame([self::URL], $this->requests);
     }
 
@@ -38,7 +38,7 @@ final class DeezerFinderTest extends TestCase
     {
         $finder = new DeezerFinder($this->api([self::URL => self::json(['error' => ['type' => 'DataException', 'message' => 'no data', 'code' => 800]])]));
 
-        self::assertEquals(FinderResult::notFound(), $finder->find('701518909440'));
+        self::assertEquals(FinderResult::notFound(), $finder->find(self::release()));
     }
 
     public function testAnyOtherErrorIsAFailure(): void
@@ -47,14 +47,14 @@ final class DeezerFinderTest extends TestCase
 
         $this->expectException(\UnexpectedValueException::class);
 
-        $finder->find('701518909440');
+        $finder->find(self::release());
     }
 
     public function testTheLinkIsBuiltFromTheAlbumIdWhateverLinkDeezerAnswers(): void
     {
         $finder = new DeezerFinder($this->api([self::URL => self::json(['id' => 1061026552, 'link' => 'https://evil.example/album/1061026552'])]));
 
-        self::assertEquals(FinderResult::found('https://www.deezer.com/album/1061026552'), $finder->find('701518909440'));
+        self::assertEquals(FinderResult::found('https://www.deezer.com/album/1061026552'), $finder->find(self::release()));
     }
 
     /** @return iterable<string, array{mixed}> */
@@ -73,7 +73,7 @@ final class DeezerFinderTest extends TestCase
 
         $this->expectException(\UnexpectedValueException::class);
 
-        $finder->find('701518909440');
+        $finder->find(self::release());
     }
 
     public function testAnHttpErrorIsAFailure(): void
@@ -82,7 +82,7 @@ final class DeezerFinderTest extends TestCase
 
         $this->expectException(ServerExceptionInterface::class);
 
-        $finder->find('701518909440');
+        $finder->find(self::release());
     }
 
     public function testATimeoutIsAFailure(): void
@@ -91,6 +91,6 @@ final class DeezerFinderTest extends TestCase
 
         $this->expectException(TransportExceptionInterface::class);
 
-        $finder->find('701518909440');
+        $finder->find(self::release());
     }
 }

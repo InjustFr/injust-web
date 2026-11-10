@@ -14,5 +14,5 @@ interface PlatformFinder
 
     public function configured(): bool;
 
-    public function find(string $upc): FinderResult;
+    public function find(ReleaseLookup $release): FinderResult;
 }

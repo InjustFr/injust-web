@@ -6,6 +6,7 @@ namespace App\Infrastructure\Platforms;
 
 use App\Application\Music\FinderResult;
 use App\Application\Music\PlatformFinder;
+use App\Application\Music\ReleaseLookup;
 use App\Domain\Music\Platform;
 use Symfony\Component\DependencyInjection\Attribute\AsTaggedItem;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
@@ -36,10 +37,10 @@ final readonly class TidalFinder implements PlatformFinder
         return '' !== $this->clientId && '' !== $this->clientSecret;
     }
 
-    public function find(string $upc): FinderResult
+    public function find(ReleaseLookup $release): FinderResult
     {
         $token = $this->api->token('tidal', self::TOKEN, $this->clientId, $this->clientSecret);
-        $answer = $this->api->json('GET', self::SEARCH, ['query' => ['countryCode' => 'FR', 'filter' => ['barcodeId' => $upc]], 'headers' => ['Accept' => 'application/vnd.api+json'], 'auth_bearer' => $token]);
+        $answer = $this->api->json('GET', self::SEARCH, ['query' => ['countryCode' => 'FR', 'filter' => ['barcodeId' => $release->upc]], 'headers' => ['Accept' => 'application/vnd.api+json'], 'auth_bearer' => $token]);
         $albums = $answer['data'] ?? null;
         if ([] === $albums) {
             return FinderResult::notFound();

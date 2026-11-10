@@ -6,6 +6,7 @@ namespace App\Infrastructure\Platforms;
 
 use App\Application\Music\FinderResult;
 use App\Application\Music\PlatformFinder;
+use App\Application\Music\ReleaseLookup;
 use App\Domain\Music\Platform;
 use Symfony\Component\DependencyInjection\Attribute\AsTaggedItem;
 
@@ -30,9 +31,9 @@ final readonly class DeezerFinder implements PlatformFinder
         return true;
     }
 
-    public function find(string $upc): FinderResult
+    public function find(ReleaseLookup $release): FinderResult
     {
-        $album = $this->api->json('GET', self::URL.$upc);
+        $album = $this->api->json('GET', self::URL.$release->upc);
         if (\array_key_exists('error', $album)) {
             return self::NO_DATA === PlatformApi::at($album, 'error.code') ? FinderResult::notFound() : throw new \UnexpectedValueException('Deezer answered an error.');
         }

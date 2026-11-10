@@ -42,7 +42,7 @@ export function releaseForm(release) {
         releaseDate: source.releaseDate,
         description: { fr: source.description.fr, en: source.description.en },
         tracks: source.tracks.map((track) => ({ title: track.title, duration: formatDuration(track.durationSeconds) })),
-        links: source.links.filter((link) => link.source !== 'auto').map((link) => ({ platform: link.platform, url: link.url })),
+        links: source.links.filter((link) => link.source === 'manual').map((link) => ({ platform: link.platform, url: link.url })),
         upc: source.upc ?? '',
         smartLinkUrl: source.smartLinkUrl ?? '',
         spotifyUrl: source.spotifyEmbed?.url ?? '',

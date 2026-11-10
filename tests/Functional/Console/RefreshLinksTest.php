@@ -43,9 +43,9 @@ final class RefreshLinksTest extends KernelTestCase
 
         $tester->assertCommandIsSuccessful();
         self::assertSame(
-            "white-men-are-the-issue: spotify found, apple-music found, deezer found, tidal found\n"
-            ."partial: spotify notFound, apple-music found, deezer found, tidal notFound\n"
-            ."failing: spotify failed, apple-music notFound, deezer failed, tidal notFound\n",
+            "white-men-are-the-issue: spotify found, apple-music found, deezer found, tidal found, youtube-music found, youtube found\n"
+            ."partial: spotify notFound, apple-music found, deezer found, tidal notFound, youtube-music notFound, youtube notFound\n"
+            ."failing: spotify failed, apple-music notFound, deezer failed, tidal notFound, youtube-music failed, youtube failed\n",
             $tester->getDisplay(),
         );
         self::getContainer()->get(EntityManagerInterface::class)->clear();

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { PUBLIC_ORDER, finderEnvKeys, hiddenAfter, isValidUpc, linkRows, missingFinders, normalizeUpc, reportKind } from './releaseLinks.js';
+import { PUBLIC_ORDER, finderEnvKeys, hiddenAfter, isFound, isValidUpc, linkRows, missingFinders, normalizeUpc, reportKind, sourceBadge } from './releaseLinks.js';
 
 describe('upc', () => {
     it('accepts valid GTIN-12 and GTIN-13', () => {
@@ -73,5 +73,23 @@ describe('finders', () => {
     it('names the env keys of a platform', () => {
         expect(finderEnvKeys('spotify')).toEqual(['SPOTIFY_CLIENT_ID', 'SPOTIFY_CLIENT_SECRET']);
         expect(finderEnvKeys('tidal')).toEqual(['TIDAL_CLIENT_ID', 'TIDAL_CLIENT_SECRET']);
+        expect(finderEnvKeys('youtube-music')).toEqual(['YOUTUBE_API_KEY']);
+        expect(finderEnvKeys('youtube')).toEqual(['YOUTUBE_API_KEY']);
+        expect(finderEnvKeys('deezer')).toEqual([]);
+    });
+});
+
+describe('sources', () => {
+    it('treats auto and search links as found, so they can be hidden', () => {
+        expect(isFound('auto')).toBe(true);
+        expect(isFound('search')).toBe(true);
+        expect(isFound('manual')).toBe(false);
+        expect(isFound(null)).toBe(false);
+    });
+
+    it('labels a search link and asks to check it', () => {
+        expect(sourceBadge('search')).toEqual({ label: 'admin.music.listen.source.search', hint: 'admin.music.listen.searchHint' });
+        expect(sourceBadge('auto')).toEqual({ label: 'admin.music.listen.source.auto', hint: null });
+        expect(sourceBadge('manual')).toEqual({ label: 'admin.music.listen.source.manual', hint: null });
     });
 });

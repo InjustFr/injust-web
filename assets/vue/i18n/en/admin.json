@@ -246,8 +246,10 @@
             "copied": "Link copied.",
             "source": {
                 "auto": "Auto",
-                "manual": "Manual"
+                "manual": "Manual",
+                "search": "Found by search"
             },
+            "searchHint": "Matched by title: check it",
             "none": "No link yet",
             "hidden": "Hidden",
             "hide": "Hide this link",

@@ -6,6 +6,7 @@ namespace App\Infrastructure\Platforms;
 
 use App\Application\Music\FinderResult;
 use App\Application\Music\PlatformFinder;
+use App\Application\Music\ReleaseLookup;
 use App\Domain\Music\Platform;
 use Symfony\Component\DependencyInjection\Attribute\AsTaggedItem;
 
@@ -29,9 +30,9 @@ final readonly class AppleMusicFinder implements PlatformFinder
         return true;
     }
 
-    public function find(string $upc): FinderResult
+    public function find(ReleaseLookup $release): FinderResult
     {
-        $answer = $this->api->json('GET', self::URL, ['query' => ['upc' => $upc, 'entity' => 'album']]);
+        $answer = $this->api->json('GET', self::URL, ['query' => ['upc' => $release->upc, 'entity' => 'album']]);
         $results = $answer['results'] ?? null;
         if (!\is_array($results)) {
             throw new \UnexpectedValueException('Apple answered without results.');

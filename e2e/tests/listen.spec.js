@@ -19,6 +19,9 @@ test('the admin fetches the links of a UPC, the visitor listens through the coun
     await panel.getByRole('button', { name: 'Fetch links now' }).click();
     await expect(panel.locator('.listen__row', { hasText: 'Deezer' }).locator('.listen__badge')).toHaveText('Auto');
     await expect(panel.locator('.listen__row', { hasText: 'Apple Music' }).locator('.listen__badge')).toHaveText('Auto');
+    const youtubeMusic = panel.locator('.listen__row', { hasText: 'YouTube Music' }).locator('.listen__badge');
+    await expect(youtubeMusic).toHaveText('Found by search');
+    await expect(youtubeMusic).toHaveAttribute('title', 'Matched by title: check it');
     await expect(panel.locator('.listen__url input')).toHaveValue(new RegExp(`/listen/${SLUG}$`));
 
     await panel.locator('.listen__row', { hasText: 'Apple Music' }).getByRole('button', { name: 'Hide this link' }).click();

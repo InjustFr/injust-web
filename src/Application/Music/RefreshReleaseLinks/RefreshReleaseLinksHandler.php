@@ -7,6 +7,7 @@ namespace App\Application\Music\RefreshReleaseLinks;
 use App\Application\Music\FinderResult;
 use App\Application\Music\PlatformFinder;
 use App\Application\Music\RefreshReport;
+use App\Application\Music\ReleaseLookup;
 use App\Application\Music\ReleaseView;
 use App\Application\Transaction;
 use App\Domain\Music\Exception\MissingUpc;
@@ -31,11 +32,11 @@ final readonly class RefreshReleaseLinksHandler
     public function __invoke(RefreshReleaseLinks $command): RefreshReport
     {
         $release = $this->releases->get($command->id);
-        $upc = $release->upc() ?? throw new MissingUpc();
+        $lookup = new ReleaseLookup($release->upc() ?? throw new MissingUpc(), $release->title(), $release->type());
         $report = [];
         $found = [];
         foreach ($this->finders as $finder) {
-            $result = $this->lookup($finder, $upc);
+            $result = $this->lookup($finder, $lookup);
             $report[$finder->platform()->value] = $result->outcome->value;
             $link = $result->link($finder->platform());
             if (null !== $link) {
@@ -49,13 +50,13 @@ final readonly class RefreshReleaseLinksHandler
         return new RefreshReport(ReleaseView::of($release, $now), $report);
     }
 
-    private function lookup(PlatformFinder $finder, string $upc): FinderResult
+    private function lookup(PlatformFinder $finder, ReleaseLookup $release): FinderResult
     {
         if (!$finder->configured()) {
             return FinderResult::notConfigured();
         }
         try {
-            return $finder->find($upc);
+            return $finder->find($release);
         } catch (\Throwable $failure) {
             $this->logger->warning('Platform lookup failed.', ['platform' => $finder->platform()->value, 'exception' => $failure::class]);
 

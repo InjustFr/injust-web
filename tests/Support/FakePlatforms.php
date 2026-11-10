@@ -19,8 +19,9 @@ final class FakePlatforms implements HttpClientInterface
     public const string FAILING = '036000291452';
     public const string SPOTIFY_ID = '4InjustWhiteMenIssue00';
     public const string TIDAL_ID = '470366521';
+    public const string YOUTUBE_ID = 'OLAK5uy_nbWdzQYfxDeG7ADva9IU5qzaNv-W_ZloE';
 
-    private const array HOSTS = ['api.deezer.com', 'itunes.apple.com', 'accounts.spotify.com', 'api.spotify.com', 'auth.tidal.com', 'openapi.tidal.com'];
+    private const array HOSTS = ['api.deezer.com', 'itunes.apple.com', 'accounts.spotify.com', 'api.spotify.com', 'auth.tidal.com', 'openapi.tidal.com', 'www.googleapis.com'];
 
     /** @param array<string, mixed> $options */
     public function request(string $method, string $url, array $options = []): ResponseInterface
@@ -41,6 +42,7 @@ final class FakePlatforms implements HttpClientInterface
             'accounts.spotify.com', 'auth.tidal.com' => self::json(['access_token' => 'fake-token', 'token_type' => 'Bearer', 'expires_in' => 3600]),
             'api.deezer.com' => self::deezer(substr((string) parse_url($url, \PHP_URL_PATH), \strlen('/album/upc:'))),
             'itunes.apple.com' => self::apple(self::upc($query['upc'] ?? '')),
+            'www.googleapis.com' => self::youtube(self::upc($query['q'] ?? '')),
             'api.spotify.com' => self::spotify(self::upc(substr(self::upc($query['q'] ?? ''), \strlen('upc:')))),
             default => self::tidal(self::upc(\is_array($query['filter'] ?? null) ? $query['filter']['barcodeId'] ?? '' : '')),
         };
@@ -81,6 +83,21 @@ final class FakePlatforms implements HttpClientInterface
         return self::json(['data' => null === $id ? [] : [['id' => $id, 'type' => 'albums']]]);
     }
 
+    private static function youtube(string $search): MockResponse
+    {
+        $playlist = static fn (string $id, string $title, string $channel): array => ['kind' => 'youtube#searchResult', 'id' => ['kind' => 'youtube#playlist', 'playlistId' => $id], 'snippet' => ['title' => $title, 'channelTitle' => $channel, 'channelId' => 'UC'.md5($channel)]];
+
+        return match ($search) {
+            'Injust Failing' => self::json(['error' => ['code' => 403, 'message' => 'The request cannot be completed because you have exceeded your quota.', 'errors' => [['reason' => 'quotaExceeded', 'domain' => 'youtube.quota']]]], 403),
+            'Injust White Men are the Issue' => self::json(['kind' => 'youtube#searchListResponse', 'items' => [
+                $playlist('OLAK5uy_mDecoyFromAnotherChannel000000', 'Album - White Men are the Issue', 'Punk Covers'),
+                $playlist('OLAK5uy_lInjustLiveAtTheRiot00000000000', 'Album - White Men are the Issue (Live)', 'Injust - Topic'),
+                $playlist(self::YOUTUBE_ID, 'Album - White Men are the Issue', 'Injust - Topic'),
+            ]]),
+            default => self::json(['kind' => 'youtube#searchListResponse', 'items' => []]),
+        };
+    }
+
     private static function id(string $upc, string $platform): int|string|null
     {
         $ids = match ($upc) {
@@ -98,8 +115,8 @@ final class FakePlatforms implements HttpClientInterface
     }
 
     /** @param array<mixed> $body */
-    private static function json(array $body): MockResponse
+    private static function json(array $body, int $status = 200): MockResponse
     {
-        return new MockResponse(json_encode($body, \JSON_THROW_ON_ERROR), ['response_headers' => ['content-type' => 'application/json']]);
+        return new MockResponse(json_encode($body, \JSON_THROW_ON_ERROR), ['http_code' => $status, 'response_headers' => ['content-type' => 'application/json']]);
     }
 }
