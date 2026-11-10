@@ -13,7 +13,43 @@
     },
     "dashboard": {
         "title": "Tableau de bord",
-        "subtitle": "Les sections du site apparaîtront ici."
+        "subtitle": "Ce qui vous attend et ce qu’il reste avant le lancement.",
+        "inbox": {
+            "title": "Messages à traiter",
+            "all": "Tous les messages",
+            "empty": "Aucun message en attente."
+        },
+        "topics": {
+            "general": "Général",
+            "lessons": "Cours de guitare",
+            "production": "Production",
+            "beats": "Beats"
+        },
+        "sections": {
+            "title": "Sections",
+            "music": "Musique",
+            "lessons": "Cours de guitare",
+            "production": "Production",
+            "beats": "Boutique de beats",
+            "checkout": "Paiement en ligne",
+            "on": "Actif",
+            "off": "Inactif",
+            "items": "{count} élément | {count} éléments"
+        },
+        "checklist": {
+            "title": "Avant le lancement",
+            "progress": "{done} sur {total} faits",
+            "done": "fait",
+            "todo": "à faire",
+            "heroImage": "Ajouter la photo d’accueil",
+            "featuredRelease": "Mettre une sortie en avant sur l’accueil",
+            "covers": "Ajouter une pochette à chaque sortie",
+            "bio": "Écrire la bio ou le manifeste",
+            "socialLinks": "Ajouter vos réseaux sociaux",
+            "contactEmail": "Renseigner l’e-mail qui reçoit les messages",
+            "legalIdentity": "Compléter l’identité légale (nécessaire au paiement)",
+            "searchIndexing": "Ouvrir le site aux moteurs de recherche"
+        }
     },
     "settings": {
         "title": "Réglages",

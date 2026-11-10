@@ -13,7 +13,43 @@
     },
     "dashboard": {
         "title": "Dashboard",
-        "subtitle": "The sections of the site will appear here."
+        "subtitle": "What is waiting for you and what is left before launch.",
+        "inbox": {
+            "title": "Open messages",
+            "all": "All messages",
+            "empty": "No message waiting."
+        },
+        "topics": {
+            "general": "General",
+            "lessons": "Guitar lessons",
+            "production": "Production",
+            "beats": "Beats"
+        },
+        "sections": {
+            "title": "Sections",
+            "music": "Music",
+            "lessons": "Guitar lessons",
+            "production": "Production services",
+            "beats": "Beats store",
+            "checkout": "Online checkout",
+            "on": "On",
+            "off": "Off",
+            "items": "{count} item | {count} items"
+        },
+        "checklist": {
+            "title": "Launch checklist",
+            "progress": "{done} of {total} done",
+            "done": "done",
+            "todo": "to do",
+            "heroImage": "Upload the hero photo",
+            "featuredRelease": "Feature a release on the home page",
+            "covers": "Add a cover to every release",
+            "bio": "Write the bio or the manifesto",
+            "socialLinks": "Add your social links",
+            "contactEmail": "Set the contact email that receives messages",
+            "legalIdentity": "Complete the legal identity (needed for checkout)",
+            "searchIndexing": "Open the site to search engines"
+        }
     },
     "settings": {
         "title": "Settings",
