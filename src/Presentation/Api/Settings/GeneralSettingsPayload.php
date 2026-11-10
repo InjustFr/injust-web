@@ -21,6 +21,7 @@ final readonly class GeneralSettingsPayload
         public LocalizedText $seoTitle = new LocalizedText(),
         public LocalizedText $seoDescription = new LocalizedText(),
         public bool $searchIndexing = false,
+        public string $googleSiteVerification = '',
     ) {
     }
 }

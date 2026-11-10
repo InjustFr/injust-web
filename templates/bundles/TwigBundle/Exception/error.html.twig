@@ -1,0 +1,24 @@
+{% extends 'base.html.twig' %}
+
+{% block head %}
+    <meta name="robots" content="noindex, nofollow">
+    <meta name="theme-color" content="#0b0d10">
+    <meta name="color-scheme" content="dark">
+    <title>{{ 'site.error.title'|trans }} | {{ brand }}</title>
+{% endblock %}
+
+{% block stylesheets %}{{ vite_entry_link_tags('site') }}{% endblock %}
+
+{% block body %}
+    <header class="site-header">
+        <a class="wordmark" href="{{ path('home') }}" aria-label="{{ 'site.home'|trans }}">{{ brand|upper }}</a>
+    </header>
+    <main id="content" tabindex="-1">
+        <section class="placeholder">
+            <p class="placeholder-status">{{ status_code }}</p>
+            <h1 class="placeholder-title">{{ 'site.error.title'|trans }}</h1>
+            <p class="placeholder-lead">{{ 'site.error.detail'|trans }}</p>
+            <a class="button" href="{{ path('home') }}">{{ 'site.not_found.back'|trans }}</a>
+        </section>
+    </main>
+{% endblock %}

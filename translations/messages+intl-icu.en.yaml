@@ -95,11 +95,19 @@ site:
     footer:
         legal: 'Legal'
         contact: 'Contact'
+    error:
+        title: 'Something went wrong'
+        detail: 'The page could not be shown. Please try again in a moment.'
     not_found:
         title: 'Nothing here'
         detail: 'This page does not exist or is not open yet.'
         back: 'Back to the home page'
     faq: 'FAQ'
+    links:
+        title: 'Links'
+        empty: 'No links yet. The full site has everything.'
+        full_site: 'Full site'
+        more: 'More from Injust'
     lessons:
         service: 'Guitar lessons'
         offers: 'Offers'

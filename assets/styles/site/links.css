@@ -1,0 +1,152 @@
+.links-page {
+    width: 100%;
+    max-width: calc(28rem + 2 * var(--gutter));
+    margin: 0 auto;
+    padding: clamp(2.5rem, 8vw, 4.5rem) var(--gutter) 2rem;
+    display: grid;
+    align-content: start;
+    gap: 2rem;
+}
+
+.links-head { display: grid; justify-items: center; gap: 0.75rem; text-align: center; }
+
+.links-mark {
+    margin: 0;
+    font-family: var(--font-display);
+    font-weight: 400;
+    font-size: clamp(4rem, 22vw, 6.5rem);
+    line-height: 0.85;
+    letter-spacing: 0.01em;
+}
+
+.links-mark img { height: clamp(4rem, 20vw, 6rem); width: auto; margin: 0 auto; }
+
+.links-tagline {
+    margin: 0;
+    max-width: 26ch;
+    font-family: var(--font-mono);
+    font-size: 0.875rem;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--fog);
+}
+
+.links-release {
+    display: grid;
+    grid-template-columns: 5.5rem 1fr;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem;
+    background: var(--soot);
+    border: var(--rule);
+}
+
+.links-release-cover { width: 5.5rem; height: 5.5rem; object-fit: cover; }
+
+.links-release-body { display: grid; gap: 0.2rem; min-width: 0; }
+
+.links-release:not(:has(.links-release-cover)) .links-release-body { grid-column: 1 / -1; }
+
+.links-release-kicker, .links-release-meta {
+    margin: 0;
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--fog);
+}
+
+.links-release-title {
+    margin: 0;
+    font-family: var(--font-display);
+    font-weight: 400;
+    font-size: 1.75rem;
+    line-height: 1;
+    text-transform: uppercase;
+    overflow-wrap: anywhere;
+}
+
+.links-release-cta {
+    grid-column: 1 / -1;
+    text-align: center;
+    font-size: 1.125rem;
+    text-transform: uppercase;
+}
+
+.links-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.75rem; }
+
+.links-button {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 3.5rem;
+    padding: 0.75rem 3.25rem;
+    border: 2px solid var(--steel);
+    color: var(--bone);
+    font-weight: 750;
+    font-stretch: 100%;
+    letter-spacing: 0.02em;
+    text-align: center;
+    text-decoration: none;
+}
+
+.links-button:hover { border-color: var(--bone); background: var(--bone); color: var(--ink); }
+
+.links-button-primary { border-color: var(--signal); background: var(--signal); color: #fff; }
+
+.links-button .links-icon { position: absolute; left: 1rem; top: 50%; translate: 0 -50%; width: 1.375rem; height: 1.375rem; }
+
+.links-button:focus-visible, .links-social:focus-visible, .links-more a:focus-visible {
+    outline: 2px solid var(--signal-bright);
+    outline-offset: 3px;
+}
+
+.links-empty {
+    margin: 0;
+    padding: 1.25rem;
+    border: 2px dashed var(--steel);
+    color: var(--fog);
+    text-align: center;
+}
+
+.links-socials {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.5rem;
+}
+
+.links-social {
+    display: grid;
+    place-items: center;
+    width: 3rem;
+    height: 3rem;
+    color: var(--fog);
+}
+
+.links-social:hover { color: var(--bone); }
+
+.links-social .links-icon { width: 1.5rem; height: 1.5rem; }
+
+.links-footer { padding: 1.5rem var(--gutter) 2.5rem; }
+
+.links-more {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.5rem 1.25rem;
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+}
+
+.links-more a { color: var(--fog); text-decoration: none; }
+
+.links-more a:hover { color: var(--bone); text-decoration: underline; text-underline-offset: 0.2em; }
+
+.links-more .links-lang { color: var(--bone); }

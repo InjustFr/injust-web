@@ -85,7 +85,7 @@ final class SecurityHeadersTest extends TestCase
         int $type = HttpKernelInterface::MAIN_REQUEST,
     ): ResponseHeaderBag {
         $settings = Settings::initial();
-        $settings->editGeneral('a@b.test', null, VatMentions::defaults(), new LocalizedText(), new LocalizedText(), $searchIndexing);
+        $settings->editGeneral('a@b.test', null, VatMentions::defaults(), new LocalizedText(), new LocalizedText(), $searchIndexing, '');
         $queries = new class(SettingsView::of($settings)) implements SettingsQueries {
             public function __construct(private readonly SettingsView $view)
             {

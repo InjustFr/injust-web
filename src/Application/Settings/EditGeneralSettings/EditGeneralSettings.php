@@ -16,6 +16,7 @@ final readonly class EditGeneralSettings
         public LocalizedText $seoTitle,
         public LocalizedText $seoDescription,
         public bool $searchIndexing,
+        public string $googleSiteVerification,
     ) {
     }
 }

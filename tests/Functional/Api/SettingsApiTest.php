@@ -142,6 +142,29 @@ final class SettingsApiTest extends WebTestCase
         self::assertSame('Protest punk.', $view->seoDescription->in('fr'));
     }
 
+    public function testTheGoogleVerificationTokenIsSavedAndRead(): void
+    {
+        $client = self::signedInClient();
+        self::assertSame('', Json::string(self::send($client, 'GET', '/api/admin/settings'), 'googleSiteVerification'));
+
+        $settings = self::send($client, 'PUT', '/api/admin/settings/general', ['googleSiteVerification' => ' abc_DEF-123456 '] + self::GENERAL);
+
+        self::assertSame('abc_DEF-123456', Json::string($settings, 'googleSiteVerification'));
+        self::getContainer()->get(EntityManagerInterface::class)->clear();
+        self::assertSame('abc_DEF-123456', self::getContainer()->get(SettingsQueries::class)->current()->googleSiteVerification);
+        self::assertSame('abc_DEF-123456', Json::string(self::send($client, 'GET', '/api/admin/settings'), 'googleSiteVerification'));
+    }
+
+    public function testAVerificationTagInsteadOfItsTokenIsRefused(): void
+    {
+        $client = self::signedInClient();
+
+        $client->jsonRequest('PUT', '/api/admin/settings/general', ['googleSiteVerification' => '<meta name="google-site-verification" content="abc_DEF-123456">'] + self::GENERAL);
+
+        self::assertResponseStatusCodeSame(422);
+        self::assertStringContainsString('token', Json::string(Json::decode((string) $client->getResponse()->getContent()), 'detail'));
+    }
+
     public function testAnInsecureBookingUrlOrABlankVatMentionIsRefused(): void
     {
         $client = self::signedInClient();

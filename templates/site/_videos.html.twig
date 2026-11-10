@@ -1,3 +1,4 @@
+{% import 'site/_image.html.twig' as media %}
 {% if music.videos is not empty %}
     <section class="videos" id="videos" aria-labelledby="videos-title">
         {% include 'site/_section_head.html.twig' with {id: 'videos-title', title: 'site.music.videos'|trans} only %}
@@ -8,7 +9,7 @@
                     <div class="video-facade" data-island="VideoFacade" data-props="{{ {youtubeId: video.youtubeId, title: video.title, thumbnail: thumbnail, play: 'site.music.play'|trans({title: video.title})}|json_encode }}">
                         <a class="video-button" href="{{ video.watchUrl }}" rel="noopener">
                             {% if thumbnail %}
-                                <img src="{{ thumbnail }}" alt="" width="1280" height="720" loading="lazy">
+                                {{ media.img(video.thumbnail) }}
                             {% endif %}
                             <span class="video-play" aria-hidden="true"></span>
                             <span class="visually-hidden">{{ 'site.music.youtube_open'|trans }}</span>

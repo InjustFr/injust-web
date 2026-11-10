@@ -28,12 +28,13 @@ export function generalForm(settings) {
         seoTitle: { ...settings.seoTitle },
         seoDescription: { ...settings.seoDescription },
         searchIndexing: settings.searchIndexing,
+        googleSiteVerification: settings.googleSiteVerification ?? '',
     };
 }
 
 export function generalPayload(form) {
     const bookingUrl = form.bookingUrl.trim();
-    return { ...form, contactEmail: form.contactEmail.trim(), bookingUrl: bookingUrl === '' ? null : bookingUrl };
+    return { ...form, contactEmail: form.contactEmail.trim(), googleSiteVerification: form.googleSiteVerification.trim(), bookingUrl: bookingUrl === '' ? null : bookingUrl };
 }
 
 export function checkoutBlocked(settings) {

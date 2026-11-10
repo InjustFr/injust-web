@@ -1,41 +1,65 @@
 {% extends 'base.html.twig' %}
+{% import 'site/_image.html.twig' as media %}
 
 {% set locale = app.request.locale %}
 {% set locales = constant('App\\Presentation\\LocaleListener::LOCALES') %}
 {% set route = app.request.attributes.get('_route') %}
 {% set params = app.request.attributes.get('_route_params') %}
 {% set alternates = {} %}
-{% for code in locales %}
-    {% set alternates = alternates|merge({(code): url(route, params|merge({_locale: code}))}) %}
-{% endfor %}
+{% if route %}
+    {% for code in locales %}
+        {% set alternates = alternates|merge({(code): url(route, params|merge({_locale: code}))}) %}
+    {% endfor %}
+{% endif %}
 {% set other = locale == 'fr' ? 'en' : 'fr' %}
+{% set seo = page_seo ?? null %}
 {% set site_title = settings.seoTitle.in(locale) ?: brand %}
-{% set site_description = settings.seoDescription.in(locale) ?: 'site.description'|trans %}
-{% set indexable = settings.searchIndexing and not hidden_from_visitors %}
+{% set site_description = (seo ? seo.description.in(locale)) ?: settings.seoDescription.in(locale) ?: 'site.description'|trans %}
+{% set indexable = settings.searchIndexing and not hidden_from_visitors and route %}
 {% set current_section = section ?? null %}
 
 {% block lang %}{{ locale }}{% endblock %}
 
 {% block head %}
     {% set home = url('home') %}
-    {% set title = page_title is defined ? page_title ~ ' | ' ~ brand : site_title %}
+    {% set title = (seo ? seo.title.in(locale)) ?: (page_title is defined ? page_title ~ ' | ' ~ brand : site_title) %}
+    {% set canonical = alternates[locale] ?? null %}
     <title>{{ title }}</title>
     <meta name="description" content="{{ site_description }}">
     <meta name="theme-color" content="#0b0d10">
     <meta name="color-scheme" content="dark">
     <meta name="robots" content="{{ indexable ? 'index, follow, max-image-preview:large' : 'noindex, nofollow' }}">
-    <link rel="canonical" href="{{ alternates[locale] }}">
-    {% for code, href in alternates %}
-        <link rel="alternate" hreflang="{{ code }}" href="{{ href }}">
-    {% endfor %}
-    <link rel="alternate" hreflang="x-default" href="{{ alternates.en }}">
+    {% if settings.googleSiteVerification %}
+        <meta name="google-site-verification" content="{{ settings.googleSiteVerification }}">
+    {% endif %}
+    {% if canonical %}
+        <link rel="canonical" href="{{ canonical }}">
+        {% for code, href in alternates %}
+            <link rel="alternate" hreflang="{{ code }}" href="{{ href }}">
+        {% endfor %}
+        <link rel="alternate" hreflang="x-default" href="{{ alternates.en }}">
+        <meta property="og:url" content="{{ canonical }}">
+    {% endif %}
+    <link rel="preload" as="font" type="font/woff2" href="{{ asset('node_modules/@fontsource/anton/files/anton-latin-400-normal.woff2', 'vite') }}" crossorigin>
     <meta property="og:type" content="website">
     <meta property="og:site_name" content="{{ brand }}">
     <meta property="og:locale" content="{{ locale == 'fr' ? 'fr_FR' : 'en_GB' }}">
+    <meta property="og:locale:alternate" content="{{ other == 'fr' ? 'fr_FR' : 'en_GB' }}">
     <meta property="og:title" content="{{ title }}">
     <meta property="og:description" content="{{ site_description }}">
-    <meta property="og:url" content="{{ alternates[locale] }}">
-    {% set share_image = og_image ?? settings.heroImage %}
+    {% set share_image = (seo ? seo.image) ?: og_image ?? settings.heroImage %}
+    {% set share_size = share_image ? image_size(share_image) : null %}
+    {% if share_size %}
+        <meta property="og:image" content="{{ url('media_image', {file: share_image ~ '.webp'}) }}">
+        <meta property="og:image:width" content="{{ share_size.width }}">
+        <meta property="og:image:height" content="{{ share_size.height }}">
+    {% else %}
+        <meta property="og:image" content="{{ absolute_url('/og-default.png') }}">
+        <meta property="og:image:width" content="1200">
+        <meta property="og:image:height" content="630">
+    {% endif %}
+    <meta property="og:image:alt" content="{{ title }}">
+    <meta name="twitter:card" content="summary_large_image">
     {% set band_photo = band_image ?? settings.heroImage %}
     {% set band = {'@type': 'MusicGroup', '@id': home ~ '#band', name: brand, url: home, genre: brand_genres} %}
     {% if band_photo %}
@@ -44,18 +68,18 @@
     {% if (band_same_as ?? []) is not empty %}
         {% set band = band|merge({sameAs: band_same_as}) %}
     {% endif %}
-    {% if share_image %}
-        <meta property="og:image" content="{{ url('media_image', {file: share_image ~ '.webp'}) }}">
-        <meta name="twitter:card" content="summary_large_image">
-    {% else %}
-        <meta name="twitter:card" content="summary">
+    {% set graph = [band] %}
+    {% if route == 'home' %}
+        {% set graph = graph|merge([{'@type': 'WebSite', '@id': home ~ '#website', url: home, name: brand, inLanguage: locale, publisher: {'@id': home ~ '#band'}}]) %}
+    {% elseif canonical %}
+        {% set graph = graph|merge([{'@type': 'BreadcrumbList', itemListElement: [
+            {'@type': 'ListItem', position: 1, name: brand, item: home},
+            {'@type': 'ListItem', position: 2, name: page_title ?? title, item: canonical},
+        ]}]) %}
     {% endif %}
     <script type="application/ld+json">{{ {
         '@context': 'https://schema.org',
-        '@graph': [
-            band,
-            {'@type': 'WebSite', '@id': home ~ '#website', url: home, name: brand, inLanguage: locale, publisher: {'@id': home ~ '#band'}},
-        ]|merge(page_graph ?? []),
+        '@graph': graph|merge(page_graph ?? []),
     }|json_encode(constant('JSON_HEX_TAG') b-or constant('JSON_HEX_AMP') b-or constant('JSON_UNESCAPED_SLASHES') b-or constant('JSON_UNESCAPED_UNICODE'))|raw }}</script>
     {% block preload %}{% endblock %}
 {% endblock %}
@@ -74,7 +98,7 @@
     <header class="site-header">
         <a class="wordmark" href="{{ path('home') }}" aria-label="{{ 'site.home'|trans }}">
             {%- if settings.logoImage -%}
-                <img src="{{ path('media_image', {file: settings.logoImage ~ '.webp'}) }}" alt="{{ brand }}">
+                {{- media.img(settings.logoImage, brand, null, 'eager') -}}
             {%- else -%}
                 {{ brand|upper }}
             {%- endif -%}
@@ -84,7 +108,7 @@
                 <a class="nav-section" href="{{ item.value == 'beats' ? path('section', {section: item.value}) : path(item.value) }}"{% if item == current_section %} aria-current="page"{% endif %}>{{ ('site.sections.' ~ item.value)|trans }}</a>
             {% endfor %}
             <a class="nav-contact" href="{{ path('contact') }}"{% if route == 'contact' %} aria-current="page"{% endif %}>{{ 'site.contact.title'|trans }}</a>
-            <a class="lang-switch" href="{{ path(route, app.request.query.all|merge(params)|merge({_locale: other})) }}" hreflang="{{ other }}" lang="{{ other }}" title="{{ 'site.switch'|trans({}, 'messages', other) }}">{{ other|upper }}</a>
+            <a class="lang-switch" href="{{ route ? path(route, app.request.query.all|merge(params)|merge({_locale: other})) : path('home', {_locale: other}) }}" hreflang="{{ other }}" lang="{{ other }}" title="{{ 'site.switch'|trans({}, 'messages', other) }}">{{ other|upper }}</a>
         </nav>
     </header>
     <main id="content" tabindex="-1">

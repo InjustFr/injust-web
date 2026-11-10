@@ -169,7 +169,7 @@ final class HomePageTest extends WebTestCase
         $crawler = $client->request('GET', '/');
 
         self::assertCount(0, $crawler->filter('iframe, object, embed, video, audio'));
-        $sources = $crawler->filter('main img, link[rel="preload"]')->each(static fn (Crawler $node): string => (string) ($node->attr('src') ?? $node->attr('href')));
+        $sources = $crawler->filter('main img, link[rel="preload"][as="image"]')->each(static fn (Crawler $node): string => (string) ($node->attr('src') ?? $node->attr('href')));
         self::assertCount(3, $sources);
         foreach ($sources as $source) {
             self::assertStringStartsWith('/media/images/', $source);

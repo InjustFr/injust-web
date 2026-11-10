@@ -60,6 +60,12 @@ Sign-in goes through mossyleaf accounts (`accounts.mossyleaf.studio`). An accoun
 
 Indexing is off by default: the site sends `noindex` and `robots.txt` disallows everything. Switch it on in the admin (Settings, Search engine indexing) when the site is ready; there is no server setting for it.
 
+### Link-in-bio and Search Console
+
+The link-in-bio page is `https://<domain>/links` (FR: `/fr/links`); manage its links in the admin (Links) and put that URL in the social bios in place of Linktree. Clicks are counted without cookies.
+
+Search Console: add the domain as a property, choose the HTML tag method, paste only the `content` value of the `google-site-verification` meta tag in the admin (Settings, general), verify, then submit `https://<domain>/sitemap.xml`.
+
 ## Reverse proxy
 
 - `compose.override.yaml` puts the app on the reverse proxy network (`PROXY_NETWORK`) with the alias `injust-web`, and opens no host port.

@@ -95,11 +95,19 @@ site:
     footer:
         legal: 'Légal'
         contact: 'Contact'
+    error:
+        title: 'Un problème est survenu'
+        detail: 'La page n’a pas pu s’afficher. Réessayez dans un instant.'
     not_found:
         title: 'Rien ici'
         detail: 'Cette page n’existe pas ou n’est pas encore ouverte.'
         back: 'Retour à l’accueil'
     faq: 'Questions fréquentes'
+    links:
+        title: 'Liens'
+        empty: 'Pas encore de liens. Tout est sur le site.'
+        full_site: 'Site complet'
+        more: 'Plus d’Injust'
     lessons:
         service: 'Cours de guitare'
         offers: 'Formules'

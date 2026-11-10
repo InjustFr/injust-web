@@ -13,6 +13,7 @@ identity:
 settings:
     invalid_siren: '“{siren}” is not a valid SIREN: it has 9 digits and passes the Luhn check.'
     legal_identity_incomplete: 'Fill in every field of the legal identity before switching online checkout on.'
+    invalid_verification_token: 'Paste only the Search Console verification token: the content value of the meta tag, 10 to 100 letters, digits, - or _.'
 legal:
     empty_document: 'A legal text needs at least one language filled in.'
 music:
@@ -45,3 +46,7 @@ sales:
     payment_mismatch: 'The payment received for order {reference} does not match its price.'
     order_not_paid: 'Order {reference} is not paid.'
     order_not_found: 'No order matches this {by, select, session {checkout session} other {payment}} ({id}).'
+links:
+    invalid_label: 'A link needs a label in at least one language, {max} characters at most in each.'
+seo:
+    invalid_page_seo: 'Keep the title to {title} characters and the description to {description} characters in each language.'

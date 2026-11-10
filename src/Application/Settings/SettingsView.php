@@ -24,6 +24,7 @@ final readonly class SettingsView
         public ?string $logoImage,
         public ?string $heroImage,
         public bool $searchIndexing,
+        public string $googleSiteVerification,
     ) {
     }
 
@@ -46,6 +47,7 @@ final readonly class SettingsView
             $settings->logoImage(),
             $settings->heroImage(),
             $settings->searchIndexing(),
+            $settings->googleSiteVerification(),
         );
     }
 

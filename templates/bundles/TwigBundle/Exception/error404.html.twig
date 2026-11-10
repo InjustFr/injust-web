@@ -1,18 +1,17 @@
-{% extends 'base.html.twig' %}
+{% extends 'site.html.twig' %}
 
-{% block head %}
-    <meta name="robots" content="noindex, nofollow">
-    <meta name="color-scheme" content="dark">
-    <title>{{ 'site.not_found.title'|trans }} | {{ brand }}</title>
-{% endblock %}
+{% set layout = site_layout() %}
+{% set settings = layout.settings %}
+{% set legal_pages = layout.legal_pages %}
+{% set page_seo = null %}
+{% set hidden_from_visitors = false %}
+{% set page_title = 'site.not_found.title'|trans %}
 
-{% block stylesheets %}{{ vite_entry_link_tags('site') }}{% endblock %}
-
-{% block body %}
-    <main id="content" class="placeholder">
+{% block main %}
+    <section class="placeholder">
         <p class="placeholder-status">404</p>
-        <h1 class="placeholder-title">{{ 'site.not_found.title'|trans }}</h1>
+        <h1 class="placeholder-title">{{ page_title }}</h1>
         <p class="placeholder-lead">{{ 'site.not_found.detail'|trans }}</p>
         <a class="button" href="{{ path('home') }}">{{ 'site.not_found.back'|trans }}</a>
-    </main>
+    </section>
 {% endblock %}

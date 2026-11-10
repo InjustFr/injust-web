@@ -1,7 +1,8 @@
+{% import 'site/_image.html.twig' as media %}
 {% set featured = music.featured %}
 <section class="hero">
     {% if settings.heroImage %}
-        <img class="hero-photo" src="{{ path('media_image', {file: settings.heroImage ~ '.webp'}) }}" alt="" fetchpriority="high">
+        {{ media.img(settings.heroImage, '', 'hero-photo', 'priority') }}
     {% endif %}
     <div class="hero-content">
         <h1 class="hero-mark">{{ brand|upper }}</h1>
@@ -9,7 +10,7 @@
         {% if featured %}
             <article class="hero-release">
                 {% if featured.cover %}
-                    <img class="hero-release-cover" src="{{ path('media_image', {file: featured.cover ~ '.webp'}) }}" alt="" width="240" height="240">
+                    {{ media.img(featured.cover, '', 'hero-release-cover', 'eager') }}
                 {% endif %}
                 <div class="hero-release-body">
                     <p class="hero-release-kicker">{{ 'site.hero.featured'|trans }}</p>

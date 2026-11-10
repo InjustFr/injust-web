@@ -10,6 +10,8 @@ use App\Application\Lessons\AddLessonOffer\AddLessonOffer;
 use App\Application\Lessons\AddLessonOffer\AddLessonOfferHandler;
 use App\Application\Lessons\EditLessonsPage\EditLessonsPage;
 use App\Application\Lessons\EditLessonsPage\EditLessonsPageHandler;
+use App\Application\Links\AddBioLink\AddBioLink;
+use App\Application\Links\AddBioLink\AddBioLinkHandler;
 use App\Application\Music\AddRelease\AddRelease;
 use App\Application\Music\AddRelease\AddReleaseHandler;
 use App\Application\Music\AddSocialLink\AddSocialLink;
@@ -28,6 +30,8 @@ use App\Application\Sales\ConfirmPayment\ConfirmPayment;
 use App\Application\Sales\ConfirmPayment\ConfirmPaymentHandler;
 use App\Application\Sales\StartCheckout\StartCheckout;
 use App\Application\Sales\StartCheckout\StartCheckoutHandler;
+use App\Application\Seo\EditPageSeo\EditPageSeo;
+use App\Application\Seo\EditPageSeo\EditPageSeoHandler;
 use App\Application\Settings\EditLegalIdentity\EditLegalIdentity;
 use App\Application\Settings\EditLegalIdentity\EditLegalIdentityHandler;
 use App\Application\Settings\InstallLegalDefaults\InstallLegalDefaults;
@@ -53,6 +57,7 @@ use App\Domain\Production\ProductionServiceDetails;
 use App\Domain\Production\ServiceKind;
 use App\Domain\Sales\ConsentKind;
 use App\Domain\Sales\ProductType;
+use App\Domain\Seo\PageKey;
 use App\Domain\Shared\LocalizedText;
 use App\Domain\Shared\Price;
 use Doctrine\Bundle\FixturesBundle\Fixture;
@@ -94,11 +99,20 @@ final class AppFixtures extends Fixture
         [SocialNetwork::Linktree, 'https://linktr.ee/injustmusic'],
     ];
 
+    private const array LINKS = [
+        ['Listen on Spotify', 'Écouter sur Spotify', SocialNetwork::Spotify, 'https://open.spotify.com/artist/6RenEaL8VkR8isDsiHDGYw', true],
+        ['Watch on YouTube', 'Regarder sur YouTube', SocialNetwork::Youtube, 'https://www.youtube.com/channel/UCxjrMeB6PABEF6Pg2ImBn2w', false],
+        ['Follow on Instagram', 'Suivre sur Instagram', SocialNetwork::Instagram, 'https://instagram.com/injustmusic', false],
+        ['Follow on TikTok', 'Suivre sur TikTok', SocialNetwork::Tiktok, 'https://tiktok.com/@injustmusic', false],
+    ];
+
     public function __construct(
         private readonly AddReleaseHandler $addRelease,
         private readonly FeatureReleaseHandler $featureRelease,
         private readonly EditMusicTextHandler $editMusicText,
         private readonly AddSocialLinkHandler $addSocialLink,
+        private readonly AddBioLinkHandler $addBioLink,
+        private readonly EditPageSeoHandler $editPageSeo,
         private readonly AddLessonOfferHandler $addLessonOffer,
         private readonly EditLessonsPageHandler $editLessonsPage,
         private readonly AddProductionServiceHandler $addProductionService,
@@ -131,6 +145,13 @@ final class AppFixtures extends Fixture
         foreach (self::SOCIAL as [$network, $url]) {
             ($this->addSocialLink)(new AddSocialLink($network, $url, null));
         }
+
+        foreach (self::LINKS as [$en, $fr, $network, $url, $highlighted]) {
+            ($this->addBioLink)(new AddBioLink(new LocalizedText($fr, $en), $url, $network, $highlighted, true));
+        }
+
+        ($this->editPageSeo)(new EditPageSeo(PageKey::Lessons, new LocalizedText('Cours de guitare rock et punk', 'Rock and punk guitar lessons'), new LocalizedText('Cours de guitare à domicile, chez le professeur ou en ligne.', 'Guitar lessons at your home, at the teacher or online.')));
+        ($this->editPageSeo)(new EditPageSeo(PageKey::Production, new LocalizedText('Production et mix musical', 'Music production and mixing'), new LocalizedText('Enregistrement, mix et mastering pour groupes rock et punk.', 'Recording, mixing and mastering for rock and punk bands.')));
 
         $this->lessons();
         $this->production();

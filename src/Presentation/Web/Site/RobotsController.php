@@ -14,7 +14,7 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 #[Route('/robots.txt', name: 'robots', methods: ['GET'], format: 'txt')]
 final readonly class RobotsController
 {
-    private const array PRIVATE_PATHS = ['/admin', '/api/', '/login', '/logout'];
+    private const array PRIVATE_PATHS = ['/admin', '/api/', '/go/', '/checkout', '/fr/checkout', '/login', '/logout'];
 
     public function __construct(
         private SettingsQueries $settings,
@@ -34,7 +34,7 @@ final readonly class RobotsController
             $lines[] = 'Sitemap: '.$this->urls->generate('sitemap', [], UrlGeneratorInterface::ABSOLUTE_URL);
         }
 
-        $response = new Response(implode("\n", $lines)."\n", headers: ['Content-Type' => 'text/plain; charset=UTF-8']);
+        $response = new Response(implode("\n", $lines)."\n");
         $response->setPublic();
         $response->setMaxAge(3600);
 

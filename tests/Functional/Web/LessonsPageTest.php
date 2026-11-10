@@ -163,7 +163,7 @@ final class LessonsPageTest extends WebTestCase
     {
         $client = self::createClient();
 
-        self::assertSame(['http://localhost/', 'http://localhost/fr', 'http://localhost/contact', 'http://localhost/fr/contact'], self::sitemap($client));
+        self::assertSame(['http://localhost/', 'http://localhost/fr', 'http://localhost/contact', 'http://localhost/fr/contact', 'http://localhost/links', 'http://localhost/fr/links'], self::sitemap($client));
 
         self::switchSections(true, true, false);
         self::assertSame([
@@ -171,6 +171,7 @@ final class LessonsPageTest extends WebTestCase
             'http://localhost/lessons', 'http://localhost/fr/lessons',
             'http://localhost/production', 'http://localhost/fr/production',
             'http://localhost/contact', 'http://localhost/fr/contact',
+            'http://localhost/links', 'http://localhost/fr/links',
         ], self::sitemap($client));
     }
 

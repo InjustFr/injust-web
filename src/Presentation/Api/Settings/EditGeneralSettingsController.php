@@ -26,6 +26,7 @@ final class EditGeneralSettingsController extends AbstractController
             $payload->seoTitle,
             $payload->seoDescription,
             $payload->searchIndexing,
+            $payload->googleSiteVerification,
         )));
     }
 }

@@ -32,7 +32,7 @@ final class SeoTest extends WebTestCase
 
         $client->request('GET', '/robots.txt');
 
-        self::assertSame("User-agent: *\nAllow: /\nDisallow: /admin\nDisallow: /api/\nDisallow: /login\nDisallow: /logout\n\nSitemap: http://localhost/sitemap.xml\n", $client->getResponse()->getContent());
+        self::assertSame("User-agent: *\nAllow: /\nDisallow: /admin\nDisallow: /api/\nDisallow: /go/\nDisallow: /checkout\nDisallow: /fr/checkout\nDisallow: /login\nDisallow: /logout\n\nSitemap: http://localhost/sitemap.xml\n", $client->getResponse()->getContent());
     }
 
     public function testWhileIndexingIsOffEveryPageIsNoindex(): void
@@ -82,11 +82,12 @@ final class SeoTest extends WebTestCase
             'http://localhost/', 'http://localhost/fr',
             'http://localhost/beats', 'http://localhost/fr/beats',
             'http://localhost/contact', 'http://localhost/fr/contact',
+            'http://localhost/links', 'http://localhost/fr/links',
             'http://localhost/legal/mentions', 'http://localhost/fr/legal/mentions',
             'http://localhost/legal/licence', 'http://localhost/fr/legal/licence',
         ], $locs);
         $links = $sitemap->url[3]->children('http://www.w3.org/1999/xhtml')->link;
-        self::assertSame(['en', 'fr'], [(string) $links[0]?->attributes()?->hreflang, (string) $links[1]?->attributes()?->hreflang]);
+        self::assertSame(['en', 'fr', 'x-default'], [(string) $links[0]?->attributes()?->hreflang, (string) $links[1]?->attributes()?->hreflang, (string) $links[2]?->attributes()?->hreflang]);
         self::assertSame(['http://localhost/beats', 'http://localhost/fr/beats'], [(string) $links[0]?->attributes()?->href, (string) $links[1]?->attributes()?->href]);
     }
 

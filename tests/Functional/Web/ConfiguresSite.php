@@ -45,6 +45,7 @@ trait ConfiguresSite
             new LocalizedText('Injust — punk de protestation', 'Injust — protest punk'),
             new LocalizedText('Punk de protestation.', 'Protest punk.'),
             $searchIndexing,
+            '',
         ));
     }
 

@@ -10,7 +10,9 @@
         "lessons": "Lessons",
         "messages": "Messages",
         "production": "Production",
-        "orders": "Orders"
+        "orders": "Orders",
+        "links": "Links",
+        "seo": "SEO"
     },
     "dashboard": {
         "title": "Dashboard",
@@ -101,7 +103,9 @@
             "seoTitle": "SEO title ({language})",
             "seoDescription": "SEO description ({language})",
             "searchIndexing": "Search engine indexing",
-            "searchIndexingHint": "Off keeps the site out of search results."
+            "searchIndexingHint": "Off keeps the site out of search results.",
+            "googleVerification": "Google Search Console token",
+            "googleVerificationHint": "Paste only the content value of Google's meta tag (the part between the quotes after content=), not the whole tag."
         },
         "images": {
             "title": "Images",
@@ -422,5 +426,54 @@
             "warning": "Close to the threshold.",
             "crossed": "Threshold crossed."
         }
+    },
+    "links": {
+        "title": "Links",
+        "subtitle": "The link-in-bio page that replaces Linktree.",
+        "publicUrl": "Public page",
+        "copy": "Copy",
+        "copied": "Link copied.",
+        "copyFailed": "Could not copy, select the link below and copy it by hand.",
+        "list": "Links",
+        "new": "New link",
+        "edit": "Edit link",
+        "delete": "Delete link",
+        "empty": "No link yet. Add the first one.",
+        "label": "Label ({language})",
+        "url": "URL",
+        "urlHint": "https only.",
+        "icon": "Icon",
+        "noIcon": "No icon",
+        "highlighted": "Highlighted",
+        "highlightedHint": "Shown as the main button.",
+        "visible": "Visible",
+        "save": "Save",
+        "saved": "Saved.",
+        "clicks": "{n} click | {n} clicks"
+    },
+    "seo": {
+        "title": "SEO",
+        "subtitle": "Titles, descriptions and share images shown in search results and link previews.",
+        "saved": "Saved.",
+        "save": "Save",
+        "pages": {
+            "home": "Home",
+            "lessons": "Lessons",
+            "production": "Production",
+            "contact": "Contact",
+            "links": "Links"
+        },
+        "homeHint": "The home page uses the SEO fields of the general settings.",
+        "editHome": "Edit in Settings",
+        "tooLong": "too long for Google",
+        "preview": "Google result preview",
+        "defaultTitle": "Default page title",
+        "defaultDescription": "Default page description",
+        "image": "Share image",
+        "noImage": "No image, the default is used.",
+        "upload": "Upload",
+        "remove": "Remove",
+        "titleField": "Title ({language})",
+        "descriptionField": "Description ({language})"
     }
 }

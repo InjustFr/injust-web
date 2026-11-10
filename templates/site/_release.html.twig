@@ -1,9 +1,10 @@
+{% import 'site/_image.html.twig' as media %}
 {% set description = release.description.in(locale) %}
 <details class="release" id="release-{{ release.slug }}">
     <summary>
         <span class="release-cover">
             {%- if release.cover -%}
-                <img src="{{ path('media_image', {file: release.cover ~ '.webp'}) }}" alt="" width="600" height="600" loading="lazy">
+                {{- media.img(release.cover) -}}
             {%- else -%}
                 <span class="cover-blank" aria-hidden="true">{{ release.title }}</span>
             {%- endif -%}

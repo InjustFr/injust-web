@@ -356,7 +356,7 @@ final class ContactApiTest extends WebTestCase
 
     private static function contactEmail(string $email): void
     {
-        self::getContainer()->get(EditGeneralSettingsHandler::class)(new EditGeneralSettings($email, null, new VatMentions('A', 'B', 'C'), new LocalizedText(), new LocalizedText(), false));
+        self::getContainer()->get(EditGeneralSettingsHandler::class)(new EditGeneralSettings($email, null, new VatMentions('A', 'B', 'C'), new LocalizedText(), new LocalizedText(), false, ''));
     }
 
     private static function service(): string

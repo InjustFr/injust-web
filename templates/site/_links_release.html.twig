@@ -1,0 +1,17 @@
+{% import 'site/_image.html.twig' as media %}
+{% set featured = music.featured %}
+{% if featured %}
+    <article class="links-release">
+        {% if featured.cover %}
+            {{ media.img(featured.cover, '', 'links-release-cover', 'priority') }}
+        {% endif %}
+        <div class="links-release-body">
+            <p class="links-release-kicker">{{ 'site.hero.featured'|trans }}</p>
+            <h2 class="links-release-title">{{ featured.title }}</h2>
+            <p class="links-release-meta">{{ featured.upcoming ? 'site.hero.out'|trans({date: featured.releaseDate|date('d.m.Y')}) : ('site.types.' ~ featured.type)|trans ~ ' · ' ~ featured.releaseDate|date('d.m.Y') }}</p>
+        </div>
+        {% if featured.smartLinkUrl %}
+            <a class="button links-release-cta" href="{{ featured.smartLinkUrl }}" rel="noopener">{{ (featured.upcoming ? 'site.hero.presave' : 'site.hero.listen')|trans }}</a>
+        {% endif %}
+    </article>
+{% endif %}

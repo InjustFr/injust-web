@@ -181,7 +181,7 @@ final class ConfirmPaymentTest extends TestCase
     {
         $settings = Settings::initial();
         $settings->editLegalIdentity(new LegalIdentity('Louis Injust', 'EI', '443061841', '1 rue du Son', 'louis@injust.test', '+33600000000', 'Louis', 'Médiateur', 'https://mediator.test', 'OVH', 'Roubaix', '+33972101007'));
-        $settings->editGeneral('', null, new VatMentions('Franchise', 'Reverse charge', 'Outside the EU'), new LocalizedText(), new LocalizedText(), false);
+        $settings->editGeneral('', null, new VatMentions('Franchise', 'Reverse charge', 'Outside the EU'), new LocalizedText(), new LocalizedText(), false, '');
 
         return new readonly class($settings) implements SettingsRepository {
             public function __construct(private Settings $settings)

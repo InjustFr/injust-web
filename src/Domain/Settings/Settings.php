@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Domain\Settings;
 
+use App\Domain\Settings\Exception\InvalidVerificationToken;
 use App\Domain\Settings\Exception\LegalIdentityIncomplete;
 use App\Domain\Shared\HttpsUrl;
 use App\Domain\Shared\LocalizedText;
@@ -15,6 +16,7 @@ class Settings
 {
     public const int ID = 1;
     public const int MAX_TEXT = 255;
+    public const int MAX_VERIFICATION_TOKEN = 100;
 
     #[ORM\Id]
     #[ORM\Column]
@@ -58,6 +60,9 @@ class Settings
 
     #[ORM\Column]
     private bool $searchIndexing = false;
+
+    #[ORM\Column(length: self::MAX_VERIFICATION_TOKEN, options: ['default' => ''])]
+    private string $googleSiteVerification = '';
 
     private function __construct()
     {
@@ -109,8 +114,12 @@ class Settings
         $this->legalIdentity = $identity;
     }
 
-    public function editGeneral(string $contactEmail, ?string $bookingUrl, VatMentions $vatMentions, LocalizedText $seoTitle, LocalizedText $seoDescription, bool $searchIndexing): void
+    public function editGeneral(string $contactEmail, ?string $bookingUrl, VatMentions $vatMentions, LocalizedText $seoTitle, LocalizedText $seoDescription, bool $searchIndexing, string $googleSiteVerification): void
     {
+        $googleSiteVerification = trim($googleSiteVerification);
+        if ('' !== $googleSiteVerification && 1 !== preg_match('/^[A-Za-z0-9_-]{10,'.self::MAX_VERIFICATION_TOKEN.'}$/', $googleSiteVerification)) {
+            throw new InvalidVerificationToken();
+        }
         $bookingUrl = HttpsUrl::orBlank($bookingUrl ?? '');
         $this->contactEmail = trim($contactEmail);
         $this->bookingUrl = '' === $bookingUrl ? null : $bookingUrl;
@@ -118,6 +127,7 @@ class Settings
         $this->seoTitle = $seoTitle;
         $this->seoDescription = $seoDescription;
         $this->searchIndexing = $searchIndexing;
+        $this->googleSiteVerification = $googleSiteVerification;
     }
 
     public function useImage(SiteImage $slot, string $image): ?string
@@ -183,6 +193,11 @@ class Settings
     public function searchIndexing(): bool
     {
         return $this->searchIndexing;
+    }
+
+    public function googleSiteVerification(): string
+    {
+        return $this->googleSiteVerification;
     }
 
     private function place(SiteImage $slot, ?string $image): ?string

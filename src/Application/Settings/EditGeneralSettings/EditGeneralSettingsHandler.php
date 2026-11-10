@@ -19,7 +19,7 @@ final readonly class EditGeneralSettingsHandler
     public function __invoke(EditGeneralSettings $command): SettingsView
     {
         $settings = $this->settings->current();
-        $settings->editGeneral($command->contactEmail, $command->bookingUrl, $command->vatMentions, $command->seoTitle, $command->seoDescription, $command->searchIndexing);
+        $settings->editGeneral($command->contactEmail, $command->bookingUrl, $command->vatMentions, $command->seoTitle, $command->seoDescription, $command->searchIndexing, $command->googleSiteVerification);
         $this->settings->save($settings);
         $this->transaction->commit();
 

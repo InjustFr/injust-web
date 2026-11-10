@@ -13,6 +13,7 @@ identity:
 settings:
     invalid_siren: '« {siren} » n’est pas un SIREN valide : il compte 9 chiffres et passe le contrôle de Luhn.'
     legal_identity_incomplete: 'Remplissez tous les champs de l’identité légale avant d’activer le paiement en ligne.'
+    invalid_verification_token: 'Collez seulement le jeton de validation de la Search Console : la valeur content de la balise meta, de 10 à 100 lettres, chiffres, - ou _.'
 legal:
     empty_document: 'Un texte légal doit être rempli dans au moins une langue.'
 music:
@@ -45,3 +46,7 @@ sales:
     payment_mismatch: 'Le paiement reçu pour la commande {reference} ne correspond pas à son prix.'
     order_not_paid: 'La commande {reference} n’est pas payée.'
     order_not_found: 'Aucune commande ne correspond à {by, select, session {cette session de paiement} other {ce paiement}} ({id}).'
+links:
+    invalid_label: 'Un lien a besoin d’un libellé dans au moins une langue, {max} caractères au plus dans chacune.'
+seo:
+    invalid_page_seo: 'Le titre tient en {title} caractères et la description en {description} caractères au plus, dans chaque langue.'

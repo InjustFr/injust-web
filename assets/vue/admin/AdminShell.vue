@@ -1,5 +1,5 @@
 <script setup>
-import { ExternalLink, FileText, GraduationCap, Inbox, LayoutDashboard, LogOut, Music, Settings, ShoppingBag, SlidersHorizontal } from '@lucide/vue';
+import { ExternalLink, FileText, GraduationCap, Inbox, LayoutDashboard, Link, Search, LogOut, Music, Settings, ShoppingBag, SlidersHorizontal } from '@lucide/vue';
 import { ConfigProvider, TooltipProvider } from 'reka-ui';
 import { computed, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
@@ -16,6 +16,8 @@ const SECTIONS = [
     { name: 'music', icon: Music },
     { name: 'lessons', icon: GraduationCap },
     { name: 'production', icon: SlidersHorizontal },
+    { name: 'links', icon: Link },
+    { name: 'seo', icon: Search },
     { name: 'orders', icon: ShoppingBag },
     { name: 'messages', icon: Inbox },
     { name: 'settings', icon: Settings },

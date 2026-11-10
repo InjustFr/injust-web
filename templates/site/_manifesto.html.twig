@@ -1,3 +1,4 @@
+{% import 'site/_image.html.twig' as media %}
 {% set portrait = music.text.portrait %}
 {% if manifesto|trim or bio|trim or portrait %}
     <section class="manifesto" id="manifesto">
@@ -10,7 +11,7 @@
         {% if bio|trim or portrait %}
             <div class="bio">
                 {% if portrait %}
-                    <img class="portrait" src="{{ path('media_image', {file: portrait ~ '.webp'}) }}" alt="{{ brand }}" width="900" height="1125" loading="lazy">
+                    {{ media.img(portrait, brand, 'portrait') }}
                 {% endif %}
                 {% if bio|trim %}
                     <h2 class="bio-title">{{ 'site.music.bio'|trans }}</h2>

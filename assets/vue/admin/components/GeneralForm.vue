@@ -57,6 +57,9 @@ async function save() {
                     <textarea v-model="form.seoDescription[language]" :name="`seoDescription-${language}`" />
                 </FormField>
             </template>
+            <FormField :label="t('admin.settings.general.googleVerification')" :hint="t('admin.settings.general.googleVerificationHint')" :error="errors.googleSiteVerification ?? null">
+                <input v-model="form.googleSiteVerification" type="text" name="googleSiteVerification" maxlength="100" autocomplete="off" spellcheck="false" />
+            </FormField>
             <ToggleRow v-model="form.searchIndexing" :label="t('admin.settings.general.searchIndexing')" :description="t('admin.settings.general.searchIndexingHint')" />
             <BaseButton type="submit" :loading="saving">{{ t('admin.settings.save') }}</BaseButton>
         </form>

@@ -109,3 +109,10 @@ test('a day is formatted for the given locale', () => {
     expect(formatDay('2026-11-10T08:00:00+00:00', 'en-GB')).toBe('10 Nov 2026');
     expect(formatDay('2026-11-10T08:00:00+00:00', 'fr-FR')).toBe('10 nov. 2026');
 });
+
+test('google verification token is kept, trimmed and always sent', () => {
+    const form = generalForm({ ...settings, googleSiteVerification: 'abcDEF_123-xyz' });
+    expect(form.googleSiteVerification).toBe('abcDEF_123-xyz');
+    expect(generalForm(settings).googleSiteVerification).toBe('');
+    expect(generalPayload({ ...form, googleSiteVerification: '  tok_en-1234567  ' }).googleSiteVerification).toBe('tok_en-1234567');
+});

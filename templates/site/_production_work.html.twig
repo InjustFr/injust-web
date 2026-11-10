@@ -1,7 +1,8 @@
+{% import 'site/_image.html.twig' as media %}
 <li class="work">
     <span class="work-cover">
         {%- if work.cover -%}
-            <img src="{{ path('media_image', {file: work.cover ~ '.webp'}) }}" alt="" width="600" height="600" loading="lazy">
+            {{- media.img(work.cover) -}}
         {%- else -%}
             <span class="cover-blank" aria-hidden="true">{{ work.title }}</span>
         {%- endif -%}

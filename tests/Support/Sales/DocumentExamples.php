@@ -33,7 +33,7 @@ final class DocumentExamples
     {
         $settings = Settings::initial();
         $settings->editLegalIdentity(self::identity());
-        $settings->editGeneral($contactEmail, $bookingUrl, VatMentions::defaults(), new LocalizedText(), new LocalizedText(), false);
+        $settings->editGeneral($contactEmail, $bookingUrl, VatMentions::defaults(), new LocalizedText(), new LocalizedText(), false, '');
 
         return SettingsView::of($settings);
     }

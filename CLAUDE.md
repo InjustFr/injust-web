@@ -93,6 +93,14 @@ Layer-first: `src/{Domain,Application,Infrastructure,Presentation}/<Context>/`, 
 - Stripe keys: `STRIPE_SECRET_KEY` and `STRIPE_WEBHOOK_SECRET` from env, empty in `.env`, never in git (`deploy/README.md` lists the webhook URL and events). Dev and test use `Tests\Support\Payments\FakeStripe` (decorates `http_client`, so dev never reaches real Stripe) and the dev/test-only pages `/_fake-checkout/{session}` (Pay signs a `checkout.session.completed` event and sends it through the real webhook).
 - Dev fixtures (dev env only) add a complete fake legal identity ("Demo Artist"), switch lessons, production and online checkout on, and place two paid demo orders with invoices; e2e `e2e/tests/checkout.spec.js` (the test mailer is `null://`, so the confirmation is asserted through the admin "Sent on").
 
+## M4b Links and SEO
+
+- `Domain/Links`: `BioLink` (localized label <= 80, `HttpsUrl`, optional `SocialNetwork` icon, highlighted, visible, `clicks`, position). Public `/links` and `/fr/links` (always on, `LinksController`, own layout in `templates/site/links.html.twig`): every button points to `GET /go/{id}` (`Site\GoController`), which runs `CountBioLinkClick` (one atomic `UPDATE ... clicks = clicks + 1 ... RETURNING url`, no entity load, no session, no cookie, no IP) and answers 302 to the stored https URL only; a `HEAD` answers the same redirect without counting; hidden or unknown id is a 404. `/go/` is disallowed in `robots.txt` and answers `X-Robots-Tag: noindex`.
+- `Domain/Seo`: `PageSeo` per `PageKey` (lessons|production|contact|links; title <= 70, description <= 170, optional share image). Home keeps `Settings.seoTitle`/`seoDescription`. `Site\SiteLayout` picks the override by route name, so renaming those routes drops it. `Settings.googleSiteVerification` is the token only (`/^[A-Za-z0-9_-]{10,100}$/`).
+- Head: canonical, hreflang en/fr/x-default, Open Graph with sized absolute image (default `public/og-default.png`), JSON-LD `MusicGroup`, `WebSite` (home), `BreadcrumbList`. Sitemap has alternates, legal `lastmod` and release covers. 404 uses the full site layout (`ErrorPageLocale` sets the locale from the path); other errors use a DB-free `error.html.twig`.
+- Admin: `/admin/links` (`LinksPage.vue`, `linksForm.js`) and `/admin/seo` (`SeoPage.vue`, `seoForm.js`); API `/api/admin/links[/order|/{id}]`, `/api/admin/seo[/{key}[/image]]`.
+- e2e `e2e/tests/links.spec.js`. ErrorPageTest boots a non-debug kernel: clear `var/cache/test<TOKEN>` after changing a service constructor.
+
 ## Accounts & security
 
 - Sign-in = mossyleaf accounts (Authentik at `accounts.mossyleaf.studio`, project `~/Sites/mossyleaf-studio/accounts`), OIDC code flow + PKCE, client id `injust`. Only accounts whose `groups` claim contains `OIDC_REQUIRED_GROUP` (`injust`) get in; dev leaves it empty.

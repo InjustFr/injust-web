@@ -10,7 +10,9 @@
         "lessons": "Cours",
         "messages": "Messages",
         "production": "Production",
-        "orders": "Commandes"
+        "orders": "Commandes",
+        "links": "Liens",
+        "seo": "SEO"
     },
     "dashboard": {
         "title": "Tableau de bord",
@@ -101,7 +103,9 @@
             "seoTitle": "Titre SEO ({language})",
             "seoDescription": "Description SEO ({language})",
             "searchIndexing": "Indexation par les moteurs de recherche",
-            "searchIndexingHint": "Désactivé, le site reste hors des résultats de recherche."
+            "searchIndexingHint": "Désactivé, le site reste hors des résultats de recherche.",
+            "googleVerification": "Jeton Google Search Console",
+            "googleVerificationHint": "Colle uniquement la valeur de content de la balise meta de Google (entre les guillemets après content=), pas la balise entière."
         },
         "images": {
             "title": "Images",
@@ -422,5 +426,54 @@
             "warning": "Proche du seuil.",
             "crossed": "Seuil dépassé."
         }
+    },
+    "links": {
+        "title": "Liens",
+        "subtitle": "La page de liens qui remplace Linktree.",
+        "publicUrl": "Page publique",
+        "copy": "Copier",
+        "copied": "Lien copié.",
+        "copyFailed": "Copie impossible, sélectionne le lien ci-dessous et copie-le à la main.",
+        "list": "Liens",
+        "new": "Nouveau lien",
+        "edit": "Modifier le lien",
+        "delete": "Supprimer le lien",
+        "empty": "Aucun lien pour l'instant. Ajoute le premier.",
+        "label": "Libellé ({language})",
+        "url": "URL",
+        "urlHint": "https uniquement.",
+        "icon": "Icône",
+        "noIcon": "Aucune icône",
+        "highlighted": "Mis en avant",
+        "highlightedHint": "Affiché comme bouton principal.",
+        "visible": "Visible",
+        "save": "Enregistrer",
+        "saved": "Enregistré.",
+        "clicks": "{n} clic | {n} clics"
+    },
+    "seo": {
+        "title": "SEO",
+        "subtitle": "Titres, descriptions et images de partage affichés dans les résultats de recherche et les aperçus de liens.",
+        "saved": "Enregistré.",
+        "save": "Enregistrer",
+        "pages": {
+            "home": "Accueil",
+            "lessons": "Cours",
+            "production": "Production",
+            "contact": "Contact",
+            "links": "Liens"
+        },
+        "homeHint": "L'accueil utilise les champs SEO des réglages généraux.",
+        "editHome": "Modifier dans Réglages",
+        "tooLong": "trop long pour Google",
+        "preview": "Aperçu du résultat Google",
+        "defaultTitle": "Titre par défaut de la page",
+        "defaultDescription": "Description par défaut de la page",
+        "image": "Image de partage",
+        "noImage": "Aucune image, celle par défaut est utilisée.",
+        "upload": "Téléverser",
+        "remove": "Retirer",
+        "titleField": "Titre ({language})",
+        "descriptionField": "Description ({language})"
     }
 }
