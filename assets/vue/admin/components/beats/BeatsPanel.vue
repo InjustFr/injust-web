@@ -12,6 +12,7 @@ import { useApi } from '../../../composables/useApi.js';
 import { useToast } from '../../../composables/useToast.js';
 import { moveId } from '../../forms.js';
 import { imageUrl } from '../../settingsForm.js';
+import { useImageFocus } from '../../../composables/useImageFraming.js';
 import { beatForm, beatPayload, fileChips, keyLabel } from '../../beatsForm.js';
 import OrderButtons from '../music/OrderButtons.vue';
 import BeatModal from './BeatModal.vue';
@@ -21,6 +22,7 @@ const props = defineProps({ beats: { type: Array, required: true } });
 const { t } = useI18n();
 const api = useApi();
 const toast = useToast();
+const focus = useImageFocus();
 const editing = ref(null);
 const open = ref(false);
 const expanded = ref(new Set());
@@ -49,7 +51,7 @@ function toggleFiles(id) {
         <ul v-else class="rows">
             <li v-for="(beat, index) in beats" :key="beat.id" class="beat-row">
                 <div class="rows__item beat-row__main">
-                    <img v-if="beat.cover" class="rows__thumb" :src="imageUrl(beat.cover)" alt="" />
+                    <img v-if="beat.cover" class="rows__thumb" :src="imageUrl(beat.cover)" :style="{ objectPosition: focus.position(beat.cover) }" alt="" />
                     <span v-else class="rows__thumb rows__thumb--empty" />
                     <span class="rows__label">
                         {{ beat.title }}

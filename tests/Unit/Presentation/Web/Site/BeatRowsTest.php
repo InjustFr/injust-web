@@ -8,6 +8,7 @@ use App\Application\Beats\BeatsQueries;
 use App\Application\Beats\BeatTierView;
 use App\Application\Beats\BeatView;
 use App\Application\Beats\LicenceTierView;
+use App\Application\Shared\ImageFocusQueries;
 use App\Application\Shared\LegalMarkdown;
 use App\Domain\Beats\Beat;
 use App\Domain\Beats\BeatDetails;
@@ -16,10 +17,13 @@ use App\Domain\Beats\Deliverable;
 use App\Domain\Beats\LicenceTier;
 use App\Domain\Beats\LicenceTierDetails;
 use App\Domain\Beats\MusicalKey;
+use App\Domain\Shared\ImageFocus;
+use App\Domain\Shared\ImageFocusRepository;
 use App\Domain\Shared\LocalizedText;
 use App\Domain\Shared\Price;
 use App\Presentation\Web\Site\BeatRows;
 use App\Presentation\Web\Site\CheckoutTierOptions;
+use App\Presentation\Web\Site\ImageFocusClasses;
 use App\Presentation\Web\Site\PriceFormat;
 use App\Presentation\Web\Site\TierColumns;
 use PHPUnit\Framework\TestCase;
@@ -48,6 +52,7 @@ final class BeatRowsTest extends TestCase
             'keyLabel' => 'Do# mineur',
             'tags' => ['punk', 'dark'],
             'cover' => 'media_image:file=01JCOVER.webp',
+            'coverClass' => 'fx-35 fy-60',
             'preview' => 'media_audio:id=01JPREVIEW',
             'price' => "dès 29,50\u{a0}€",
             'cents' => 2950,
@@ -62,7 +67,7 @@ final class BeatRowsTest extends TestCase
 
         $row = self::rows([])->rows([$view])[0];
 
-        self::assertSame([null, null, null, null, 'Ré majeur', [], null], [$row['cover'], $row['preview'], $row['price'], $row['cents'], $row['keyLabel'], $row['licences'], $row['buy']]);
+        self::assertSame([null, '', null, null, null, 'Ré majeur', [], null], [$row['cover'], $row['coverClass'], $row['preview'], $row['price'], $row['cents'], $row['keyLabel'], $row['licences'], $row['buy']]);
     }
 
     public function testTheKeysOfTheRowsFollowTheKeyOrderOnce(): void
@@ -102,7 +107,12 @@ final class BeatRowsTest extends TestCase
             'site.beats.notes.d' => 'Ré',
         ], 'fr', 'messages+intl-icu');
 
-        return new BeatRows($beats, new PriceFormat(), $translator, self::urls(), new CheckoutTierOptions($beats, new TierColumns(new PriceFormat(), new LegalMarkdown()), self::urls()));
+        $cover = ImageFocus::centered('01JCOVER');
+        $cover->moveTo(35, 60);
+        $focuses = self::createStub(ImageFocusRepository::class);
+        $focuses->method('all')->willReturn([$cover]);
+
+        return new BeatRows($beats, new PriceFormat(), $translator, self::urls(), new CheckoutTierOptions($beats, new TierColumns(new PriceFormat(), new LegalMarkdown()), self::urls()), new ImageFocusClasses(new ImageFocusQueries($focuses)));
     }
 
     private static function urls(): UrlGeneratorInterface

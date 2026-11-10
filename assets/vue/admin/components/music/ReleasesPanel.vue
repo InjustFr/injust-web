@@ -11,6 +11,7 @@ import { useApi } from '../../../composables/useApi.js';
 import { useToast } from '../../../composables/useToast.js';
 import { moveId } from '../../forms.js';
 import { imageUrl } from '../../settingsForm.js';
+import { useImageFocus } from '../../../composables/useImageFraming.js';
 import OrderButtons from './OrderButtons.vue';
 import ReleaseModal from './ReleaseModal.vue';
 
@@ -18,6 +19,7 @@ const props = defineProps({ releases: { type: Array, required: true }, finders: 
 const { t } = useI18n();
 const api = useApi();
 const toast = useToast();
+const focus = useImageFocus();
 const editing = ref(null);
 const open = ref(false);
 const reorder = (id, delta) => toast.attempt(() => api.put('/api/admin/music/releases/order', { ids: moveId(props.releases.map((item) => item.id), id, delta) }));
@@ -39,7 +41,7 @@ const remove = (id) => toast.attempt(() => api.del(`/api/admin/music/releases/${
         <EmptyState :icon="Disc3" v-if="releases.length === 0" :title="t('admin.music.releases.empty')" />
         <ul v-else class="rows">
             <li v-for="(release, index) in releases" :key="release.id" class="rows__item">
-                <img v-if="release.cover" class="rows__thumb" :src="imageUrl(release.cover)" alt="" />
+                <img v-if="release.cover" class="rows__thumb" :src="imageUrl(release.cover)" :style="{ objectPosition: focus.position(release.cover) }" alt="" />
                 <span v-else class="rows__thumb rows__thumb--empty" />
                 <span class="rows__label">
                     {{ release.title }}

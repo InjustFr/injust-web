@@ -138,6 +138,14 @@ Layer-first: `src/{Domain,Application,Infrastructure,Presentation}/<Context>/`, 
 - Public `/listen/{slug}` and `/fr/listen/{slug}` (`ListenController`, `listen.html.twig`, indexable, in the sitemap, JSON-LD MusicAlbum/MusicRecording); buttons go through `GET /listen/{slug}/{platform}` (`ListenClickController`, 302, one atomic upsert into `release_link_click`, no session, no IP, HEAD not counted, noindex, disallowed in robots). The home "Listen" and "All platforms" buttons point to it when a release has a link or a UPC.
 - Tests: `Tests\Support\FakePlatforms` decorates `http_client` (UPC 701518909440 on all four, 012345678905 Apple and Deezer, 036000291452 failures); dev fixtures use them; e2e `e2e/tests/listen.spec.js`.
 
+## M9 Image framing
+
+- Non-destructive focus point per uploaded image: `Domain\Shared\ImageFocus` (table `image_focus`, image ULID primary key, x and y 0..100 in steps of 5, `InvalidFocus` 422; 50/50 is the default and stores no row). `SetImageFocus` (404 when the file is not in `ImageStorage`; 50/50 deletes the row); `Images::discard` also forgets the focus. Reads through `ImageFocusQueries`.
+- Admin API `GET|PUT /api/admin/images/{id}/focus` -> `{id, x, y}` (GET answers 50/50 for an unknown image, PUT checks the file); `GET /api/admin/images/focus` lists every stored focus (the admin thumbnails read it once).
+- Public: Twig `image_focus(id)` (`Site\ImageFocusClasses`, a `ResetInterface` memo loaded once per request) returns `fx-35 fy-60` or ''; the `_image.html.twig` macro appends it, `BeatRows` carry the ready-made `coverClass` for the server row and the `BeatTable` island. `base.css` sets `object-position: var(--fx, 50%) var(--fy, 50%)` on `img` and generates `.fx-0..100` / `.fy-0..100` (step 5), so there are no inline styles (CSP).
+- Admin: `components/ui/FocusPicker.vue` (click, drag, arrows, Shift = 25, Home/End = left/right edge, Page Up/Down = top/bottom edge), `admin/components/ImageFramingModal.vue` (`v-model:open`, `image-id`, `kind`; the picker and Save wait for the stored focus), composables `useImageFraming(kind, urlOf)` / `useImageFocus` (one shared list of focuses), `shared/focusPoint.js`, `shared/imageFraming.js` (slot frames: hero phone 9:19.5 + desktop 16:9, covers 1:1, portrait 4:5; the modal opens after an upload when the ratio differs by more than 2%, always for the hero) and an "Adjust framing" button wherever an image exists. Logo and SEO share images have no picker.
+- e2e `e2e/tests/framing.spec.js`.
+
 ## Accounts & security
 
 - Sign-in = mossyleaf accounts (Authentik at `accounts.mossyleaf.studio`, project `~/Sites/mossyleaf-studio/accounts`), OIDC code flow + PKCE, client id `injust`. Only accounts whose `groups` claim contains `OIDC_REQUIRED_GROUP` (`injust`) get in; dev leaves it empty.

@@ -646,5 +646,20 @@
             "intro": "Introduction, Markdown ({language})",
             "faq": "FAQ, Markdown ({language})"
         }
+    },
+    "framing": {
+        "title": "Ajuster le cadrage",
+        "adjust": "Ajuster le cadrage",
+        "hint": "Cliquez ou glissez sur la partie de l'image qui doit rester visible. Les flèches déplacent le point, Maj le déplace plus vite. Les aperçus montrent comment chaque format recadre l'image.",
+        "point": "Point de cadrage",
+        "pointValue": "{x} % depuis la gauche, {y} % depuis le haut",
+        "save": "Enregistrer le cadrage",
+        "saved": "Cadrage enregistré.",
+        "frames": {
+            "phone": "Téléphone",
+            "desktop": "Ordinateur",
+            "square": "Carré",
+            "portrait": "Portrait 4:5"
+        }
     }
 }

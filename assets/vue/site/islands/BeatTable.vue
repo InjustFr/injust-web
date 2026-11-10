@@ -160,7 +160,7 @@ onBeforeUnmount(() => audio.value?.pause());
                     <button type="button" class="beat-play" :aria-pressed="isPlaying(beat)" :aria-label="labels.play.replace('{title}', beat.title)" @click="apply(player(state, { type: 'toggle', id: beat.id }))"><span class="beat-play-icon" aria-hidden="true"></span></button>
                 </td>
                 <td class="beat-cover">
-                    <img v-if="beat.cover" :src="beat.cover" alt="" width="56" height="56" loading="lazy" decoding="async">
+                    <img v-if="beat.cover" :class="beat.coverClass || undefined" :src="beat.cover" alt="" width="56" height="56" loading="lazy" decoding="async">
                     <span v-else class="cover-blank" aria-hidden="true">{{ beat.title.charAt(0) }}</span>
                 </td>
                 <th :id="`beat-title-${beat.id}`" scope="row" class="beat-title">

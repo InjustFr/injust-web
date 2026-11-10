@@ -11,6 +11,7 @@ import { useApi } from '../../../composables/useApi.js';
 import { useToast } from '../../../composables/useToast.js';
 import { moveId } from '../../forms.js';
 import { imageUrl } from '../../settingsForm.js';
+import { useImageFocus } from '../../../composables/useImageFraming.js';
 import OrderButtons from '../music/OrderButtons.vue';
 import PortfolioModal from './PortfolioModal.vue';
 
@@ -18,6 +19,7 @@ const props = defineProps({ items: { type: Array, required: true } });
 const { t } = useI18n();
 const api = useApi();
 const toast = useToast();
+const focus = useImageFocus();
 const editing = ref(null);
 const open = ref(false);
 const reorder = (id, delta) => toast.attempt(() => api.put('/api/admin/production/portfolio/order', { ids: moveId(props.items.map((item) => item.id), id, delta) }));
@@ -37,7 +39,7 @@ function edit(id) {
         <EmptyState v-if="items.length === 0" :icon="Disc3" :title="t('admin.production.portfolio.empty')" />
         <ul v-else class="rows">
             <li v-for="(item, index) in items" :key="item.id" class="rows__item">
-                <img v-if="item.cover" class="rows__thumb" :src="imageUrl(item.cover)" alt="" />
+                <img v-if="item.cover" class="rows__thumb" :src="imageUrl(item.cover)" :style="{ objectPosition: focus.position(item.cover) }" alt="" />
                 <span v-else class="rows__thumb rows__thumb--empty" />
                 <span class="rows__label">
                     {{ item.title }}

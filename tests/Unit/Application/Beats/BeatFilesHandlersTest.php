@@ -26,6 +26,7 @@ use App\Domain\Beats\BeatRepository;
 use App\Domain\Beats\Deliverable;
 use App\Domain\Beats\Exception\UnsupportedBeatFile;
 use App\Domain\Beats\MusicalKey;
+use App\Domain\Shared\ImageFocusRepository;
 use App\Tests\Support\Sales\Journal;
 use App\Tests\Support\Sales\RecordingTransaction;
 use PHPUnit\Framework\TestCase;
@@ -172,7 +173,7 @@ final class BeatFilesHandlersTest extends TestCase
         $images = self::createStub(ImageStorage::class);
         $images->method('delete')->willReturnCallback(fn (string $file): null => $this->journal->write('delete image '.$file));
 
-        new DeleteBeatHandler($this->beats, new RecordingPrivateFiles($this->journal), new RecordingAudio($this->journal), new Images($images), new RecordingTransaction($this->journal))(new DeleteBeat($this->beat->id()));
+        new DeleteBeatHandler($this->beats, new RecordingPrivateFiles($this->journal), new RecordingAudio($this->journal), new Images($images, self::createStub(ImageFocusRepository::class)), new RecordingTransaction($this->journal))(new DeleteBeat($this->beat->id()));
 
         self::assertSame(['remove beat', 'commit', 'delete mp3', 'delete stems', 'delete tag', 'delete image 01HZZZZZZZZZZZZZZZZZZZZZZC.webp'], $this->journal->entries);
     }
@@ -182,7 +183,7 @@ final class BeatFilesHandlersTest extends TestCase
         $images = self::createStub(ImageStorage::class);
         $images->method('delete')->willReturnCallback(fn (string $file): null => $this->journal->write('delete image '.$file));
 
-        new DeleteBeatHandler($this->beats, new RecordingPrivateFiles($this->journal), new RecordingAudio($this->journal), new Images($images), new RecordingTransaction($this->journal))(new DeleteBeat($this->beat->id()));
+        new DeleteBeatHandler($this->beats, new RecordingPrivateFiles($this->journal), new RecordingAudio($this->journal), new Images($images, self::createStub(ImageFocusRepository::class)), new RecordingTransaction($this->journal))(new DeleteBeat($this->beat->id()));
 
         self::assertSame(['remove beat', 'commit'], $this->journal->entries);
     }

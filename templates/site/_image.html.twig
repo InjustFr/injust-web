@@ -1,6 +1,7 @@
 {% macro img(id, alt = '', class = null, loading = 'lazy') %}
     {%- set size = image_size(id) -%}
-    <img{% if class %} class="{{ class }}"{% endif %} src="{{ path('media_image', {file: id ~ '.webp'}) }}" alt="{{ alt }}"
+    {%- set classes = (class ~ ' ' ~ image_focus(id))|trim -%}
+    <img{% if classes %} class="{{ classes }}"{% endif %} src="{{ path('media_image', {file: id ~ '.webp'}) }}" alt="{{ alt }}"
         {%- if size %} width="{{ size.width }}" height="{{ size.height }}"{% endif %}
         {%- if loading == 'priority' %} fetchpriority="high"{% else %}{% if loading == 'lazy' %} loading="lazy"{% endif %} decoding="async"{% endif %}>
 {%- endmacro %}

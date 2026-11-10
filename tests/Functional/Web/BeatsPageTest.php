@@ -91,7 +91,7 @@ final class BeatsPageTest extends WebTestCase
         $rows = Json::array($props, 'rows');
         self::assertCount(2, $rows);
         $first = Json::array($rows, 0);
-        self::assertSame(['id', 'slug', 'title', 'bpm', 'key', 'keyLabel', 'tags', 'cover', 'preview', 'price', 'cents', 'licences', 'buy'], array_keys($first));
+        self::assertSame(['id', 'slug', 'title', 'bpm', 'key', 'keyLabel', 'tags', 'cover', 'coverClass', 'preview', 'price', 'cents', 'licences', 'buy'], array_keys($first));
         self::assertSame([$riot, 'riot-gear', 'Riot Gear', 140, 'a-minor', 'A minor', ['punk'], null, 'from €29.99', 2999], [$first['id'], $first['slug'], $first['title'], $first['bpm'], $first['key'], $first['keyLabel'], $first['tags'], $first['cover'], $first['price'], $first['cents']]);
         self::assertMatchesRegularExpression('#^/media/audio/[0-9A-HJKMNP-TV-Z]{26}\.mp3$#', Json::string($first, 'preview'));
         self::assertSame(['lofi', 'punk'], $props['tags']);

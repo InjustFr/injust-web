@@ -2,6 +2,7 @@ shared:
     order_mismatch: 'The new order must list every item exactly once: reload the page and try again.'
     invalid_url: '“{url}” is not a secure web address: it must start with https://.'
     not_found: 'This {subject, select, user {account} other {item}} no longer exists.'
+    invalid_focus: 'Place the focus on a {step} % grid between 0 and 100 on each axis.'
     unsupported_image: 'This file is not an image the site can show: use JPEG, PNG, WebP or AVIF.'
     negative_price: 'A price cannot be negative.'
     unsupported_locale: 'English or French only, not “{locale}”.'

@@ -6,14 +6,17 @@ import ConfirmButton from '../../../components/ui/ConfirmButton.vue';
 import FormField from '../../../components/ui/FormField.vue';
 import PageSection from '../../../components/ui/PageSection.vue';
 import { useApi } from '../../../composables/useApi.js';
+import { useImageFraming } from '../../../composables/useImageFraming.js';
 import { useToast } from '../../../composables/useToast.js';
 import { imageUpload, imageUrl } from '../../settingsForm.js';
 import { textForm, textPayload } from '../../musicForm.js';
+import ImageFramingModal from '../ImageFramingModal.vue';
 
 const props = defineProps({ text: { type: Object, required: true } });
 const { t } = useI18n();
 const api = useApi();
 const toast = useToast();
+const framing = useImageFraming('portrait', imageUrl);
 const form = reactive(textForm(props.text));
 const errors = ref({});
 const saving = ref(false);
@@ -39,7 +42,7 @@ async function save() {
 function upload(event) {
     const body = imageUpload(event.target.files);
     event.target.value = '';
-    if (body) toast.attempt(() => api.post('/api/admin/music/portrait', body), t('admin.music.saved'));
+    if (body) toast.attempt(async () => framing.uploaded((await api.post('/api/admin/music/portrait', body)).portrait), t('admin.music.saved'));
 }
 
 const removePortrait = () => toast.attempt(() => api.del('/api/admin/music/portrait'), t('admin.music.saved'));
@@ -67,8 +70,10 @@ const removePortrait = () => toast.attempt(() => api.del('/api/admin/music/portr
                 {{ t('admin.music.upload') }}
                 <input class="visually-hidden" type="file" accept="image/*" name="portrait" @change="upload" />
             </label>
+            <BaseButton v-if="text.portrait" variant="secondary" @click="framing.adjust(text.portrait)">{{ t('admin.framing.adjust') }}</BaseButton>
             <ConfirmButton v-if="text.portrait" :label="t('admin.music.remove')" @confirm="removePortrait" />
         </div>
+        <ImageFramingModal v-model:open="framing.state.open" :image-id="framing.state.imageId" :kind="framing.state.kind" />
     </PageSection>
 </template>
 

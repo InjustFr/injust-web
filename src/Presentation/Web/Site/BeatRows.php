@@ -19,13 +19,14 @@ final readonly class BeatRows
         private TranslatorInterface $translator,
         private UrlGeneratorInterface $urls,
         private CheckoutTierOptions $checkout,
+        private ImageFocusClasses $focus,
     ) {
     }
 
     /**
      * @param list<BeatView> $beats
      *
-     * @return list<array{id: string, slug: string, title: string, bpm: int, key: string, keyLabel: string, tags: list<string>, cover: ?string, preview: ?string, price: ?string, cents: ?int, licences: array<string, ?string>, buy: ?string}>
+     * @return list<array{id: string, slug: string, title: string, bpm: int, key: string, keyLabel: string, tags: list<string>, cover: ?string, coverClass: string, preview: ?string, price: ?string, cents: ?int, licences: array<string, ?string>, buy: ?string}>
      */
     public function rows(array $beats): array
     {
@@ -60,7 +61,7 @@ final readonly class BeatRows
         return $tags;
     }
 
-    /** @return array{id: string, slug: string, title: string, bpm: int, key: string, keyLabel: string, tags: list<string>, cover: ?string, preview: ?string, price: ?string, cents: ?int, licences: array<string, ?string>, buy: ?string} */
+    /** @return array{id: string, slug: string, title: string, bpm: int, key: string, keyLabel: string, tags: list<string>, cover: ?string, coverClass: string, preview: ?string, price: ?string, cents: ?int, licences: array<string, ?string>, buy: ?string} */
     private function row(BeatView $beat): array
     {
         $options = $this->beats->tiersFor($beat->id);
@@ -76,6 +77,7 @@ final readonly class BeatRows
             'keyLabel' => $this->keyLabel($beat->key),
             'tags' => $beat->tags,
             'cover' => null === $beat->cover ? null : $this->urls->generate('media_image', ['file' => $beat->cover.'.webp']),
+            'coverClass' => $this->focus->of($beat->cover),
             'preview' => null === $beat->preview ? null : $this->urls->generate('media_audio', ['id' => $beat->preview->id]),
             'price' => null === $price ? null : $this->translator->trans('site.beats.from', ['price' => $this->prices->format($price->cents, $this->translator->getLocale())]),
             'cents' => $price?->cents,

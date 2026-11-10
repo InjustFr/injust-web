@@ -646,5 +646,20 @@
             "intro": "Introduction, Markdown ({language})",
             "faq": "FAQ, Markdown ({language})"
         }
+    },
+    "framing": {
+        "title": "Adjust framing",
+        "adjust": "Adjust framing",
+        "hint": "Click or drag onto the part of the image that must stay visible. Arrow keys move the point, Shift moves it faster. The previews show how each format crops the image.",
+        "point": "Focus point",
+        "pointValue": "{x}% from the left, {y}% from the top",
+        "save": "Save framing",
+        "saved": "Framing saved.",
+        "frames": {
+            "phone": "Phone",
+            "desktop": "Desktop",
+            "square": "Square",
+            "portrait": "Portrait 4:5"
+        }
     }
 }

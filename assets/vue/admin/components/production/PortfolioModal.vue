@@ -6,15 +6,19 @@ import BaseModal from '../../../components/ui/BaseModal.vue';
 import ConfirmButton from '../../../components/ui/ConfirmButton.vue';
 import FormField from '../../../components/ui/FormField.vue';
 import { useApi } from '../../../composables/useApi.js';
+import { useImageFocus, useImageFraming } from '../../../composables/useImageFraming.js';
 import { useToast } from '../../../composables/useToast.js';
 import { KINDS, portfolioForm, portfolioPayload } from '../../productionForm.js';
 import { imageUpload, imageUrl } from '../../settingsForm.js';
+import ImageFramingModal from '../ImageFramingModal.vue';
 
 const props = defineProps({ item: { type: Object, default: null } });
 const open = defineModel('open', { type: Boolean, required: true });
 const { t } = useI18n();
 const api = useApi();
 const toast = useToast();
+const framing = useImageFraming('cover', imageUrl);
+const focus = useImageFocus();
 const form = reactive(portfolioForm(null));
 const errors = ref({});
 const saving = ref(false);
@@ -44,7 +48,7 @@ async function save() {
 function upload(event) {
     const body = imageUpload(event.target.files);
     event.target.value = '';
-    if (body) toast.attempt(() => api.post(`/api/admin/production/portfolio/${props.item.id}/cover`, body), t('admin.production.saved'));
+    if (body) toast.attempt(async () => framing.uploaded((await api.post(`/api/admin/production/portfolio/${props.item.id}/cover`, body)).cover), t('admin.production.saved'));
 }
 
 const removeCover = () => toast.attempt(() => api.del(`/api/admin/production/portfolio/${props.item.id}/cover`), t('admin.production.saved'));
@@ -75,16 +79,18 @@ const removeCover = () => toast.attempt(() => api.del(`/api/admin/production/por
             </FormField>
 
             <div v-if="item" class="item__cover">
-                <img v-if="item.cover" class="item__preview" :src="imageUrl(item.cover)" :alt="t('admin.production.portfolio.cover')" />
+                <img v-if="item.cover" class="item__preview" :src="imageUrl(item.cover)" :style="{ objectPosition: focus.position(item.cover) }" :alt="t('admin.production.portfolio.cover')" />
                 <label class="item__upload">
                     {{ t('admin.production.portfolio.cover') }}
                     <input class="visually-hidden" type="file" accept="image/*" name="cover" @change="upload" />
                 </label>
+                <BaseButton v-if="item.cover" variant="secondary" @click="framing.adjust(item.cover)">{{ t('admin.framing.adjust') }}</BaseButton>
                 <ConfirmButton v-if="item.cover" :label="t('admin.production.remove')" @confirm="removeCover" />
             </div>
 
             <BaseButton type="submit" :loading="saving">{{ t('admin.production.save') }}</BaseButton>
         </form>
+        <ImageFramingModal v-model:open="framing.state.open" :image-id="framing.state.imageId" :kind="framing.state.kind" />
     </BaseModal>
 </template>
 

@@ -7,8 +7,10 @@ import BaseSelect from '../../../components/ui/BaseSelect.vue';
 import ConfirmButton from '../../../components/ui/ConfirmButton.vue';
 import FormField from '../../../components/ui/FormField.vue';
 import { useApi } from '../../../composables/useApi.js';
+import { useImageFocus, useImageFraming } from '../../../composables/useImageFraming.js';
 import { useToast } from '../../../composables/useToast.js';
 import { imageUpload, imageUrl } from '../../settingsForm.js';
+import ImageFramingModal from '../ImageFramingModal.vue';
 import { KEYS, beatForm, beatPayload, keyLabel } from '../../beatsForm.js';
 import ToggleRow from '../ToggleRow.vue';
 
@@ -17,6 +19,8 @@ const open = defineModel('open', { type: Boolean, required: true });
 const { t } = useI18n();
 const api = useApi();
 const toast = useToast();
+const framing = useImageFraming('cover', imageUrl);
+const focus = useImageFocus();
 const form = reactive(beatForm(null));
 const errors = ref({});
 const saving = ref(false);
@@ -47,7 +51,7 @@ async function save() {
 function upload(event) {
     const body = imageUpload(event.target.files);
     event.target.value = '';
-    if (body) toast.attempt(() => api.post(`/api/admin/beats/${props.beat.id}/cover`, body), t('admin.beats.saved'));
+    if (body) toast.attempt(async () => framing.uploaded((await api.post(`/api/admin/beats/${props.beat.id}/cover`, body)).cover), t('admin.beats.saved'));
 }
 
 const removeCover = () => toast.attempt(() => api.del(`/api/admin/beats/${props.beat.id}/cover`), t('admin.beats.saved'));
@@ -74,16 +78,18 @@ const removeCover = () => toast.attempt(() => api.del(`/api/admin/beats/${props.
             <ToggleRow v-model="form.visible" :label="t('admin.beats.beats.visible')" :description="t('admin.beats.beats.visibleHint')" :error="errors.visible ?? null" />
 
             <div v-if="beat" class="beat__cover">
-                <img v-if="beat.cover" class="beat__preview" :src="imageUrl(beat.cover)" :alt="t('admin.beats.beats.cover')" />
+                <img v-if="beat.cover" class="beat__preview" :src="imageUrl(beat.cover)" :style="{ objectPosition: focus.position(beat.cover) }" :alt="t('admin.beats.beats.cover')" />
                 <label class="beat__upload">
                     {{ t('admin.beats.beats.cover') }}
                     <input class="visually-hidden" type="file" accept="image/*" name="cover" @change="upload" />
                 </label>
+                <BaseButton v-if="beat.cover" variant="secondary" @click="framing.adjust(beat.cover)">{{ t('admin.framing.adjust') }}</BaseButton>
                 <ConfirmButton v-if="beat.cover" :label="t('admin.beats.remove')" @confirm="removeCover" />
             </div>
 
             <BaseButton type="submit" :loading="saving">{{ t('admin.beats.save') }}</BaseButton>
         </form>
+        <ImageFramingModal v-model:open="framing.state.open" :image-id="framing.state.imageId" :kind="framing.state.kind" />
     </BaseModal>
 </template>
 

@@ -6,7 +6,7 @@
     </td>
     <td class="beat-cover">
         {%- if beat.cover -%}
-            <img src="{{ beat.cover }}" alt="" width="56" height="56" loading="lazy" decoding="async">
+            <img{% if beat.coverClass %} class="{{ beat.coverClass }}"{% endif %} src="{{ beat.cover }}" alt="" width="56" height="56" loading="lazy" decoding="async">
         {%- else -%}
             <span class="cover-blank" aria-hidden="true">{{ beat.title|first }}</span>
         {%- endif -%}

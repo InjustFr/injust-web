@@ -2,6 +2,7 @@ shared:
     order_mismatch: 'Le nouvel ordre doit lister chaque élément une seule fois : rechargez la page et réessayez.'
     invalid_url: '« {url} » n’est pas une adresse web sécurisée : elle doit commencer par https://.'
     not_found: '{subject, select, user {Ce compte n’existe} other {Cet élément n’existe}} plus.'
+    invalid_focus: 'Placez le point de cadrage sur une grille de {step} % entre 0 et 100 sur chaque axe.'
     unsupported_image: 'Ce fichier n’est pas une image que le site peut afficher : utilisez du JPEG, PNG, WebP ou AVIF.'
     negative_price: 'Un prix ne peut pas être négatif.'
     unsupported_locale: 'En français ou en anglais uniquement, pas en « {locale} ».'

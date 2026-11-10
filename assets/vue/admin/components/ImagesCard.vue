@@ -1,26 +1,33 @@
 <script setup>
 import { useI18n } from 'vue-i18n';
+import BaseButton from '../../components/ui/BaseButton.vue';
 import ConfirmButton from '../../components/ui/ConfirmButton.vue';
 import PageSection from '../../components/ui/PageSection.vue';
 import { useApi } from '../../composables/useApi.js';
+import { useImageFraming } from '../../composables/useImageFraming.js';
 import { useToast } from '../../composables/useToast.js';
 import { imageUpload, imageUrl } from '../settingsForm.js';
+import ImageFramingModal from './ImageFramingModal.vue';
 
 const SLOTS = [
-    { name: 'logo', field: 'logoImage' },
-    { name: 'hero', field: 'heroImage' },
+    { name: 'logo', field: 'logoImage', framed: false },
+    { name: 'hero', field: 'heroImage', framed: true },
 ];
 
 defineProps({ settings: { type: Object, required: true } });
 const { t } = useI18n();
 const api = useApi();
 const toast = useToast();
+const framing = useImageFraming('hero', imageUrl);
 
-function upload(slot, event) {
+function upload({ name, field, framed }, event) {
     const body = imageUpload(event.target.files);
     event.target.value = '';
     if (!body) return;
-    toast.attempt(() => api.post(`/api/admin/settings/images/${slot}`, body), t('admin.settings.saved'));
+    toast.attempt(async () => {
+        const settings = await api.post(`/api/admin/settings/images/${name}`, body);
+        if (framed) framing.uploaded(settings[field]);
+    }, t('admin.settings.saved'));
 }
 
 function remove(slot) {
@@ -38,12 +45,14 @@ function remove(slot) {
                 <div class="images__actions">
                     <label class="images__upload">
                         {{ t('admin.settings.images.upload') }}
-                        <input class="visually-hidden" type="file" accept="image/*" :name="`image-${slot.name}`" @change="upload(slot.name, $event)" />
+                        <input class="visually-hidden" type="file" accept="image/*" :name="`image-${slot.name}`" @change="upload(slot, $event)" />
                     </label>
+                    <BaseButton v-if="slot.framed && settings[slot.field]" variant="secondary" @click="framing.adjust(settings[slot.field])">{{ t('admin.framing.adjust') }}</BaseButton>
                     <ConfirmButton v-if="settings[slot.field]" :label="t('admin.settings.images.remove')" @confirm="remove(slot.name)" />
                 </div>
             </div>
         </div>
+        <ImageFramingModal v-model:open="framing.state.open" :image-id="framing.state.imageId" :kind="framing.state.kind" />
     </PageSection>
 </template>
 
