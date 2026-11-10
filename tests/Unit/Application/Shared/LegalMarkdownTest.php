@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace App\Tests\Unit\Presentation\Web\Site;
+namespace App\Tests\Unit\Application\Shared;
 
-use App\Presentation\Web\Site\LegalMarkdown;
+use App\Application\Shared\LegalMarkdown;
 use PHPUnit\Framework\TestCase;
 
 final class LegalMarkdownTest extends TestCase

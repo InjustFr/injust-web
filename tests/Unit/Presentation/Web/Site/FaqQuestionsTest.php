@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Tests\Unit\Presentation\Web\Site;
 
+use App\Application\Shared\LegalMarkdown;
 use App\Presentation\Web\Site\FaqQuestions;
-use App\Presentation\Web\Site\LegalMarkdown;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 

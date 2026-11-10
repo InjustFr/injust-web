@@ -1,0 +1,11 @@
+{% extends 'pdf/_layout.html.twig' %}
+
+{% block lang %}{{ locale }}{% endblock %}
+
+{% block title %}{{ ('legal.' ~ kind)|trans({}, 'documents', locale) }}{% endblock %}
+
+{% block body %}
+    <p class="meta">{{ ('legal.' ~ kind)|trans({}, 'documents', locale) }}<br>
+    {{ 'legal.version'|trans({version: version, date: updatedAt|date('d/m/Y', 'Europe/Paris')}, 'documents', locale) }}</p>
+    {{ body|raw }}
+{% endblock %}

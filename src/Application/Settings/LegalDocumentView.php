@@ -10,7 +10,7 @@ use App\Domain\Shared\LocalizedText;
 
 final readonly class LegalDocumentView
 {
-    private function __construct(
+    public function __construct(
         public LegalKind $kind,
         public LocalizedText $body,
         public int $version,

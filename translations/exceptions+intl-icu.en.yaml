@@ -4,6 +4,7 @@ shared:
     not_found: 'This {subject, select, user {account} other {item}} no longer exists.'
     unsupported_image: 'This file is not an image the site can show: use JPEG, PNG, WebP or AVIF.'
     negative_price: 'A price cannot be negative.'
+    unsupported_locale: 'English or French only, not “{locale}”.'
 user:
     invalid_email: '“{email}” is not a valid email address.'
     email_taken: 'An account already uses {email}.'
@@ -26,7 +27,6 @@ lessons:
     invalid_duration: 'A lesson lasts between {min} and {max} minutes, in steps of {step} minutes.'
 contact:
     too_many_messages: 'You have sent several messages in a short time: wait 10 minutes and try again.'
-    unsupported_locale: 'Messages are written in English or French, not “{locale}”.'
 production:
     untitled_service: 'A service needs a title in at least one language.'
     missing_fixed_price: 'A fixed-price service needs a price above 0 €: switch it to a quote to leave the price out.'
@@ -34,3 +34,14 @@ production:
     invalid_revisions: 'A service includes between {min} and {max} revisions.'
     missing_roles: 'List at least one thing you did on this track.'
     invalid_year: 'The year must be between {min} and {max}.'
+sales:
+    too_many_checkouts: 'You have started several orders in a short time: wait 10 minutes and try again.'
+    checkout_closed: 'Online payment is not open yet: contact me to book.'
+    section_closed: 'This part of the site is closed for now: contact me to book.'
+    product_unavailable: 'This offer cannot be paid online: it may have changed or need a quote. Contact me to book it.'
+    missing_consent: 'Tick every box above to place the order.'
+    terms_changed: 'The terms of sale changed while this page was open: reload it, read them and order again.'
+    payment_unavailable: 'The payment page could not be opened: try again in a few minutes.'
+    payment_mismatch: 'The payment received for order {reference} does not match its price.'
+    order_not_paid: 'Order {reference} is not paid.'
+    order_not_found: 'No order matches this {by, select, session {checkout session} other {payment}} ({id}).'

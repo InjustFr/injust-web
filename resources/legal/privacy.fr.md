@@ -16,7 +16,7 @@ Le responsable du traitement des données personnelles collectées sur {siteUrl}
 - Données : nom, adresse e-mail, adresse et pays de facturation, pays d'émission de la carte bancaire, le cas échéant raison sociale et numéro de TVA, détail de la commande, montants et historique des téléchargements.
 - Finalité : exécuter la commande (cours, prestation ou licence), envoyer la confirmation, les liens de téléchargement et les factures, gérer les éventuelles rétractations et réclamations, et tenir la comptabilité.
 - Base légale : exécution du contrat et respect des obligations légales comptables et fiscales.
-- Durée de conservation : dix ans pour les factures et pièces comptables (article L123-22 du Code de commerce) ; cinq ans après la fin du contrat pour les autres éléments du dossier de commande.
+- Durée de conservation : dix ans pour les factures et pièces comptables (article L123-22 du Code de commerce) ; cinq ans après la fin du contrat pour les autres éléments du dossier de commande. Une commande abandonnée avant le paiement est supprimée trente jours après son début.
 
 ### Consentements et preuves contractuelles
 

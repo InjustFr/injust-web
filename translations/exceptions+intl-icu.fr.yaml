@@ -4,6 +4,7 @@ shared:
     not_found: '{subject, select, user {Ce compte n’existe} other {Cet élément n’existe}} plus.'
     unsupported_image: 'Ce fichier n’est pas une image que le site peut afficher : utilisez du JPEG, PNG, WebP ou AVIF.'
     negative_price: 'Un prix ne peut pas être négatif.'
+    unsupported_locale: 'En français ou en anglais uniquement, pas en « {locale} ».'
 user:
     invalid_email: '« {email} » n’est pas une adresse email valide.'
     email_taken: 'Un compte utilise déjà {email}.'
@@ -26,7 +27,6 @@ lessons:
     invalid_duration: 'Un cours dure entre {min} et {max} minutes, par paliers de {step} minutes.'
 contact:
     too_many_messages: 'Vous avez envoyé plusieurs messages en peu de temps : attendez 10 minutes et réessayez.'
-    unsupported_locale: 'Les messages s’écrivent en français ou en anglais, pas en « {locale} ».'
 production:
     untitled_service: 'Une prestation a besoin d’un titre dans au moins une langue.'
     missing_fixed_price: 'Une prestation à prix fixe a besoin d’un prix supérieur à 0 € : passez-la sur devis pour ne pas afficher de prix.'
@@ -34,3 +34,14 @@ production:
     invalid_revisions: 'Une prestation comprend de {min} à {max} retouches.'
     missing_roles: 'Indiquez au moins ce que vous avez fait sur ce titre.'
     invalid_year: 'L’année doit être comprise entre {min} et {max}.'
+sales:
+    too_many_checkouts: 'Vous avez lancé plusieurs commandes en peu de temps : attendez 10 minutes et réessayez.'
+    checkout_closed: 'Le paiement en ligne n’est pas encore ouvert : contactez-moi pour réserver.'
+    section_closed: 'Cette partie du site est fermée pour le moment : contactez-moi pour réserver.'
+    product_unavailable: 'Cette offre ne peut pas être payée en ligne : elle a peut-être changé ou se fait sur devis. Contactez-moi pour la réserver.'
+    missing_consent: 'Cochez toutes les cases ci-dessus pour passer la commande.'
+    terms_changed: 'Les conditions générales de vente ont changé pendant que cette page était ouverte : rechargez-la, relisez-les et commandez à nouveau.'
+    payment_unavailable: 'La page de paiement n’a pas pu s’ouvrir : réessayez dans quelques minutes.'
+    payment_mismatch: 'Le paiement reçu pour la commande {reference} ne correspond pas à son prix.'
+    order_not_paid: 'La commande {reference} n’est pas payée.'
+    order_not_found: 'Aucune commande ne correspond à {by, select, session {cette session de paiement} other {ce paiement}} ({id}).'

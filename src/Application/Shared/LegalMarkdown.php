@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Presentation\Web\Site;
+namespace App\Application\Shared;
 
 use League\CommonMark\CommonMarkConverter;
 

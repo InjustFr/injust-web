@@ -25,5 +25,9 @@
             {%- endif -%}
         </span>
     </p>
-    <a class="button" href="{{ path('contact', {topic: 'production', offer: service.id}) }}" aria-describedby="offer-{{ service.id }}">{{ (service.pricing == 'fixed' ? 'site.production.contact' : 'site.production.quote')|trans }}</a>
+    {% if bookable and service.pricing == 'fixed' %}
+        <a class="button" href="{{ path('checkout', {productType: 'production', productId: service.id}) }}" aria-describedby="offer-{{ service.id }}">{{ 'site.checkout.book'|trans }}</a>
+    {% else %}
+        <a class="button" href="{{ path('contact', {topic: 'production', offer: service.id}) }}" aria-describedby="offer-{{ service.id }}">{{ (service.pricing == 'fixed' ? 'site.production.contact' : 'site.production.quote')|trans }}</a>
+    {% endif %}
 </li>

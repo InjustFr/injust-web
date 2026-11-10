@@ -1,0 +1,33 @@
+{% set dateFormat = 'sales.date_format'|trans({}, 'emails') %}
+{{ 'sales.confirmation.greeting'|trans({}, 'emails') }}
+
+{{ 'sales.confirmation.intro'|trans({}, 'emails') }}
+
+{{ 'sales.confirmation.reference'|trans({reference: order.reference}, 'emails') }}
+{{ 'sales.confirmation.product'|trans({product: order.productLabel}, 'emails') }}
+{{ 'sales.confirmation.price'|trans({amount: order.price.cents / 100}, 'emails') }}
+{{ 'sales.confirmation.date'|trans({date: paidAt|date(dateFormat ~ ' H:i', 'Europe/Paris')}, 'emails') }}
+
+{{ 'sales.confirmation.consents'|trans({}, 'emails') }}
+{% for consent in order.consents %}
+- {{ 'sales.confirmation.consent'|trans({text: consent.text, date: consent.acceptedAt|date(dateFormat ~ ' H:i:s', 'Europe/Paris')}, 'emails') }}
+{% endfor %}
+
+{{ 'sales.confirmation.next'|trans({}, 'emails') }}
+{% if bookingUrl %}
+{{ 'sales.confirmation.booking'|trans({}, 'emails') }} {{ bookingUrl }}
+{% else %}
+{{ 'sales.confirmation.contact_soon'|trans({}, 'emails') }}
+{% endif %}
+
+{{ 'sales.confirmation.withdrawal_title'|trans({}, 'emails') }}
+{{ 'sales.confirmation.withdrawal'|trans({date: paidAt|date_modify('+14 days')|date(dateFormat, 'Europe/Paris')}, 'emails') }}
+{{ 'sales.confirmation.pro_rata'|trans({}, 'emails') }}
+{{ 'sales.confirmation.how_to_withdraw'|trans({email: contactEmail, reference: order.reference}, 'emails') }}
+
+{{ 'sales.confirmation.mediator'|trans({name: mediatorName, url: mediatorUrl}, 'emails') }}
+
+{{ 'sales.confirmation.attachments'|trans({}, 'emails') }}
+
+--
+{{ 'sales.confirmation.signature'|trans({}, 'emails') }}

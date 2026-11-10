@@ -6,7 +6,7 @@ namespace App\Tests\Unit\Domain\Contact;
 
 use App\Domain\Contact\ContactMessage;
 use App\Domain\Contact\ContactTopic;
-use App\Domain\Contact\Exception\UnsupportedLocale;
+use App\Domain\Shared\Exception\UnsupportedLocale;
 use PHPUnit\Framework\TestCase;
 
 final class ContactMessageTest extends TestCase
@@ -59,7 +59,7 @@ final class ContactMessageTest extends TestCase
             ContactMessage::receive('Joe', 'joe@example.test', ContactTopic::General, 'Hello there, Injust.', 'de', new \DateTimeImmutable());
             self::fail('A German message was accepted.');
         } catch (UnsupportedLocale $refused) {
-            self::assertSame(['contact.unsupported_locale', ['locale' => 'de']], [$refused->getMessage(), $refused->parameters()]);
+            self::assertSame(['shared.unsupported_locale', ['locale' => 'de']], [$refused->getMessage(), $refused->parameters()]);
         }
     }
 }

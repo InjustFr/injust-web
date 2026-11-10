@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Presentation\Web\Site;
 
 use App\Application\Production\ProductionServiceView;
+use App\Application\Shared\LegalMarkdown;
 
 final readonly class ProductionCards
 {

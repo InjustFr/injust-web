@@ -9,7 +9,8 @@
         "music": "Musique",
         "lessons": "Cours",
         "messages": "Messages",
-        "production": "Production"
+        "production": "Production",
+        "orders": "Commandes"
     },
     "dashboard": {
         "title": "Tableau de bord",
@@ -135,7 +136,7 @@
     },
     "music": {
         "title": "Musique",
-        "subtitle": "Sorties, vidéos, textes et liens affichés sur l'accueil musique.",
+        "subtitle": "Sorties, vidéos, textes et liens affichés sur l’accueil musique.",
         "tabs": {
             "releases": "Sorties",
             "videos": "Vidéos",
@@ -156,7 +157,7 @@
             "edit": "Modifier la sortie",
             "empty": "Aucune sortie.",
             "upcoming": "à venir",
-            "featured": "Mettre en avant sur l'accueil",
+            "featured": "Mettre en avant sur l’accueil",
             "types": {
                 "single": "Single",
                 "ep": "EP",
@@ -221,7 +222,7 @@
             "tagline": "Accroche ({language})",
             "manifesto": "Manifeste, Markdown ({language})",
             "bio": "Bio, Markdown ({language})",
-            "hooks": "Phrases d'accroche",
+            "hooks": "Phrases d’accroche",
             "hooksHint": "Une ligne en anglais par ligne, 12 maximum."
         },
         "portrait": {
@@ -237,7 +238,7 @@
         "edit": "Modifier",
         "delete": "Supprimer",
         "kinds": {
-            "single": "Cours à l'unité",
+            "single": "Cours à l’unité",
             "pack": "Forfait"
         },
         "formats": {
@@ -253,7 +254,7 @@
         "offers": {
             "title": "Offres",
             "new": "Nouvelle offre",
-            "edit": "Modifier l'offre",
+            "edit": "Modifier l’offre",
             "empty": "Aucune offre pour le moment.",
             "titleField": "Titre ({language})",
             "description": "Description courte ({language})",
@@ -308,7 +309,7 @@
             "price": "Prix (EUR)",
             "priceHint": "Par exemple 150 ou 150,50.",
             "priceFrom": "À partir de (EUR)",
-            "priceFromHint": "Laisse vide pour n'afficher aucun montant.",
+            "priceFromHint": "Laisse vide pour n’afficher aucun montant.",
             "deliveryDays": "Délai (jours)",
             "deliveryDaysHint": "Entre 1 et 120, optionnel.",
             "revisions": "Retouches incluses",
@@ -326,14 +327,14 @@
             "artist": "Artiste",
             "roles": "Rôles",
             "year": "Année",
-            "url": "Lien d'écoute",
+            "url": "Lien d’écoute",
             "urlHint": "Adresse en https.",
             "cover": "Pochette"
         }
     },
     "messages": {
         "title": "Messages",
-        "subtitle": "Messages envoyés par le formulaire de contact, les plus récents d'abord.",
+        "subtitle": "Messages envoyés par le formulaire de contact, les plus récents d’abord.",
         "showHandled": "Afficher les messages traités",
         "empty": "Aucun message.",
         "handle": "Marquer comme traité",
@@ -345,6 +346,81 @@
             "lessons": "Cours",
             "production": "Production",
             "beats": "Beats"
+        }
+    },
+    "orders": {
+        "title": "Commandes",
+        "subtitle": "Paiements en ligne, les plus récents d’abord. Prix TTC.",
+        "year": "Année",
+        "status": "Statut",
+        "allStatuses": "Tous les statuts",
+        "export": "Exporter le livre des recettes (CSV)",
+        "empty": "Aucune commande pour ces filtres.",
+        "count": "{count} commande | {count} commandes",
+        "statuses": {
+            "pending": "En attente",
+            "paid": "Payée",
+            "expired": "Expirée",
+            "withdrawn": "Rétractée",
+            "refunded": "Remboursée"
+        },
+        "types": {
+            "lesson": "Cours",
+            "production": "Production",
+            "beat": "Beat"
+        },
+        "columns": {
+            "reference": "Référence",
+            "paidAt": "Payée le",
+            "product": "Produit",
+            "customer": "Client",
+            "country": "Pays",
+            "amount": "Montant",
+            "status": "Statut"
+        },
+        "notPaid": "Non payée",
+        "detail": {
+            "open": "Voir le détail",
+            "close": "Masquer le détail",
+            "customer": "Client",
+            "email": "E-mail",
+            "address": "Adresse",
+            "company": "Société",
+            "vatId": "N° de TVA",
+            "cardCountry": "Pays de la carte",
+            "none": "Non renseigné",
+            "cgvVersion": "Version des CGV",
+            "consents": "Consentements",
+            "acceptedAt": "accepté le {date}",
+            "invoice": "Facture",
+            "invoiceNumber": "Facture {number}",
+            "openInvoice": "Ouvrir la facture",
+            "noInvoice": "Pas encore de facture.",
+            "confirmation": "E-mail de confirmation",
+            "sentAt": "Envoyé le {date}",
+            "notSent": "Non envoyé",
+            "resend": "Renvoyer la confirmation",
+            "resendMessage": "L’e-mail de confirmation avec la facture et les CGV sera renvoyé au client.",
+            "resendAction": "Renvoyer",
+            "resent": "Confirmation envoyée.",
+            "format": "Format : {format}"
+        },
+        "totals": {
+            "title": "Chiffre d’affaires {year}",
+            "empty": "Aucune vente cette année.",
+            "country": "Pays",
+            "total": "Total",
+            "digital": {
+                "title": "Ventes numériques aux consommateurs UE hors France",
+                "hint": "Les beats vendus à des particuliers d’un autre pays de l’UE comptent pour le seuil UE de {threshold}. Au-delà, la TVA est due dans le pays de l’acheteur."
+            },
+            "lessons": {
+                "title": "Cours en ligne aux consommateurs UE hors France",
+                "hint": "Cours en ligne vendus à des particuliers d’un autre pays de l’UE. Surveillez ce total avec le précédent : la même logique de seuil peut s’appliquer aux deux."
+            },
+            "progress": "{amount} sur {threshold}",
+            "warning": "Proche du seuil.",
+            "crossed": "Seuil dépassé."
         }
     }
 }

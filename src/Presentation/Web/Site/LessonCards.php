@@ -48,6 +48,7 @@ final readonly class LessonCards
             'sessions' => $offer->sessions,
             'minutes' => $offer->minutes,
             'price' => $this->prices->format($offer->price->cents, $locale),
+            'bookable' => $offer->price->cents > 0,
             'per_lesson' => OfferKind::Pack->value === $offer->kind ? $this->prices->format((int) round($offer->price->cents / $offer->sessions), $locale) : null,
         ];
     }

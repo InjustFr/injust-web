@@ -22,9 +22,11 @@ Fill `.env`:
 | `POSTGRES_PASSWORD` | `openssl rand -hex 24` |
 | `OIDC_CLIENT_SECRET` | Secret of the `injust` provider in mossyleaf accounts (Authentik) |
 | `MAILER_DSN` | Mail transport, e.g. Resend SMTP: `smtp://resend:<API_KEY>@smtp.resend.com:465` (the key stays in the server `.env`) |
+| `STRIPE_SECRET_KEY` | Stripe secret key (`sk_test_…` first, `sk_live_…` only once the legal texts are reviewed); only in the server `.env`, never in git |
+| `STRIPE_WEBHOOK_SECRET` | Signing secret (`whsec_…`) of the webhook endpoint below; empty refuses every event |
 | `MAILER_SENDER` | From address of contact mails, on a domain verified at the mail provider (default `Injust <noreply@injustmusic.com>`) |
 
-Then `docker compose up -d`. The entrypoint waits for the database, runs the migrations, installs the missing default legal texts (`app:legal:install-defaults`) and deletes contact messages older than three years (`app:contact:purge`).
+Then `docker compose up -d`. The entrypoint waits for the database, runs the migrations, installs the missing default legal texts (`app:legal:install-defaults`), deletes contact messages older than three years (`app:contact:purge`) and expired, unpaid checkouts older than 30 days (`app:sales:purge`).
 
 ## Contact form
 
@@ -34,7 +36,21 @@ Messages are kept three years, as the privacy text says: the entrypoint runs `ap
 
 ```cron
 17 4 * * * cd "$DEPLOY_DIR" && docker compose exec -T app php bin/console app:contact:purge
+19 4 * * * cd "$DEPLOY_DIR" && docker compose exec -T app php bin/console app:sales:purge
 ```
+
+## Online payments (Stripe)
+
+Checkout uses Stripe Checkout (card). Start with a Stripe test-mode account and its test keys, check a full purchase (payment, invoice, confirmation mail in the admin under Orders), then swap in the live keys.
+
+Register this webhook endpoint in Stripe (Developers, Webhooks): `https://injustmusic.com/webhooks/stripe`, with exactly these events:
+
+- `checkout.session.completed`
+- `checkout.session.async_payment_succeeded`
+- `checkout.session.expired`
+- `charge.refunded`
+
+Copy its signing secret into `STRIPE_WEBHOOK_SECRET`. The endpoint verifies the `Stripe-Signature` header (5 minute tolerance). A failed mail makes it answer 500 so Stripe retries; a refund of a payment the site has not recorded yet answers 503 for the same reason; a payment whose amount differs from the order answers 422 and stays unpaid. Sessions are card only (Apple Pay, Google Pay and Link still work), because invoices say "paid by card". Online checkout stays off until it is switched on in the admin (Settings), which needs a complete legal identity.
 
 ## Who can sign in to `/admin`
 

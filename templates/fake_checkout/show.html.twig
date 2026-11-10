@@ -1,0 +1,14 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Fake checkout{% endblock %}
+
+{% block body %}
+    <main>
+        <h1>Fake checkout</h1>
+        <p>{{ (checkout.amount_total / 100)|number_format(2) }} {{ checkout.currency|upper }}</p>
+        <form method="post" action="{{ path('fake_checkout_pay', {session: session}) }}">
+            <button type="submit">Pay</button>
+        </form>
+        <p><a href="{{ checkout.cancel_url }}">Cancel</a></p>
+    </main>
+{% endblock %}

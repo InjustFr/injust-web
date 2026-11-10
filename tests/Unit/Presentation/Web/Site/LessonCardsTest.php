@@ -51,9 +51,20 @@ final class LessonCardsTest extends TestCase
                 'sessions' => 4,
                 'minutes' => 45,
                 'price' => "250,01\u{a0}€",
+                'bookable' => true,
                 'per_lesson' => "62,50\u{a0}€",
             ]],
         ]], $groups);
+    }
+
+    public function testOnlyAPaidOfferCanBeBookedOnline(): void
+    {
+        $groups = new LessonCards(new PriceFormat())->groups([
+            self::offer('Essai', 'Trial', OfferKind::Single, 1, LessonFormat::Online, 0),
+            self::offer('Cours', 'Lesson', OfferKind::Single, 1, LessonFormat::Online, 1),
+        ], 'en');
+
+        self::assertSame([false, true], array_column($groups[0]['offers'], 'bookable'));
     }
 
     public function testNoOfferMeansNoGroup(): void

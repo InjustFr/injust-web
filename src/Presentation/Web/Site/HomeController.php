@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Presentation\Web\Site;
 
 use App\Application\Music\MusicQueries;
+use App\Application\Shared\LegalMarkdown;
 use Psr\Clock\ClockInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;

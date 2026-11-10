@@ -24,8 +24,22 @@ use App\Application\Production\AddProductionService\AddProductionService;
 use App\Application\Production\AddProductionService\AddProductionServiceHandler;
 use App\Application\Production\EditProductionPage\EditProductionPage;
 use App\Application\Production\EditProductionPage\EditProductionPageHandler;
+use App\Application\Sales\ConfirmPayment\ConfirmPayment;
+use App\Application\Sales\ConfirmPayment\ConfirmPaymentHandler;
+use App\Application\Sales\StartCheckout\StartCheckout;
+use App\Application\Sales\StartCheckout\StartCheckoutHandler;
+use App\Application\Settings\EditLegalIdentity\EditLegalIdentity;
+use App\Application\Settings\EditLegalIdentity\EditLegalIdentityHandler;
+use App\Application\Settings\InstallLegalDefaults\InstallLegalDefaults;
+use App\Application\Settings\InstallLegalDefaults\InstallLegalDefaultsHandler;
+use App\Application\Settings\SettingsQueries;
+use App\Application\Settings\SwitchOnlineCheckout\SwitchOnlineCheckout;
+use App\Application\Settings\SwitchOnlineCheckout\SwitchOnlineCheckoutHandler;
+use App\Application\Settings\SwitchSections\SwitchSections;
+use App\Application\Settings\SwitchSections\SwitchSectionsHandler;
 use App\Domain\Contact\ContactTopic;
 use App\Domain\Lessons\LessonFormat;
+use App\Domain\Lessons\LessonOffer;
 use App\Domain\Lessons\LessonOfferDetails;
 use App\Domain\Lessons\OfferKind;
 use App\Domain\Music\ReleaseDetails;
@@ -34,13 +48,18 @@ use App\Domain\Music\SocialNetwork;
 use App\Domain\Music\Track;
 use App\Domain\Production\PortfolioItemDetails;
 use App\Domain\Production\Pricing;
+use App\Domain\Production\ProductionService;
 use App\Domain\Production\ProductionServiceDetails;
 use App\Domain\Production\ServiceKind;
+use App\Domain\Sales\ConsentKind;
+use App\Domain\Sales\ProductType;
 use App\Domain\Shared\LocalizedText;
 use App\Domain\Shared\Price;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Persistence\ObjectManager;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\Uid\Ulid;
+use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 final class AppFixtures extends Fixture
 {
@@ -86,6 +105,16 @@ final class AppFixtures extends Fixture
         private readonly EditProductionPageHandler $editProductionPage,
         private readonly AddPortfolioItemHandler $addPortfolioItem,
         private readonly SendContactMessageHandler $sendContactMessage,
+        private readonly EditLegalIdentityHandler $editLegalIdentity,
+        private readonly SwitchOnlineCheckoutHandler $switchOnlineCheckout,
+        private readonly SwitchSectionsHandler $switchSections,
+        private readonly InstallLegalDefaultsHandler $installLegalDefaults,
+        private readonly StartCheckoutHandler $startCheckout,
+        private readonly ConfirmPaymentHandler $confirmPayment,
+        private readonly HttpClientInterface $httpClient,
+        private readonly SettingsQueries $settings,
+        #[Autowire('%kernel.environment%')]
+        private readonly string $environment,
     ) {
     }
 
@@ -106,6 +135,10 @@ final class AppFixtures extends Fixture
         $this->lessons();
         $this->production();
         $this->messages();
+
+        if ('dev' === $this->environment) {
+            $this->shop($manager);
+        }
     }
 
     /** @param list<array{string, int}> $tracks */
@@ -200,5 +233,50 @@ final class AppFixtures extends Fixture
     {
         ($this->sendContactMessage)(new SendContactMessage('Alex Example', 'alex@example.com', ContactTopic::General, 'Hello, when is the album out? Looking forward to it.', 'en'));
         ($this->sendContactMessage)(new SendContactMessage('Camille Exemple', 'camille@example.com', ContactTopic::Lessons, 'Bonjour, je cherche des cours de guitare le samedi matin.', 'fr'));
+    }
+
+    private function shop(ObjectManager $manager): void
+    {
+        ($this->editLegalIdentity)(new EditLegalIdentity(
+            'Demo Artist',
+            'EI',
+            '123456782',
+            "1 rue de l'Exemple\n75000 Paris",
+            'demo@example.com',
+            '+33 1 23 45 67 89',
+            'Demo Artist',
+            'Demo Mediator',
+            'https://mediator.example.com',
+            'Demo Host',
+            "2 avenue de l'Hébergeur\n75000 Paris",
+            '+33 1 98 76 54 32',
+        ));
+        ($this->installLegalDefaults)(new InstallLegalDefaults());
+        ($this->switchSections)(new SwitchSections(true, true, false));
+        ($this->switchOnlineCheckout)(new SwitchOnlineCheckout(true));
+
+        $this->paidOrder(ProductType::Lesson, $this->first($manager, LessonOffer::class, [])->id()->toBase32(), 'buyer-one@example.com', 'fr');
+        $this->paidOrder(ProductType::Production, $this->first($manager, ProductionService::class, ['pricing' => Pricing::Fixed])->id()->toBase32(), 'buyer-two@example.com', 'en');
+    }
+
+    /**
+     * @template T of object
+     *
+     * @param class-string<T>      $class
+     * @param array<string, mixed> $criteria
+     *
+     * @return T
+     */
+    private function first(ObjectManager $manager, string $class, array $criteria): object
+    {
+        return $manager->getRepository($class)->findOneBy($criteria, ['position' => 'ASC']) ?? throw new \LogicException($class);
+    }
+
+    private function paidOrder(ProductType $type, string $productId, string $email, string $locale): void
+    {
+        $started = ($this->startCheckout)(new StartCheckout($type, $productId, $locale, $email, array_map(static fn (ConsentKind $kind) => $kind->value, $type->requiredConsents()), $this->settings->legalDocument($type->cgvKind())->version));
+        $session = basename((string) parse_url($started->url, \PHP_URL_PATH));
+        $this->httpClient->request('POST', 'https://api.stripe.com/v1/test_helpers/checkout/sessions/'.$session.'/pay')->getContent();
+        ($this->confirmPayment)(new ConfirmPayment($session));
     }
 }

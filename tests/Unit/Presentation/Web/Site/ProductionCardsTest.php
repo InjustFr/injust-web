@@ -5,13 +5,13 @@ declare(strict_types=1);
 namespace App\Tests\Unit\Presentation\Web\Site;
 
 use App\Application\Production\ProductionServiceView;
+use App\Application\Shared\LegalMarkdown;
 use App\Domain\Production\Pricing;
 use App\Domain\Production\ProductionService;
 use App\Domain\Production\ProductionServiceDetails;
 use App\Domain\Production\ServiceKind;
 use App\Domain\Shared\LocalizedText;
 use App\Domain\Shared\Price;
-use App\Presentation\Web\Site\LegalMarkdown;
 use App\Presentation\Web\Site\PriceFormat;
 use App\Presentation\Web\Site\ProductionCards;
 use PHPUnit\Framework\TestCase;

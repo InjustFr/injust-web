@@ -84,7 +84,7 @@
                 <a class="nav-section" href="{{ item.value == 'beats' ? path('section', {section: item.value}) : path(item.value) }}"{% if item == current_section %} aria-current="page"{% endif %}>{{ ('site.sections.' ~ item.value)|trans }}</a>
             {% endfor %}
             <a class="nav-contact" href="{{ path('contact') }}"{% if route == 'contact' %} aria-current="page"{% endif %}>{{ 'site.contact.title'|trans }}</a>
-            <a class="lang-switch" href="{{ path(route, params|merge({_locale: other})) }}" hreflang="{{ other }}" lang="{{ other }}" title="{{ 'site.switch'|trans({}, 'messages', other) }}">{{ other|upper }}</a>
+            <a class="lang-switch" href="{{ path(route, app.request.query.all|merge(params)|merge({_locale: other})) }}" hreflang="{{ other }}" lang="{{ other }}" title="{{ 'site.switch'|trans({}, 'messages', other) }}">{{ other|upper }}</a>
         </nav>
     </header>
     <main id="content" tabindex="-1">

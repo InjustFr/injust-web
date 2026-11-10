@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Presentation\Web\Site;
 
+use App\Application\Shared\LegalMarkdown;
+
 final readonly class FaqQuestions
 {
     public function __construct(private LegalMarkdown $markdown)

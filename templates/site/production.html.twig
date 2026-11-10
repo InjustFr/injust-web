@@ -17,7 +17,7 @@
         {% if services %}
             <ul class="offer-list service-list">
                 {% for service in services %}
-                    {% include 'site/_production_service.html.twig' with {service: service} only %}
+                    {% include 'site/_production_service.html.twig' with {service: service, bookable: settings.onlineCheckout} only %}
                 {% endfor %}
             </ul>
         {% else %}

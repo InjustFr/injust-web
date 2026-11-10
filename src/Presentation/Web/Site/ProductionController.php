@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Presentation\Web\Site;
 
 use App\Application\Production\ProductionQueries;
+use App\Application\Shared\LegalMarkdown;
 use App\Domain\Settings\Section;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;

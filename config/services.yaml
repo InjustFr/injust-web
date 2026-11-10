@@ -29,3 +29,14 @@ when@test:
         App\Tests\Support\FakeYoutube:
             decorates: http_client
             arguments: ['@.inner']
+
+        App\Tests\Support\Payments\FakeStripe: &fake_stripe
+            decorates: http_client
+            arguments:
+                $client: '@.inner'
+                $sessions: !service { class: Symfony\Component\Cache\Adapter\FilesystemAdapter, arguments: ['fake_stripe', 0, '%kernel.cache_dir%'] }
+                $clock: '@clock'
+
+when@dev:
+    services:
+        App\Tests\Support\Payments\FakeStripe: *fake_stripe

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Presentation\Web\Site;
 
-use App\Application\Settings\LegalDocumentView;
+use App\Application\Settings\LegalDocumentHtml;
 use App\Application\Settings\SettingsQueries;
 use App\Domain\Settings\LegalKind;
 use App\Domain\Shared\Exception\NotFound;
@@ -21,7 +21,7 @@ final readonly class LegalController
 {
     public function __construct(
         private SettingsQueries $queries,
-        private LegalMarkdown $markdown,
+        private LegalDocumentHtml $html,
         private SitePage $page,
     ) {
     }
@@ -36,33 +36,7 @@ final readonly class LegalController
 
         return $this->page->render('site/legal.html.twig', [
             'kind' => $kind,
-            'body' => $this->markdown->toHtml($document->body->in($request->getLocale()), $this->placeholders($request, $document)),
+            'body' => $this->html->render($document, $this->queries->current(), $request->getLocale(), $request->getSchemeAndHttpHost()),
         ]);
-    }
-
-    /** @return array<string, string> */
-    private function placeholders(Request $request, LegalDocumentView $document): array
-    {
-        $settings = $this->queries->current();
-        $legal = $settings->legal;
-        $date = new \IntlDateFormatter($request->getLocale(), \IntlDateFormatter::LONG, \IntlDateFormatter::NONE, $document->updatedAt->getTimezone());
-
-        return [
-            'name' => $legal->name,
-            'businessForm' => $legal->businessForm,
-            'siren' => $legal->siren,
-            'address' => $legal->address,
-            'email' => $legal->email,
-            'phone' => $legal->phone,
-            'publicationDirector' => $legal->publicationDirector,
-            'mediatorName' => $legal->mediatorName,
-            'mediatorUrl' => $legal->mediatorUrl,
-            'hostName' => $legal->hostName,
-            'hostAddress' => $legal->hostAddress,
-            'hostPhone' => $legal->hostPhone,
-            'vatMention' => $settings->vatMentions->consumer,
-            'siteUrl' => $request->getSchemeAndHttpHost(),
-            'updatedAt' => (string) $date->format($document->updatedAt),
-        ];
     }
 }

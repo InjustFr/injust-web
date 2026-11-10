@@ -9,7 +9,8 @@
         "music": "Music",
         "lessons": "Lessons",
         "messages": "Messages",
-        "production": "Production"
+        "production": "Production",
+        "orders": "Orders"
     },
     "dashboard": {
         "title": "Dashboard",
@@ -345,6 +346,81 @@
             "lessons": "Lessons",
             "production": "Production",
             "beats": "Beats"
+        }
+    },
+    "orders": {
+        "title": "Orders",
+        "subtitle": "Online payments, newest first. Prices include tax.",
+        "year": "Year",
+        "status": "Status",
+        "allStatuses": "All statuses",
+        "export": "Export revenue book (CSV)",
+        "empty": "No order for these filters.",
+        "count": "{count} order | {count} orders",
+        "statuses": {
+            "pending": "Pending",
+            "paid": "Paid",
+            "expired": "Expired",
+            "withdrawn": "Withdrawn",
+            "refunded": "Refunded"
+        },
+        "types": {
+            "lesson": "Lesson",
+            "production": "Production",
+            "beat": "Beat"
+        },
+        "columns": {
+            "reference": "Reference",
+            "paidAt": "Paid on",
+            "product": "Product",
+            "customer": "Customer",
+            "country": "Country",
+            "amount": "Amount",
+            "status": "Status"
+        },
+        "notPaid": "Not paid",
+        "detail": {
+            "open": "Show details",
+            "close": "Hide details",
+            "customer": "Customer",
+            "email": "Email",
+            "address": "Address",
+            "company": "Company",
+            "vatId": "VAT ID",
+            "cardCountry": "Card country",
+            "none": "Not provided",
+            "cgvVersion": "Terms of sale version",
+            "consents": "Consents",
+            "acceptedAt": "accepted on {date}",
+            "invoice": "Invoice",
+            "invoiceNumber": "Invoice {number}",
+            "openInvoice": "Open invoice",
+            "noInvoice": "No invoice yet.",
+            "confirmation": "Confirmation email",
+            "sentAt": "Sent on {date}",
+            "notSent": "Not sent",
+            "resend": "Resend confirmation",
+            "resendMessage": "The confirmation email with the invoice and the terms of sale will be sent again to the customer.",
+            "resendAction": "Resend",
+            "resent": "Confirmation sent.",
+            "format": "Format: {format}"
+        },
+        "totals": {
+            "title": "Revenue {year}",
+            "empty": "No sale this year.",
+            "country": "Country",
+            "total": "Total",
+            "digital": {
+                "title": "Digital sales to EU consumers outside France",
+                "hint": "Beats sold to private buyers in another EU country count toward the EU digital threshold of {threshold}. Above it, VAT is due in the buyer's country."
+            },
+            "lessons": {
+                "title": "Online lessons to EU consumers outside France",
+                "hint": "Online lessons sold to private buyers in another EU country. Watch this total alongside the digital one: the same threshold logic can apply to both."
+            },
+            "progress": "{amount} of {threshold}",
+            "warning": "Close to the threshold.",
+            "crossed": "Threshold crossed."
         }
     }
 }

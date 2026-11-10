@@ -32,7 +32,11 @@
                                     <span class="offer-per-lesson">{{ 'site.lessons.per_lesson'|trans({price: offer.per_lesson}) }}</span>
                                 {% endif %}
                             </p>
-                            <a class="button" href="{{ path('contact', {topic: 'lessons', offer: offer.id}) }}" aria-describedby="offer-{{ offer.id }}">{{ 'site.lessons.contact'|trans }}</a>
+                            {% if settings.onlineCheckout and offer.bookable %}
+                                <a class="button" href="{{ path('checkout', {productType: 'lesson', productId: offer.id}) }}" aria-describedby="offer-{{ offer.id }}">{{ 'site.checkout.book'|trans }}</a>
+                            {% else %}
+                                <a class="button" href="{{ path('contact', {topic: 'lessons', offer: offer.id}) }}" aria-describedby="offer-{{ offer.id }}">{{ 'site.lessons.contact'|trans }}</a>
+                            {% endif %}
                         </li>
                     {% endfor %}
                 </ul>

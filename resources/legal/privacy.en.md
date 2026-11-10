@@ -18,7 +18,7 @@ The controller of the personal data collected on {siteUrl} is {name}, {businessF
 - Data: name, email address, billing address and country, country of issue of the payment card, where applicable company name and VAT number, order details, amounts and download history.
 - Purpose: performing the order (lesson, service or licence), sending the confirmation, download links and invoices, handling any withdrawal or complaint, and keeping the accounts.
 - Legal basis: performance of the contract and compliance with legal accounting and tax obligations.
-- Retention: ten years for invoices and accounting records (article L123-22 of the French Commercial Code); five years after the end of the contract for the rest of the order file.
+- Retention: ten years for invoices and accounting records (article L123-22 of the French Commercial Code); five years after the end of the contract for the rest of the order file. An order abandoned before payment is deleted thirty days after it was started.
 
 ### Consents and contractual evidence
 

@@ -3,6 +3,8 @@ framework:
         pools:
             cache.contact_limiter:
                 adapter: cache.adapter.filesystem
+            cache.checkout_limiter:
+                adapter: cache.adapter.filesystem
     rate_limiter:
         contact:
             policy: sliding_window
@@ -21,4 +23,10 @@ framework:
             limit: 100
             interval: '1 day'
             cache_pool: cache.contact_limiter
+            lock_factory: lock.factory
+        checkout:
+            policy: sliding_window
+            limit: 10
+            interval: '10 minutes'
+            cache_pool: cache.checkout_limiter
             lock_factory: lock.factory

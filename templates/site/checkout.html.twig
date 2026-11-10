@@ -1,0 +1,61 @@
+{% extends 'site.html.twig' %}
+
+{% set page_title = 'site.checkout.title'|trans %}
+
+{% block main %}
+    <div class="checkout">
+        <header class="checkout-head">
+            <p class="page-kicker">{{ ('site.sections.' ~ section.value)|trans }}</p>
+            <h1 class="checkout-title">{{ page_title }}</h1>
+        </header>
+        <section class="checkout-summary" aria-labelledby="checkout-summary-title">
+            <h2 class="checkout-label" id="checkout-summary-title">{{ 'site.checkout.summary'|trans }}</h2>
+            <p class="checkout-product">{{ product.label }}</p>
+            <ul class="checkout-details">
+                {% if lesson %}
+                    <li>{{ ('site.lessons.kinds.' ~ lesson.kind)|trans({sessions: lesson.sessions}) }}</li>
+                    <li>{{ ('site.lessons.formats.' ~ lesson.format)|trans }}</li>
+                    <li>{{ 'site.lessons.meta'|trans({sessions: lesson.sessions, minutes: lesson.minutes}) }}</li>
+                {% elseif service %}
+                    <li>{{ ('site.production.kinds.' ~ service.kind)|trans }}</li>
+                    {% if service.deliveryDays is not null %}<li>{{ 'site.production.delivery'|trans({days: service.deliveryDays}) }}</li>{% endif %}
+                    {% if service.revisions is not null %}<li>{{ 'site.production.revisions'|trans({revisions: service.revisions}) }}</li>{% endif %}
+                {% endif %}
+            </ul>
+            <p class="checkout-total">
+                <span class="checkout-label">{{ 'site.checkout.total'|trans }}</span>
+                <span class="checkout-price">{{ price }}</span>
+            </p>
+            <p class="checkout-tax">{{ 'site.checkout.ttc'|trans }} {{ settings.vatMentions.consumer }}</p>
+        </section>
+        <section class="checkout-next" aria-labelledby="checkout-next-title">
+            <h2 class="checkout-label" id="checkout-next-title">{{ 'site.checkout.next.title'|trans }}</h2>
+            <ol>
+                <li>{{ 'site.checkout.next.pay'|trans }}</li>
+                <li>{{ 'site.checkout.next.address'|trans }}</li>
+                <li>{{ 'site.checkout.next.email'|trans }}</li>
+            </ol>
+        </section>
+        <div class="checkout-form" data-island="CheckoutForm" data-props="{{ {
+            endpoint: path('api_checkout_start'),
+            product: {productType: product.type.value, productId: product.id, locale: locale, cgvVersion: cgv.version},
+            consents: product.type.requiredConsents()|map(kind => {kind: kind.value, text: ('sales.consents.' ~ kind.value)|trans({version: cgv.version})}),
+            terms: {href: path('legal', {kind: cgv.kind.value}), label: 'site.checkout.terms_link'|trans({version: cgv.version})},
+            labels: {
+                email: 'site.checkout.email'|trans,
+                emailHint: 'site.checkout.email_hint'|trans,
+                emailInvalid: 'site.checkout.email_invalid'|trans,
+                required: 'site.contact.required'|trans,
+                consents: 'site.checkout.consents'|trans,
+                submit: 'site.checkout.submit'|trans,
+                submitting: 'site.checkout.submitting'|trans,
+                incomplete: 'site.checkout.incomplete'|trans,
+                invalid: 'site.checkout.invalid'|trans,
+                tooMany: 'site.checkout.too_many'|trans,
+                error: 'site.checkout.error'|trans,
+            },
+        }|json_encode }}">
+            <p class="checkout-fallback">{{ 'site.checkout.fallback'|trans }}</p>
+        </div>
+    </div>
+{% endblock %}
