@@ -10,3 +10,38 @@ login:
     failed: 'Connexion impossible, réessayez.'
     expired: 'Cette connexion a pris trop de temps ou a été ouverte dans un autre onglet, réessayez.'
     denied: 'Votre compte mossyleaf n’a pas accès à l’admin d’Injust.'
+site:
+    description: 'Injust : punk de protestation et hard rock.'
+    skip: 'Passer au contenu'
+    nav: 'Principale'
+    home: 'Accueil Injust'
+    switch: 'Lire en français'
+    sections:
+        lessons: 'Cours'
+        production: 'Production'
+        beats: 'Beats'
+    leads:
+        lessons: 'Cours de guitare chez vous, chez moi ou en ligne. Riffs, rythmique, son et les morceaux que vous voulez jouer.'
+        production: 'Mixage, mastering, production et arrangement pour les groupes et artistes qui veulent un son fort et honnête.'
+        beats: 'Des beats et instrumentaux pour votre prochaine sortie, avec des licences claires et un téléchargement immédiat.'
+    soon: 'Ouverture prochaine'
+    write: 'M’écrire'
+    hero:
+        release: 'Nouvelle musique en approche'
+    hidden:
+        title: 'Section masquée aux visiteurs'
+        detail: 'Cette section est désactivée. Seuls les admins connectés voient cette page.'
+    legal:
+        mentions: 'Mentions légales'
+        privacy: 'Politique de confidentialité'
+        cgv-lessons: 'CGV : cours'
+        cgv-production: 'CGV : production'
+        cgv-beats: 'CGV : beats'
+        licence: 'Conditions de licence'
+    footer:
+        legal: 'Légal'
+        contact: 'Contact'
+    not_found:
+        title: 'Rien ici'
+        detail: 'Cette page n’existe pas ou n’est pas encore ouverte.'
+        back: 'Retour à l’accueil'

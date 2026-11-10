@@ -82,6 +82,18 @@ final class AuthenticationTest extends WebTestCase
         self::assertResponseRedirects('/login');
     }
 
+    public function testAFrenchBrowserReturnsToTheRegisteredLogoutUri(): void
+    {
+        $client = self::createClient([], ['HTTP_ACCEPT_LANGUAGE' => 'fr-FR,fr;q=0.9']);
+        $client->loginUser(SecurityUser::fromUser(self::createUser()));
+        $client->request('GET', '/admin/');
+        $token = Json::string(Json::decode((string) $client->getCrawler()->filter('#app-session')->text()), 'logoutToken');
+
+        $client->request('POST', '/logout', ['_csrf_token' => $token]);
+
+        self::assertResponseRedirects('https://accounts.test/end-session?client_id=injust&post_logout_redirect_uri=http%3A%2F%2Flocalhost%2F');
+    }
+
     /**
      * @return array<string, string>
      */

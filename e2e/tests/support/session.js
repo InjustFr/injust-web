@@ -5,7 +5,7 @@ export const EDITOR = {
 
 export const OUTSIDER = {
     account: 'outsider',
-    claims: { email: 'outsider@injust.test', name: 'Outsider', groups: ['mossydew'] },
+    claims: { email: 'outsider@injust.test', name: 'Outsider', groups: ['strangers'] },
 };
 
 export async function signInWithAccount(page, account) {

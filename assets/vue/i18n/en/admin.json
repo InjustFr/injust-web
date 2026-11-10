@@ -3,10 +3,93 @@
         "label": "Admin sections",
         "dashboard": "Dashboard",
         "site": "Public site",
-        "signOut": "Sign out"
+        "signOut": "Sign out",
+        "settings": "Settings",
+        "legal": "Legal texts"
     },
     "dashboard": {
         "title": "Dashboard",
         "subtitle": "The sections of the site will appear here."
+    },
+    "settings": {
+        "title": "Settings",
+        "subtitle": "Sections, legal identity, contact, SEO and images.",
+        "saved": "Saved.",
+        "save": "Save",
+        "sections": {
+            "title": "Sections",
+            "music": "Music",
+            "musicHint": "The home page, always on.",
+            "lessons": "Guitar lessons",
+            "production": "Production services",
+            "beats": "Beats store"
+        },
+        "checkout": {
+            "label": "Online checkout",
+            "hint": "Lets visitors buy online.",
+            "blocked": "Complete the legal identity below to enable online checkout."
+        },
+        "identity": {
+            "title": "Legal identity",
+            "complete": "Complete: online checkout can be enabled.",
+            "incomplete": "Every field is required before online checkout can be enabled.",
+            "sirenInvalid": "Invalid SIREN (9 digits, checksum).",
+            "name": "Name",
+            "businessForm": "Business form",
+            "siren": "SIREN",
+            "address": "Address",
+            "email": "Email",
+            "phone": "Phone",
+            "publicationDirector": "Publication director",
+            "mediatorName": "Consumer mediator",
+            "mediatorUrl": "Mediator website",
+            "hostName": "Host",
+            "hostAddress": "Host address"
+        },
+        "general": {
+            "title": "General",
+            "contactEmail": "Contact email",
+            "bookingUrl": "Booking URL",
+            "bookingUrlHint": "https only. Leave empty for none.",
+            "vat": {
+                "consumer": "VAT mention, consumers",
+                "euBusiness": "VAT mention, EU businesses",
+                "nonEuBusiness": "VAT mention, non-EU businesses"
+            },
+            "seoTitle": "SEO title ({language})",
+            "seoDescription": "SEO description ({language})",
+            "searchIndexing": "Search engine indexing",
+            "searchIndexingHint": "Off keeps the site out of search results."
+        },
+        "images": {
+            "title": "Images",
+            "logo": "Logo",
+            "hero": "Hero image",
+            "none": "No image.",
+            "upload": "Upload",
+            "remove": "Remove"
+        }
+    },
+    "legal": {
+        "title": "Legal texts",
+        "subtitle": "Markdown, one text per language. Every edit creates a new version.",
+        "kinds": "Legal documents",
+        "kind": {
+            "mentions": "Legal notice",
+            "privacy": "Privacy",
+            "cgv-lessons": "Terms: lessons",
+            "cgv-production": "Terms: production",
+            "cgv-beats": "Terms: beats",
+            "licence": "Licence"
+        },
+        "version": "Version {version}",
+        "updated": "updated {date}",
+        "viewPublic": "View public page",
+        "placeholders": "Placeholders such as {'{name}'} or {'{siren}'} are filled from the legal identity when the page is shown.",
+        "french": "French",
+        "english": "English",
+        "save": "Save",
+        "saved": "Text saved.",
+        "missing": "This document has not been created yet."
     }
 }

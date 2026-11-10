@@ -1,0 +1,10 @@
+{% extends 'site.html.twig' %}
+
+{% set page_title = ('site.legal.' ~ kind.value)|trans %}
+
+{% block main %}
+    <article class="legal">
+        <h1 class="legal-title">{{ page_title }}</h1>
+        <div class="legal-body">{{ body|raw }}</div>
+    </article>
+{% endblock %}

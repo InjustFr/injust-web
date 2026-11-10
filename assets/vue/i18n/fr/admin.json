@@ -3,10 +3,93 @@
         "label": "Sections de l’admin",
         "dashboard": "Tableau de bord",
         "site": "Site public",
-        "signOut": "Se déconnecter"
+        "signOut": "Se déconnecter",
+        "settings": "Réglages",
+        "legal": "Textes légaux"
     },
     "dashboard": {
         "title": "Tableau de bord",
         "subtitle": "Les sections du site apparaîtront ici."
+    },
+    "settings": {
+        "title": "Réglages",
+        "subtitle": "Rubriques, identité légale, contact, SEO et images.",
+        "saved": "Enregistré.",
+        "save": "Enregistrer",
+        "sections": {
+            "title": "Rubriques",
+            "music": "Musique",
+            "musicHint": "La page d’accueil, toujours active.",
+            "lessons": "Cours de guitare",
+            "production": "Services de production",
+            "beats": "Boutique de beats"
+        },
+        "checkout": {
+            "label": "Paiement en ligne",
+            "hint": "Permet aux visiteurs d’acheter en ligne.",
+            "blocked": "Complétez l’identité légale ci-dessous pour activer le paiement en ligne."
+        },
+        "identity": {
+            "title": "Identité légale",
+            "complete": "Complète : le paiement en ligne peut être activé.",
+            "incomplete": "Tous les champs sont requis avant d’activer le paiement en ligne.",
+            "sirenInvalid": "SIREN invalide (9 chiffres, clé de contrôle).",
+            "name": "Nom",
+            "businessForm": "Forme juridique",
+            "siren": "SIREN",
+            "address": "Adresse",
+            "email": "E-mail",
+            "phone": "Téléphone",
+            "publicationDirector": "Directeur de la publication",
+            "mediatorName": "Médiateur de la consommation",
+            "mediatorUrl": "Site du médiateur",
+            "hostName": "Hébergeur",
+            "hostAddress": "Adresse de l’hébergeur"
+        },
+        "general": {
+            "title": "Général",
+            "contactEmail": "E-mail de contact",
+            "bookingUrl": "Lien de réservation",
+            "bookingUrlHint": "https uniquement. Laisser vide pour aucun.",
+            "vat": {
+                "consumer": "Mention TVA, particuliers",
+                "euBusiness": "Mention TVA, entreprises UE",
+                "nonEuBusiness": "Mention TVA, entreprises hors UE"
+            },
+            "seoTitle": "Titre SEO ({language})",
+            "seoDescription": "Description SEO ({language})",
+            "searchIndexing": "Indexation par les moteurs de recherche",
+            "searchIndexingHint": "Désactivé, le site reste hors des résultats de recherche."
+        },
+        "images": {
+            "title": "Images",
+            "logo": "Logo",
+            "hero": "Image d’en-tête",
+            "none": "Aucune image.",
+            "upload": "Téléverser",
+            "remove": "Retirer"
+        }
+    },
+    "legal": {
+        "title": "Textes légaux",
+        "subtitle": "Markdown, un texte par langue. Chaque modification crée une nouvelle version.",
+        "kinds": "Documents légaux",
+        "kind": {
+            "mentions": "Mentions légales",
+            "privacy": "Confidentialité",
+            "cgv-lessons": "CGV : cours",
+            "cgv-production": "CGV : production",
+            "cgv-beats": "CGV : beats",
+            "licence": "Licence"
+        },
+        "version": "Version {version}",
+        "updated": "mis à jour le {date}",
+        "viewPublic": "Voir la page publique",
+        "placeholders": "Les variables comme {'{name}'} ou {'{siren}'} sont remplies depuis l’identité légale à l’affichage.",
+        "french": "Français",
+        "english": "Anglais",
+        "save": "Enregistrer",
+        "saved": "Texte enregistré.",
+        "missing": "Ce document n’a pas encore été créé."
     }
 }

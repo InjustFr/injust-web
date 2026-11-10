@@ -1,5 +1,5 @@
 <script setup>
-import { ExternalLink, LayoutDashboard, LogOut } from '@lucide/vue';
+import { ExternalLink, FileText, LayoutDashboard, LogOut, Settings } from '@lucide/vue';
 import { ConfigProvider, TooltipProvider } from 'reka-ui';
 import { useI18n } from 'vue-i18n';
 import ToastHost from '../components/ui/ToastHost.vue';
@@ -11,6 +11,8 @@ const session = useSession();
 
 const SECTIONS = [
     { name: 'dashboard', icon: LayoutDashboard },
+    { name: 'settings', icon: Settings },
+    { name: 'legal', icon: FileText },
 ];
 </script>
 
@@ -39,7 +41,9 @@ const SECTIONS = [
                 </div>
             </header>
             <main id="main" class="admin__main">
-                <RouterView />
+                <RouterView v-slot="{ Component }">
+                    <Suspense><component :is="Component" /></Suspense>
+                </RouterView>
             </main>
         </div>
         <ToastHost />

@@ -1,0 +1,18 @@
+{% extends 'base.html.twig' %}
+
+{% block head %}
+    <meta name="robots" content="noindex, nofollow">
+    <meta name="color-scheme" content="dark">
+    <title>{{ 'site.not_found.title'|trans }} | {{ brand }}</title>
+{% endblock %}
+
+{% block stylesheets %}{{ vite_entry_link_tags('site') }}{% endblock %}
+
+{% block body %}
+    <main id="content" class="placeholder">
+        <p class="placeholder-status">404</p>
+        <h1 class="placeholder-title">{{ 'site.not_found.title'|trans }}</h1>
+        <p class="placeholder-lead">{{ 'site.not_found.detail'|trans }}</p>
+        <a class="button" href="{{ path('home') }}">{{ 'site.not_found.back'|trans }}</a>
+    </main>
+{% endblock %}

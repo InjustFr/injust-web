@@ -1,4 +1,4 @@
-import { expect, test } from '@playwright/test';
+import { expect, test } from './support/test.js';
 import { OUTSIDER, signIn, signInWithAccount } from './support/session.js';
 
 test('the home page needs no account, the admin does', async ({ page }) => {

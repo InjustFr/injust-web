@@ -1,7 +1,22 @@
 {% extends 'site.html.twig' %}
 
-{% block body %}
-    <main id="site">
-        <h1>INJUST</h1>
-    </main>
+{% block preload %}
+    {% if settings.heroImage %}
+        <link rel="preload" as="image" href="{{ path('media_image', {file: settings.heroImage ~ '.webp'}) }}" fetchpriority="high">
+    {% endif %}
+{% endblock %}
+
+{% block main %}
+    <section class="hero">
+        {% if settings.heroImage %}
+            <img class="hero-photo" src="{{ path('media_image', {file: settings.heroImage ~ '.webp'}) }}" alt="" fetchpriority="high">
+        {% endif %}
+        <div class="hero-content">
+            <h1 class="hero-mark">{{ brand|upper }}</h1>
+            <p class="hero-genre">{{ 'site.description'|trans }}</p>
+            <div class="hero-release" data-featured-release>
+                <p>{{ 'site.hero.release'|trans }}</p>
+            </div>
+        </div>
+    </section>
 {% endblock %}

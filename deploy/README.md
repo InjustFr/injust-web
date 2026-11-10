@@ -16,23 +16,27 @@ Fill `.env`:
 | Variable | Value |
 |---|---|
 | `IMAGE` / `TAG` | Image to run; `make deploy` sets `TAG` to the commit it deploys |
-| `DEFAULT_URI` | Public address of the site, used for absolute links |
+| `DEFAULT_URI` | Public address of the site (`https://injustmusic.com`), used for absolute links |
 | `PROXY_NETWORK` | External Docker network of the nginx reverse proxy (`docker network ls`) |
 | `APP_SECRET` | `openssl rand -hex 16` |
 | `POSTGRES_PASSWORD` | `openssl rand -hex 24` |
 | `OIDC_CLIENT_SECRET` | Secret of the `injust` provider in mossyleaf accounts (Authentik) |
 | `MAILER_DSN` | SMTP transport for outgoing mail (Resend SMTP) |
 
-Then `docker compose up -d`. The entrypoint waits for the database and runs the migrations.
+Then `docker compose up -d`. The entrypoint waits for the database, runs the migrations and installs the missing default legal texts (`app:legal:install-defaults`).
 
 ## Who can sign in to `/admin`
 
 Sign-in goes through mossyleaf accounts (`accounts.mossyleaf.studio`). An account needs the **`injust`** group in Authentik: the application is bound to it, and the app checks the `groups` claim again (`OIDC_REQUIRED_GROUP`).
 
+## Search engines
+
+Indexing is off by default: the site sends `noindex` and `robots.txt` disallows everything. Switch it on in the admin (Settings, Search engine indexing) when the site is ready; there is no server setting for it.
+
 ## Reverse proxy
 
 - `compose.override.yaml` puts the app on the reverse proxy network (`PROXY_NETWORK`) with the alias `injust-web`, and opens no host port.
-- The site's server block of the nginx configuration proxies to `http://injust-web` and needs `client_max_body_size 22M` for image uploads, plus `X-Forwarded-Host`/`X-Forwarded-Port` like the other app blocks.
+- The site's server block of the nginx configuration proxies to `http://injust-web` and needs `client_max_body_size 25M` for image uploads, plus `X-Forwarded-Host`/`X-Forwarded-Port` like the other app blocks.
 - Uploaded images live in the `app_share` volume (`var/share/images`), the data in `database_data`.
 
 ## Updating

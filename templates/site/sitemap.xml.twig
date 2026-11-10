@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
+{% set locales = constant('App\\Presentation\\LocaleListener::LOCALES') %}
+{% for page in pages %}
+{% for locale in locales %}
+  <url>
+    <loc>{{ url(page[0], page[1]|merge({_locale: locale})) }}</loc>
+{% for alternate in locales %}
+    <xhtml:link rel="alternate" hreflang="{{ alternate }}" href="{{ url(page[0], page[1]|merge({_locale: alternate})) }}"/>
+{% endfor %}
+  </url>
+{% endfor %}
+{% endfor %}
+</urlset>

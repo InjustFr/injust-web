@@ -35,7 +35,7 @@ final readonly class OidcSingleSignOn implements SingleSignOn
     {
         return self::withQuery($this->configuration->logoutUrl, [
             'client_id' => $this->configuration->clientId,
-            'post_logout_redirect_uri' => $this->urls->generate('home', [], UrlGeneratorInterface::ABSOLUTE_URL),
+            'post_logout_redirect_uri' => $this->urls->generate('home', ['_locale' => 'en'], UrlGeneratorInterface::ABSOLUTE_URL),
         ]);
     }
 

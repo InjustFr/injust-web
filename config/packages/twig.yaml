@@ -2,6 +2,8 @@ twig:
     file_name_pattern: '*.twig'
     globals:
         accounts_url: '%env(ACCOUNTS_URL)%'
+        brand: 'Injust'
+        brand_genres: ['Punk rock', 'Hard rock']
 
 when@test:
     twig:

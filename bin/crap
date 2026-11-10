@@ -1,0 +1,19 @@
+#!/usr/bin/env php
+<?php
+
+declare(strict_types=1);
+
+require dirname(__DIR__).'/vendor/autoload.php';
+
+[, $report, $max] = $argv + [null, null, null];
+$changed = array_slice($argv, 3);
+if (null === $report || null === $max || !is_file($report)) {
+    fwrite(STDERR, "Usage: bin/crap <crap4j.xml> <max> [changed src files...]\n");
+    exit(2);
+}
+
+$violations = Tooling\CrapFilter::violations((string) file_get_contents($report), (float) $max, $changed);
+foreach ($violations as $violation) {
+    fwrite(STDERR, sprintf("CRAP %s > %s: %s\n", $violation['crap'], $max, $violation['method']));
+}
+exit([] === $violations ? 0 : 1);

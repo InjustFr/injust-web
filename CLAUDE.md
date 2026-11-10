@@ -26,10 +26,11 @@ make install         # composer install + npm install
 make db              # create + migrate dev DB
 make fixtures        # reset the dev database with demo data
 make migration       # generate a migration from mapping changes
-make test            # PHPUnit; TEST_TOKEN=n uses its own database app_testn (parallel agents never share one)
-make test-js / phpstan / deptrac / cs / cs-fix / audit   # keep all at 0
+make test            # PHPUnit; TEST_TOKEN=n uses its own database app_testn, cache var/cache/testn and share dir var/share/testn (parallel agents never share one)
+make test-js / phpstan / deptrac / depcruise / cs / cs-fix / audit   # keep all at 0
+make gate            # cs phpstan deptrac depcruise + coverage, CRAP <= 10 and mutation (Infection/Stryker, MSI >= 80) on changed files; GATE_BASE=<ref> picks the base (default HEAD); crap, mutation, crap-js, mutation-js run alone
 make e2e             # Playwright against php-e2e (APP_ENV=test)
-make qa              # cs phpstan deptrac audit test test-js e2e
+make qa              # gate audit e2e (the pre-commit hook runs make gate; make up sets core.hooksPath)
 make ci              # full suite from a fresh checkout, as GitHub Actions runs it
 make deploy          # run the image CI published to Docker Hub for HEAD on DEPLOY_HOST (.deploy.env)
 ```
@@ -43,6 +44,15 @@ Layer-first: `src/{Domain,Application,Infrastructure,Presentation}/<Context>/`, 
 - `Infrastructure`: Doctrine repositories and `DoctrineTransaction`, `Storage\GdImageResizer` (WebP, 1600 px max), `Storage\LocalImageStorage` (`var/share/images`), the Security/Accounts adapters.
 - `Presentation`: controllers. Admin API goes under `/api/admin/…` with `MapRequestPayload` DTOs; `DomainExceptionListener` turns a domain exception into a 422 `problem+json`; `SameOriginGuard` refuses cross-origin writes on `/api/`; `RefreshAfterWrite` + `ApiPreload` return the refreshed GET payloads the admin asks for in `X-Refresh`; `AppShellController` serves the admin SPA on `/admin/{path}` and preloads its first API calls.
 - Public pages: `Presentation/Web/Site/*Controller` render `templates/site/*.html.twig`, which extend `templates/site.html.twig` (SEO head: title, description, canonical, Open Graph, JSON-LD). `robots.txt` and `sitemap.xml` are controllers. Uploaded images are served by `MediaController` (`/media/images/{ulid}.webp`, immutable cache).
+
+## M0 contexts and contracts
+
+- `Domain/Shared`: `LocalizedText` {fr, en} (`in($locale)` falls back to the other side) and `Price` (cents, EUR).
+- `Settings` context: single `Settings` row (sections Lessons/Production/Beats, online checkout, legal identity, VAT mentions, SEO, logo/hero image ULIDs, `searchIndexing` default off) and `LegalDocument` per `LegalKind` (versioned Markdown, FR + EN). Read through `Application\Settings\SettingsQueries`; a missing row means defaults (sections off). Checkout needs a complete legal identity (`LegalIdentityIncomplete`).
+- Admin API: `/api/admin/settings[/sections|/checkout|/legal-identity|/general|/images/{logo|hero}]` and `/api/admin/legal[/{kind}]`; admin pages Settings and Legal texts.
+- Default legal texts: `resources/legal/<kind>.<fr|en>.md` with `{placeholders}`, read through the `Application\Settings\LegalDefaults` port (`Infrastructure\Storage\MarkdownLegalDefaults`) and installed by `app:legal:install-defaults` (entrypoint, `make fixtures`, `make e2e`) because fixtures truncate `legal_document`. They are templates: a lawyer must review them before checkout goes live.
+- Public site: localized routes `home`, `section`, `legal` (EN `/…`, FR `/fr/…`); `SectionGate::hiddenFromVisitors(Section)` gates each section (404 for visitors, banner for a signed-in admin); render through `SitePage::render`. Later sections replace `SectionController`. Islands live in `assets/vue/site/islands/<Name>.vue`, mounted from `[data-island]`.
+- e2e specs use `e2e/tests/support/test.js`, which fails any test on a CSP violation.
 
 ## Accounts & security
 

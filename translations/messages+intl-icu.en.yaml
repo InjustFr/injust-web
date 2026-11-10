@@ -10,3 +10,38 @@ login:
     failed: 'Unable to sign in, please try again.'
     expired: 'This sign-in took too long or was opened in another tab, please try again.'
     denied: 'Your mossyleaf account does not have access to the Injust admin.'
+site:
+    description: 'Injust: protest punk and hard rock.'
+    skip: 'Skip to content'
+    nav: 'Main'
+    home: 'Injust home'
+    switch: 'Read in English'
+    sections:
+        lessons: 'Lessons'
+        production: 'Production'
+        beats: 'Beats'
+    leads:
+        lessons: 'Guitar lessons at your place, at mine or online. Riffs, rhythm, tone and the songs you want to play.'
+        production: 'Mixing, mastering, production and arrangement for bands and artists who want it loud and honest.'
+        beats: 'Beats and instrumentals for your next release, with clear licences and instant downloads.'
+    soon: 'Opening soon'
+    write: 'Write to me'
+    hero:
+        release: 'New music on the way'
+    hidden:
+        title: 'Hidden from visitors'
+        detail: 'This section is switched off. Only signed-in admins can see this page.'
+    legal:
+        mentions: 'Legal notice'
+        privacy: 'Privacy policy'
+        cgv-lessons: 'Terms of sale: lessons'
+        cgv-production: 'Terms of sale: production'
+        cgv-beats: 'Terms of sale: beats'
+        licence: 'Licence terms'
+    footer:
+        legal: 'Legal'
+        contact: 'Contact'
+    not_found:
+        title: 'Nothing here'
+        detail: 'This page does not exist or is not open yet.'
+        back: 'Back to the home page'

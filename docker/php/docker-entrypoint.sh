@@ -14,6 +14,7 @@ if [ "$1" = "frankenphp" ] || [ "${1#-}" != "$1" ]; then
     done
 
     php bin/console doctrine:migrations:migrate --no-interaction --allow-no-migration
+    php bin/console app:legal:install-defaults --no-interaction
     php bin/console cache:warmup
 fi
 

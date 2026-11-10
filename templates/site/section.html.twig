@@ -1,0 +1,14 @@
+{% extends 'site.html.twig' %}
+
+{% set page_title = ('site.sections.' ~ section.value)|trans %}
+
+{% block main %}
+    <section class="placeholder">
+        <p class="placeholder-status">{{ 'site.soon'|trans }}</p>
+        <h1 class="placeholder-title">{{ page_title }}</h1>
+        <p class="placeholder-lead">{{ ('site.leads.' ~ section.value)|trans }}</p>
+        {% if settings.contactEmail %}
+            <a class="button" href="mailto:{{ settings.contactEmail }}">{{ 'site.write'|trans }}</a>
+        {% endif %}
+    </section>
+{% endblock %}

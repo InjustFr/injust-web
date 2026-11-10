@@ -1,0 +1,19 @@
+:root {
+    --ink: #0b0d10;
+    --soot: #14181d;
+    --steel: #2b323a;
+    --fog: #98a2ad;
+    --bone: #e9edf0;
+    --signal: #d4202a;
+    --signal-bright: #ff4d52;
+
+    --font-display: 'Anton', 'Impact', 'Arial Narrow', sans-serif;
+    --font-body: 'Archivo Variable', 'Archivo', system-ui, sans-serif;
+    --font-mono: 'JetBrains Mono', ui-monospace, 'SFMono-Regular', monospace;
+
+    --gutter: clamp(1rem, 4vw, 3rem);
+    --rule: 2px solid var(--steel);
+    --header-height: 4.5rem;
+
+    color-scheme: dark;
+}

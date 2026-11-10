@@ -1,8 +1,15 @@
 shared:
     not_found: '{subject, select, user {Ce compte n’existe} other {Cet élément n’existe}} plus.'
     unsupported_image: 'Ce fichier n’est pas une image que le site peut afficher : utilisez du JPEG, PNG, WebP ou AVIF.'
+    negative_price: 'Un prix ne peut pas être négatif.'
 user:
     invalid_email: '« {email} » n’est pas une adresse email valide.'
     email_taken: 'Un compte utilise déjà {email}.'
 identity:
     access_denied: 'Votre compte mossyleaf n’a pas accès à l’admin d’Injust.'
+settings:
+    invalid_siren: '« {siren} » n’est pas un SIREN valide : il compte 9 chiffres et passe le contrôle de Luhn.'
+    invalid_url: '« {url} » n’est pas une adresse web sécurisée : elle doit commencer par https://.'
+    legal_identity_incomplete: 'Remplissez tous les champs de l’identité légale avant d’activer le paiement en ligne.'
+legal:
+    empty_document: 'Un texte légal doit être rempli dans au moins une langue.'
