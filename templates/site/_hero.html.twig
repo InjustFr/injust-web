@@ -6,18 +6,20 @@
     {% endif %}
     <div class="hero-content">
         <h1 class="hero-mark">{{ brand|upper }}</h1>
-        <p class="hero-tagline">{{ music.text.tagline.in(locale) ?: 'site.description'|trans }}</p>
-        {% if music.socialLinks is not empty %}
-            <ul class="hero-socials" aria-label="{{ 'site.links.socials'|trans }}">
-                {% for social in music.socialLinks %}
-                    <li>
-                        <a class="hero-social" href="{{ social.url }}" rel="me noopener" aria-label="{{ social.label ?: ('site.networks.' ~ social.network)|trans }}">
-                            {%- include 'site/_links_icon.html.twig' with {network: social.network} only -%}
-                        </a>
-                    </li>
-                {% endfor %}
-            </ul>
-        {% endif %}
+        <div class="hero-intro">
+            <p class="hero-tagline">{{ music.text.tagline.in(locale) ?: 'site.description'|trans }}</p>
+            {% if music.socialLinks is not empty %}
+                <ul class="hero-socials" aria-label="{{ 'site.links.socials'|trans }}">
+                    {% for social in music.socialLinks %}
+                        <li>
+                            <a class="hero-social" href="{{ social.url }}" rel="me noopener" aria-label="{{ social.label ?: ('site.networks.' ~ social.network)|trans }}">
+                                {%- include 'site/_links_icon.html.twig' with {network: social.network} only -%}
+                            </a>
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+        </div>
         {% if featured %}
             <article class="hero-release">
                 {% if featured.cover %}
