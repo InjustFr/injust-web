@@ -8,7 +8,8 @@
         "legal": "Textes légaux",
         "music": "Musique",
         "lessons": "Cours",
-        "messages": "Messages"
+        "messages": "Messages",
+        "production": "Production"
     },
     "dashboard": {
         "title": "Tableau de bord",
@@ -230,6 +231,68 @@
             "priceHint": "Par exemple 45 ou 45,50.",
             "duration": "{minutes} min",
             "packSessions": "× {count}"
+        }
+    },
+    "production": {
+        "title": "Production",
+        "subtitle": "Services, références et textes de la page production.",
+        "saved": "Enregistré.",
+        "save": "Enregistrer",
+        "edit": "Modifier",
+        "delete": "Supprimer",
+        "remove": "Retirer",
+        "kinds": {
+            "mix": "Mixage",
+            "master": "Mastering",
+            "mix-master": "Mixage et mastering",
+            "production": "Production",
+            "arrangement": "Arrangement",
+            "recording": "Enregistrement",
+            "other": "Autre"
+        },
+        "pricings": {
+            "fixed": "Prix fixe",
+            "quote": "Sur devis"
+        },
+        "texts": {
+            "title": "Textes de la page",
+            "intro": "Introduction, Markdown ({language})",
+            "process": "Comment ça marche, Markdown ({language})",
+            "faq": "FAQ, Markdown ({language})"
+        },
+        "services": {
+            "title": "Services",
+            "new": "Nouveau service",
+            "edit": "Modifier le service",
+            "empty": "Aucun service pour le moment.",
+            "kind": "Type",
+            "titleField": "Titre ({language})",
+            "description": "Description courte ({language})",
+            "pricing": "Tarification",
+            "price": "Prix (EUR)",
+            "priceHint": "Par exemple 150 ou 150,50.",
+            "priceFrom": "À partir de (EUR)",
+            "priceFromHint": "Laisse vide pour n'afficher aucun montant.",
+            "deliveryDays": "Délai (jours)",
+            "deliveryDaysHint": "Entre 1 et 120, optionnel.",
+            "revisions": "Retouches incluses",
+            "revisionsHint": "Entre 0 et 10, optionnel.",
+            "from": "à partir de {price}",
+            "onQuote": "sur devis",
+            "days": "{count} j"
+        },
+        "portfolio": {
+            "title": "Références",
+            "new": "Nouvelle référence",
+            "edit": "Modifier la référence",
+            "empty": "Aucune référence pour le moment.",
+            "titleField": "Titre",
+            "artist": "Artiste",
+            "roles": "Rôles",
+            "year": "Année",
+            "url": "Lien d'écoute",
+            "urlHint": "Adresse en https.",
+            "cover": "Pochette"
         }
     },
     "messages": {

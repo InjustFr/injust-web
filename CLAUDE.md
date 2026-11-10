@@ -75,6 +75,14 @@ Layer-first: `src/{Domain,Application,Infrastructure,Presentation}/<Context>/`, 
 - Public pages `/lessons` (`LessonsController`, gated by `SectionGate`, offers grouped by format, FAQ, JSON-LD `Service`) and `/contact` (always on, `ContactForm` island prefilled from `?topic=lessons&offer=<id>`). Every buy button is a "Contact me" link until checkout exists (M4).
 - Dev fixtures add demo offers, lessons texts and two messages; e2e `e2e/tests/contact.spec.js` (the test mailer is `null://`, so mail is not asserted there).
 
+## M3 Production
+
+- `Domain/Production`: `ProductionService` (localized title and description, `ServiceKind` mix|master|mix-master|production|arrangement|recording|other, `Pricing` fixed|quote, `Price` (fixed must be > 0, a quote may be 0 = "on quote"), `deliveryDays` 1..120 and `revisions` 0..10 both optional, position; `ProductionServiceDetails` validates), `PortfolioItem` (title, artist, at least one role, year 1990..2100, optional https listen link and cover image ULID, position; `PortfolioItemDetails` validates), single-row `ProductionPage` (Markdown intro, process, FAQ). Same ordering contract as Lessons.
+- `Application\Contact\ContactOffers` resolves `?topic=&offer=` for lessons (`LessonsQueries`) and production (`ProductionQueries::service`); the controller prefill and `SendContactMessageHandler` both use it. A replaced or removed cover file is deleted after commit.
+- Admin API `/api/admin/production[/page|/services[/order]|/portfolio[/order]|/portfolio/{id}/cover]`; page `/admin/production` (`productionForm.js`, `components/production/*`; a cover can only be uploaded when editing an existing item).
+- Public `/production` (`ProductionController`, gated by `SectionGate`, `ProductionCards`, JSON-LD `Service` with one `Offer` per service via `ProductionStructuredData`, process steps, portfolio, FAQ shared with Lessons through `_faq.html.twig`). Shared hero/card/FAQ styles live in `services.css`. Fixed services show "Contact me", quotes "Request a quote" (price hidden at 0 EUR), both linking to `/contact?topic=production&offer=<id>` until checkout exists (M4).
+- Dev fixtures add demo services, texts and three portfolio items (Injust's own releases); e2e `e2e/tests/production.spec.js`.
+
 ## Accounts & security
 
 - Sign-in = mossyleaf accounts (Authentik at `accounts.mossyleaf.studio`, project `~/Sites/mossyleaf-studio/accounts`), OIDC code flow + PKCE, client id `injust`. Only accounts whose `groups` claim contains `OIDC_REQUIRED_GROUP` (`injust`) get in; dev leaves it empty.

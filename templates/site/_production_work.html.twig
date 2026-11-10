@@ -1,0 +1,20 @@
+<li class="work">
+    <span class="work-cover">
+        {%- if work.cover -%}
+            <img src="{{ path('media_image', {file: work.cover ~ '.webp'}) }}" alt="" width="600" height="600" loading="lazy">
+        {%- else -%}
+            <span class="cover-blank" aria-hidden="true">{{ work.title }}</span>
+        {%- endif -%}
+    </span>
+    <h3 class="work-title">{{ work.title }}</h3>
+    <p class="work-artist">{{ work.artist }}</p>
+    <p class="work-meta">
+        {%- if work.year -%}
+            <span class="work-year">{{ work.year }}</span>
+        {%- endif -%}
+        <span class="work-roles">{{ work.roles|map(role => ('site.production.kinds.' ~ role)|trans)|join(' · ') }}</span>
+    </p>
+    {% if work.url %}
+        <a class="work-link" href="{{ work.url }}" rel="noopener" target="_blank" aria-label="{{ 'site.production.listen_label'|trans({title: work.title, artist: work.artist}) }}">{{ 'site.production.listen'|trans }} <span aria-hidden="true">↗</span></a>
+    {% endif %}
+</li>

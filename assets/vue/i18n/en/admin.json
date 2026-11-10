@@ -8,7 +8,8 @@
         "legal": "Legal texts",
         "music": "Music",
         "lessons": "Lessons",
-        "messages": "Messages"
+        "messages": "Messages",
+        "production": "Production"
     },
     "dashboard": {
         "title": "Dashboard",
@@ -230,6 +231,68 @@
             "priceHint": "For example 45 or 45,50.",
             "duration": "{minutes} min",
             "packSessions": "× {count}"
+        }
+    },
+    "production": {
+        "title": "Production",
+        "subtitle": "Services, portfolio and page texts for the production page.",
+        "saved": "Saved.",
+        "save": "Save",
+        "edit": "Edit",
+        "delete": "Delete",
+        "remove": "Remove",
+        "kinds": {
+            "mix": "Mixing",
+            "master": "Mastering",
+            "mix-master": "Mixing and mastering",
+            "production": "Production",
+            "arrangement": "Arrangement",
+            "recording": "Recording",
+            "other": "Other"
+        },
+        "pricings": {
+            "fixed": "Fixed price",
+            "quote": "On quote"
+        },
+        "texts": {
+            "title": "Page texts",
+            "intro": "Introduction, Markdown ({language})",
+            "process": "How it works, Markdown ({language})",
+            "faq": "FAQ, Markdown ({language})"
+        },
+        "services": {
+            "title": "Services",
+            "new": "New service",
+            "edit": "Edit service",
+            "empty": "No service yet.",
+            "kind": "Type",
+            "titleField": "Title ({language})",
+            "description": "Short description ({language})",
+            "pricing": "Pricing",
+            "price": "Price (EUR)",
+            "priceHint": "For example 150 or 150,50.",
+            "priceFrom": "From (EUR)",
+            "priceFromHint": "Leave empty to show no amount.",
+            "deliveryDays": "Delivery (days)",
+            "deliveryDaysHint": "Between 1 and 120, optional.",
+            "revisions": "Included revisions",
+            "revisionsHint": "Between 0 and 10, optional.",
+            "from": "from {price}",
+            "onQuote": "on quote",
+            "days": "{count} d"
+        },
+        "portfolio": {
+            "title": "Portfolio",
+            "new": "New item",
+            "edit": "Edit item",
+            "empty": "No portfolio item yet.",
+            "titleField": "Title",
+            "artist": "Artist",
+            "roles": "Roles",
+            "year": "Year",
+            "url": "Listen link",
+            "urlHint": "An https address.",
+            "cover": "Cover"
         }
     },
     "messages": {

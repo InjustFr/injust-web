@@ -7,11 +7,16 @@ namespace App\Tests\Functional\Api\Contact;
 use App\Application\Contact\ContactQueries;
 use App\Application\Lessons\AddLessonOffer\AddLessonOffer;
 use App\Application\Lessons\AddLessonOffer\AddLessonOfferHandler;
+use App\Application\Production\AddProductionService\AddProductionService;
+use App\Application\Production\AddProductionService\AddProductionServiceHandler;
 use App\Application\Settings\EditGeneralSettings\EditGeneralSettings;
 use App\Application\Settings\EditGeneralSettings\EditGeneralSettingsHandler;
 use App\Domain\Lessons\LessonFormat;
 use App\Domain\Lessons\LessonOfferDetails;
 use App\Domain\Lessons\OfferKind;
+use App\Domain\Production\Pricing;
+use App\Domain\Production\ProductionServiceDetails;
+use App\Domain\Production\ServiceKind;
 use App\Domain\Settings\VatMentions;
 use App\Domain\Shared\LocalizedText;
 use App\Domain\Shared\Price;
@@ -114,6 +119,32 @@ final class ContactApiTest extends WebTestCase
         $acknowledgement = self::getMailerMessage(1);
         self::assertNotNull($acknowledgement);
         self::assertEmailTextBodyContains($acknowledgement, 'About: Trial lesson');
+    }
+
+    public function testAProductionServiceIsSnapshottedInTheVisitorsLanguage(): void
+    {
+        $client = self::visitor();
+        $service = self::service();
+
+        $client->jsonRequest('POST', '/api/contact', [...self::MESSAGE, 'topic' => 'production', 'offerRef' => $service], ['HTTP_ACCEPT_LANGUAGE' => 'fr']);
+
+        $message = self::getContainer()->get(ContactQueries::class)->messages(true)[0];
+        self::assertSame(['production', $service, 'Matriçage'], [$message->topic, $message->offerRef, $message->offerLabel]);
+    }
+
+    public function testAnOfferFromAnotherTopicIsIgnored(): void
+    {
+        $client = self::visitor();
+        $client->disableReboot();
+        $service = self::service();
+        $offer = self::getContainer()->get(AddLessonOfferHandler::class)(new AddLessonOffer(new LessonOfferDetails(new LocalizedText('Cours'), new LocalizedText(), OfferKind::Single, 1, LessonFormat::Online, 30, new Price(2000))))->id;
+
+        $client->jsonRequest('POST', '/api/contact', [...self::MESSAGE, 'topic' => 'lessons', 'offerRef' => $service]);
+        $client->jsonRequest('POST', '/api/contact', [...self::MESSAGE, 'topic' => 'production', 'offerRef' => $offer]);
+        $client->jsonRequest('POST', '/api/contact', [...self::MESSAGE, 'topic' => 'production']);
+
+        $messages = self::getContainer()->get(ContactQueries::class)->messages(true);
+        self::assertSame([[null, null], [null, null], [null, null]], array_map(static fn ($message): array => [$message->offerRef, $message->offerLabel], $messages));
     }
 
     public function testAnUnknownOrForeignOfferIsIgnored(): void
@@ -326,5 +357,10 @@ final class ContactApiTest extends WebTestCase
     private static function contactEmail(string $email): void
     {
         self::getContainer()->get(EditGeneralSettingsHandler::class)(new EditGeneralSettings($email, null, new VatMentions('A', 'B', 'C'), new LocalizedText(), new LocalizedText(), false));
+    }
+
+    private static function service(): string
+    {
+        return self::getContainer()->get(AddProductionServiceHandler::class)(new AddProductionService(new ProductionServiceDetails(new LocalizedText('Matriçage', 'Mastering'), new LocalizedText(), ServiceKind::Master, Pricing::Quote, new Price(0))))->id;
     }
 }

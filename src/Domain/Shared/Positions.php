@@ -29,4 +29,10 @@ final class Positions
             $byId[$id]->moveTo($position);
         }
     }
+
+    /** @param list<Positioned> $items */
+    public static function next(array $items): int
+    {
+        return [] === $items ? 0 : max(array_map(static fn (Positioned $item): int => $item->position(), $items)) + 1;
+    }
 }

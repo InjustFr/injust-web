@@ -9,7 +9,7 @@ export function contactPayload(form) {
         name: form.name.trim(),
         email: form.email.trim(),
         topic: form.topic,
-        offerRef: form.topic === 'lessons' && form.offer ? form.offer : null,
+        offerRef: form.offer || null,
         body: form.body.trim(),
         website: form.website,
     };

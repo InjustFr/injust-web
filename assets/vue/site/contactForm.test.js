@@ -10,8 +10,12 @@ describe('contactPayload', () => {
         expect(contactPayload(form)).toEqual({ name: 'Joe', email: 'joe@punk.test', topic: 'lessons', offerRef: '01JBN5Z7Q3X0000000000000AA', body: 'I want to play loud.', website: '' });
     });
 
-    it('drops the offer for any other topic or when none is picked', () => {
-        expect(contactPayload({ ...form, topic: 'general' }).offerRef).toBeNull();
+    it('keeps the offer for any topic and lets the server resolve it', () => {
+        expect(contactPayload({ ...form, topic: 'production' }).offerRef).toBe('01JBN5Z7Q3X0000000000000AA');
+        expect(contactPayload({ ...form, topic: 'general' }).offerRef).toBe('01JBN5Z7Q3X0000000000000AA');
+    });
+
+    it('sends no offer when none is picked', () => {
         expect(contactPayload({ ...form, offer: null }).offerRef).toBeNull();
         expect(contactPayload({ ...form, offer: '' }).offerRef).toBeNull();
     });

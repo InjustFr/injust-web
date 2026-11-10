@@ -19,7 +19,7 @@ final readonly class LessonsController
         private SectionGate $gate,
         private LessonsQueries $lessons,
         private LessonCards $cards,
-        private LessonsFaq $faq,
+        private FaqQuestions $faq,
         private LegalMarkdown $markdown,
         private LessonsStructuredData $structuredData,
         private SitePage $page,

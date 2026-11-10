@@ -1,0 +1,52 @@
+{% extends 'site.html.twig' %}
+
+{% set page_title = 'site.sections.production'|trans %}
+
+{% block main %}
+    <section class="page-hero" aria-labelledby="production-title">
+        <p class="page-kicker">{{ 'site.production.service'|trans }}</p>
+        <h1 class="page-title" id="production-title">{{ page_title }}</h1>
+        {% if intro|trim %}
+            <div class="page-intro">{{ intro|raw }}</div>
+        {% else %}
+            <p class="page-lead">{{ 'site.leads.production'|trans }}</p>
+        {% endif %}
+    </section>
+    <section class="offers services" aria-labelledby="services-title">
+        {% include 'site/_section_head.html.twig' with {id: 'services-title', title: 'site.production.services'|trans} only %}
+        {% if services %}
+            <ul class="offer-list service-list">
+                {% for service in services %}
+                    {% include 'site/_production_service.html.twig' with {service: service} only %}
+                {% endfor %}
+            </ul>
+        {% else %}
+            <div class="offers-empty">
+                <p>{{ 'site.production.empty'|trans }}</p>
+                <a class="button" href="{{ path('contact', {topic: 'production'}) }}">{{ 'site.write'|trans }}</a>
+            </div>
+        {% endif %}
+    </section>
+    {% if process|trim %}
+        <section class="process" aria-labelledby="process-title">
+            {% include 'site/_section_head.html.twig' with {id: 'process-title', title: 'site.production.process'|trans} only %}
+            <div class="process-body">{{ process|raw }}</div>
+        </section>
+    {% endif %}
+    {% if portfolio %}
+        <section class="portfolio" aria-labelledby="portfolio-title">
+            {% include 'site/_section_head.html.twig' with {id: 'portfolio-title', title: 'site.production.portfolio'|trans} only %}
+            <ul class="work-list">
+                {% for work in portfolio %}
+                    {% include 'site/_production_work.html.twig' with {work: work} only %}
+                {% endfor %}
+            </ul>
+        </section>
+    {% endif %}
+    {% if faq|trim %}
+        <section class="faq" aria-labelledby="faq-title">
+            {% include 'site/_section_head.html.twig' with {id: 'faq-title', title: 'site.faq'|trans} only %}
+            {% include 'site/_faq.html.twig' with {faq: faq, questions: faq_questions} only %}
+        </section>
+    {% endif %}
+{% endblock %}

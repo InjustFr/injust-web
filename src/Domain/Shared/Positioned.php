@@ -10,5 +10,7 @@ interface Positioned
 {
     public function id(): Ulid;
 
+    public function position(): int;
+
     public function moveTo(int $position): void;
 }

@@ -48,6 +48,22 @@ final class PositionsTest extends TestCase
         }
     }
 
+    public function testTheNextPositionFollowsTheHighestOneEvenWithGaps(): void
+    {
+        [$a, $b, $c] = self::links();
+        $c->moveTo(7);
+        $a->moveTo(4);
+
+        self::assertSame(8, Positions::next([$c, $a, $b]));
+        self::assertSame(5, Positions::next([$a]));
+        self::assertSame(2, Positions::next([$b]));
+    }
+
+    public function testTheFirstPositionIsZero(): void
+    {
+        self::assertSame(0, Positions::next([]));
+    }
+
     /** @return list<SocialLink> */
     private static function links(): array
     {

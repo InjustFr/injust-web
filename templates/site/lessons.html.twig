@@ -3,13 +3,13 @@
 {% set page_title = 'site.sections.lessons'|trans %}
 
 {% block main %}
-    <section class="lessons-hero" aria-labelledby="lessons-title">
-        <p class="lessons-kicker">{{ 'site.lessons.service'|trans }}</p>
-        <h1 class="lessons-title" id="lessons-title">{{ page_title }}</h1>
+    <section class="page-hero" aria-labelledby="lessons-title">
+        <p class="page-kicker">{{ 'site.lessons.service'|trans }}</p>
+        <h1 class="page-title" id="lessons-title">{{ page_title }}</h1>
         {% if intro|trim %}
-            <div class="lessons-intro">{{ intro|raw }}</div>
+            <div class="page-intro">{{ intro|raw }}</div>
         {% else %}
-            <p class="lessons-lead">{{ 'site.leads.lessons'|trans }}</p>
+            <p class="page-lead">{{ 'site.leads.lessons'|trans }}</p>
         {% endif %}
     </section>
     <section class="offers" aria-labelledby="offers-title">
@@ -46,19 +46,8 @@
     </section>
     {% if faq|trim %}
         <section class="faq" aria-labelledby="faq-title">
-            {% include 'site/_section_head.html.twig' with {id: 'faq-title', title: 'site.lessons.faq'|trans} only %}
-            {% if faq_questions %}
-                <div class="faq-list">
-                    {% for item in faq_questions %}
-                        <details class="faq-item">
-                            <summary>{{ item.question }}</summary>
-                            <div class="faq-answer">{{ item.answer|raw }}</div>
-                        </details>
-                    {% endfor %}
-                </div>
-            {% else %}
-                <div class="faq-body">{{ faq|raw }}</div>
-            {% endif %}
+            {% include 'site/_section_head.html.twig' with {id: 'faq-title', title: 'site.faq'|trans} only %}
+            {% include 'site/_faq.html.twig' with {faq: faq, questions: faq_questions} only %}
         </section>
     {% endif %}
 {% endblock %}

@@ -4,16 +4,16 @@ declare(strict_types=1);
 
 namespace App\Tests\Unit\Presentation\Web\Site;
 
+use App\Presentation\Web\Site\FaqQuestions;
 use App\Presentation\Web\Site\LegalMarkdown;
-use App\Presentation\Web\Site\LessonsFaq;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
-final class LessonsFaqTest extends TestCase
+final class FaqQuestionsTest extends TestCase
 {
     public function testAFaqOfQuestionsBecomesQuestionsWithTheirAnswers(): void
     {
-        $faq = new LessonsFaq(new LegalMarkdown());
+        $faq = new FaqQuestions(new LegalMarkdown());
 
         self::assertSame([
             ['question' => 'Do I need a guitar?', 'answer' => "<p>Yes, <em>any</em>.</p>\n"],
@@ -24,7 +24,7 @@ final class LessonsFaqTest extends TestCase
 
     public function testASingleQuestionIsEnough(): void
     {
-        self::assertSame([['question' => 'Why?', 'answer' => "<p>Because.</p>\n"]], new LessonsFaq(new LegalMarkdown())->questions("### Why?\nBecause."));
+        self::assertSame([['question' => 'Why?', 'answer' => "<p>Because.</p>\n"]], new FaqQuestions(new LegalMarkdown())->questions("### Why?\nBecause."));
     }
 
     /** @return iterable<string, array{string}> */
@@ -41,6 +41,6 @@ final class LessonsFaqTest extends TestCase
     #[DataProvider('plainFaqs')]
     public function testAnyOtherFaqStaysPlain(string $markdown): void
     {
-        self::assertNull(new LessonsFaq(new LegalMarkdown())->questions($markdown));
+        self::assertNull(new FaqQuestions(new LegalMarkdown())->questions($markdown));
     }
 }

@@ -6,9 +6,14 @@ namespace App\Tests\Functional\Web;
 
 use App\Application\Lessons\AddLessonOffer\AddLessonOffer;
 use App\Application\Lessons\AddLessonOffer\AddLessonOfferHandler;
+use App\Application\Production\AddProductionService\AddProductionService;
+use App\Application\Production\AddProductionService\AddProductionServiceHandler;
 use App\Domain\Lessons\LessonFormat;
 use App\Domain\Lessons\LessonOfferDetails;
 use App\Domain\Lessons\OfferKind;
+use App\Domain\Production\Pricing;
+use App\Domain\Production\ProductionServiceDetails;
+use App\Domain\Production\ServiceKind;
 use App\Domain\Shared\LocalizedText;
 use App\Domain\Shared\Price;
 use App\Tests\Support\Json;
@@ -64,6 +69,24 @@ final class ContactPageTest extends WebTestCase
 
         $props = self::props($client->request('GET', '/contact?topic=lessons&offer='.$id));
         self::assertSame(['id' => $id, 'label' => 'Four-lesson pack'], $props['offer']);
+    }
+
+    public function testAProductionLinkPrefillsTheServiceInTheVisitorsLanguage(): void
+    {
+        $client = self::createClient();
+        self::switchSections(true, true, false);
+        $service = self::getContainer()->get(AddProductionServiceHandler::class)(new AddProductionService(new ProductionServiceDetails(new LocalizedText('Mixage', 'Mixing'), new LocalizedText(), ServiceKind::Mix, Pricing::Fixed, new Price(25000))))->id;
+        $offer = self::offer();
+
+        $props = self::props($client->request('GET', '/fr/contact?topic=production&offer='.$service));
+        self::assertSame('production', $props['topic']);
+        self::assertSame(['id' => $service, 'label' => 'Mixage'], $props['offer']);
+
+        $props = self::props($client->request('GET', '/contact?topic=production&offer='.$service));
+        self::assertSame(['id' => $service, 'label' => 'Mixing'], $props['offer']);
+
+        self::assertNull(self::props($client->request('GET', '/contact?topic=production&offer='.$offer))['offer']);
+        self::assertNull(self::props($client->request('GET', '/contact?topic=lessons&offer='.$service))['offer']);
     }
 
     public function testAnUnknownOfferOrATopicThatIsNotOpenIsIgnored(): void

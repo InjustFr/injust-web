@@ -22,7 +22,7 @@ const root = ref(null);
 const status = ref(null);
 const done = ref(null);
 
-const showOffer = computed(() => offer.value !== null && form.topic === 'lessons');
+const showOffer = computed(() => offer.value !== null && form.topic === props.topic);
 
 function fieldError(field) {
     const error = errors.value[field];

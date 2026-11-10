@@ -8,6 +8,7 @@ use App\Application\Lessons\LessonOfferView;
 use App\Application\Transaction;
 use App\Domain\Lessons\LessonOffer;
 use App\Domain\Lessons\LessonOfferRepository;
+use App\Domain\Shared\Positions;
 
 final readonly class AddLessonOfferHandler
 {
@@ -19,7 +20,7 @@ final readonly class AddLessonOfferHandler
 
     public function __invoke(AddLessonOffer $command): LessonOfferView
     {
-        $offer = LessonOffer::add($command->details, \count($this->offers->all()));
+        $offer = LessonOffer::add($command->details, Positions::next($this->offers->all()));
         $this->offers->add($offer);
         $this->transaction->commit();
 

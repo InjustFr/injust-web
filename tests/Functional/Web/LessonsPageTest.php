@@ -73,9 +73,9 @@ final class LessonsPageTest extends WebTestCase
 
         $crawler = $client->request('GET', '/lessons');
 
-        self::assertSame('loud', $crawler->filter('.lessons-intro strong')->text());
+        self::assertSame('loud', $crawler->filter('.page-intro strong')->text());
         self::assertCount(0, $crawler->filter('main script'));
-        self::assertStringContainsString('&lt;script&gt;', $crawler->filter('.lessons-intro')->html());
+        self::assertStringContainsString('&lt;script&gt;', $crawler->filter('.page-intro')->html());
         self::assertCount(0, $crawler->filter('.faq details'));
         self::assertSame('Do I need a guitar?', $crawler->filter('.faq-body h3')->text());
     }
@@ -91,7 +91,7 @@ final class LessonsPageTest extends WebTestCase
         self::assertSame(['Do I need a guitar?', 'Where?'], $crawler->filter('.faq details summary')->each(static fn (Crawler $summary): string => $summary->text()));
         self::assertSame('any', $crawler->filter('.faq details')->first()->filter('.faq-answer strong')->text());
         self::assertSame('At home or online.', $crawler->filter('.faq details')->last()->filter('.faq-answer')->text());
-        self::assertCount(0, $crawler->filter('.lessons-intro'));
+        self::assertCount(0, $crawler->filter('.page-intro'));
     }
 
     public function testWithoutOffersThePageSaysSoAndPointsToTheContactForm(): void

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Presentation\Web\Site;
 
-use App\Application\Lessons\LessonsQueries;
+use App\Application\Contact\ContactOffers;
 use App\Application\Settings\SettingsQueries;
 use App\Domain\Contact\ContactTopic;
 use App\Domain\Settings\Section;
@@ -19,7 +19,7 @@ final readonly class ContactController
 {
     public function __construct(
         private SettingsQueries $settings,
-        private LessonsQueries $lessons,
+        private ContactOffers $offers,
         private SitePage $page,
     ) {
     }
@@ -28,12 +28,11 @@ final readonly class ContactController
     {
         $topics = [ContactTopic::General->value, ...array_map(static fn (Section $section): string => $section->value, $this->settings->current()->enabledSections())];
         $topic = \in_array($request->query->getString('topic'), $topics, true) ? $request->query->getString('topic') : ContactTopic::General->value;
-        $offer = ContactTopic::Lessons->value === $topic ? $this->lessons->offer($request->query->getString('offer')) : null;
 
         return $this->page->render('site/contact.html.twig', [
             'topics' => $topics,
             'topic' => $topic,
-            'offer' => null === $offer ? null : ['id' => $offer->id, 'label' => $offer->title->in($request->getLocale())],
+            'offer' => $this->offers->find(ContactTopic::from($topic), $request->query->getString('offer'), $request->getLocale()),
         ]);
     }
 }

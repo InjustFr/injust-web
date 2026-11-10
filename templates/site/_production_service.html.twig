@@ -1,0 +1,29 @@
+<li class="offer service">
+    <p class="offer-kind">{{ ('site.production.kinds.' ~ service.kind)|trans }}</p>
+    <h3 class="offer-title" id="offer-{{ service.id }}">{{ service.title }}</h3>
+    {% if service.description %}
+        <div class="offer-description">{{ service.description|raw }}</div>
+    {% endif %}
+    {% if service.delivery_days is not null or service.revisions is not null %}
+        <p class="offer-meta">
+            {%- if service.delivery_days is not null -%}
+                <span class="offer-delivery">{{ 'site.production.delivery'|trans({days: service.delivery_days}) }}</span>
+            {%- endif -%}
+            {%- if service.revisions is not null -%}
+                <span class="offer-revisions">{{ 'site.production.revisions'|trans({revisions: service.revisions}) }}</span>
+            {%- endif -%}
+        </p>
+    {% endif %}
+    <p class="offer-pricing">
+        <span class="offer-price">
+            {%- if service.pricing == 'fixed' -%}
+                {{ service.price }}
+            {%- elseif service.price -%}
+                {{ 'site.production.from'|trans({price: service.price}) }}
+            {%- else -%}
+                {{ 'site.production.on_quote'|trans }}
+            {%- endif -%}
+        </span>
+    </p>
+    <a class="button" href="{{ path('contact', {topic: 'production', offer: service.id}) }}" aria-describedby="offer-{{ service.id }}">{{ (service.pricing == 'fixed' ? 'site.production.contact' : 'site.production.quote')|trans }}</a>
+</li>

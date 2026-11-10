@@ -1,26 +1,11 @@
+import { centsToEuros, eurosToCents, pair, trimmed } from './forms.js';
+
 export const KINDS = ['single', 'pack'];
 export const FORMATS = ['at-home', 'at-teacher', 'online'];
-
-const EUROS = /^(\d+)(?:[.,](\d{1,2}))?$/;
-
-export function eurosToCents(value) {
-    const match = EUROS.exec(String(value).trim());
-    if (!match) return null;
-    return Number(match[1]) * 100 + Number((match[2] ?? '').padEnd(2, '0'));
-}
-
-export function centsToEuros(cents) {
-    if (cents === null) return '';
-    const rest = cents % 100;
-    return rest === 0 ? String(cents / 100) : `${Math.floor(cents / 100)}.${String(rest).padStart(2, '0')}`;
-}
 
 export function sessionsFor(kind, sessions) {
     return kind === 'single' ? 1 : Math.max(2, Number.parseInt(sessions, 10) || 0);
 }
-
-const pair = (value) => ({ fr: value.fr, en: value.en });
-const trimmed = (value) => ({ fr: value.fr.trim(), en: value.en.trim() });
 
 export function offerForm(offer) {
     if (!offer) {

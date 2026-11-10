@@ -11,7 +11,7 @@ use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Routing\Requirement\EnumRequirement;
 
 #[AsController]
-#[Route(path: ['en' => '/{section}', 'fr' => '/fr/{section}'], name: 'section', requirements: ['section' => new EnumRequirement([Section::Production, Section::Beats])], methods: ['GET'])]
+#[Route(path: ['en' => '/{section}', 'fr' => '/fr/{section}'], name: 'section', requirements: ['section' => new EnumRequirement([Section::Beats])], methods: ['GET'])]
 final readonly class SectionController
 {
     public function __construct(

@@ -27,3 +27,10 @@ lessons:
 contact:
     too_many_messages: 'Vous avez envoyé plusieurs messages en peu de temps : attendez 10 minutes et réessayez.'
     unsupported_locale: 'Les messages s’écrivent en français ou en anglais, pas en « {locale} ».'
+production:
+    untitled_service: 'Une prestation a besoin d’un titre dans au moins une langue.'
+    missing_fixed_price: 'Une prestation à prix fixe a besoin d’un prix supérieur à 0 € : passez-la sur devis pour ne pas afficher de prix.'
+    invalid_delivery_days: 'Un délai de livraison va de {min} à {max} jours.'
+    invalid_revisions: 'Une prestation comprend de {min} à {max} retouches.'
+    missing_roles: 'Indiquez au moins ce que vous avez fait sur ce titre.'
+    invalid_year: 'L’année doit être comprise entre {min} et {max}.'

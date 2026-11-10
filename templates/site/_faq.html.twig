@@ -1,0 +1,12 @@
+{% if questions %}
+    <div class="faq-list">
+        {% for item in questions %}
+            <details class="faq-item">
+                <summary>{{ item.question }}</summary>
+                <div class="faq-answer">{{ item.answer|raw }}</div>
+            </details>
+        {% endfor %}
+    </div>
+{% else %}
+    <div class="faq-body">{{ faq|raw }}</div>
+{% endif %}

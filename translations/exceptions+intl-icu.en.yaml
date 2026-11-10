@@ -27,3 +27,10 @@ lessons:
 contact:
     too_many_messages: 'You have sent several messages in a short time: wait 10 minutes and try again.'
     unsupported_locale: 'Messages are written in English or French, not “{locale}”.'
+production:
+    untitled_service: 'A service needs a title in at least one language.'
+    missing_fixed_price: 'A fixed-price service needs a price above 0 €: switch it to a quote to leave the price out.'
+    invalid_delivery_days: 'A delivery takes between {min} and {max} days.'
+    invalid_revisions: 'A service includes between {min} and {max} revisions.'
+    missing_roles: 'List at least one thing you did on this track.'
+    invalid_year: 'The year must be between {min} and {max}.'

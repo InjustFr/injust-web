@@ -18,6 +18,12 @@ use App\Application\Music\EditMusicText\EditMusicText;
 use App\Application\Music\EditMusicText\EditMusicTextHandler;
 use App\Application\Music\FeatureRelease\FeatureRelease;
 use App\Application\Music\FeatureRelease\FeatureReleaseHandler;
+use App\Application\Production\AddPortfolioItem\AddPortfolioItem;
+use App\Application\Production\AddPortfolioItem\AddPortfolioItemHandler;
+use App\Application\Production\AddProductionService\AddProductionService;
+use App\Application\Production\AddProductionService\AddProductionServiceHandler;
+use App\Application\Production\EditProductionPage\EditProductionPage;
+use App\Application\Production\EditProductionPage\EditProductionPageHandler;
 use App\Domain\Contact\ContactTopic;
 use App\Domain\Lessons\LessonFormat;
 use App\Domain\Lessons\LessonOfferDetails;
@@ -26,6 +32,10 @@ use App\Domain\Music\ReleaseDetails;
 use App\Domain\Music\ReleaseType;
 use App\Domain\Music\SocialNetwork;
 use App\Domain\Music\Track;
+use App\Domain\Production\PortfolioItemDetails;
+use App\Domain\Production\Pricing;
+use App\Domain\Production\ProductionServiceDetails;
+use App\Domain\Production\ServiceKind;
 use App\Domain\Shared\LocalizedText;
 use App\Domain\Shared\Price;
 use Doctrine\Bundle\FixturesBundle\Fixture;
@@ -72,6 +82,9 @@ final class AppFixtures extends Fixture
         private readonly AddSocialLinkHandler $addSocialLink,
         private readonly AddLessonOfferHandler $addLessonOffer,
         private readonly EditLessonsPageHandler $editLessonsPage,
+        private readonly AddProductionServiceHandler $addProductionService,
+        private readonly EditProductionPageHandler $editProductionPage,
+        private readonly AddPortfolioItemHandler $addPortfolioItem,
         private readonly SendContactMessageHandler $sendContactMessage,
     ) {
     }
@@ -91,6 +104,7 @@ final class AppFixtures extends Fixture
         }
 
         $this->lessons();
+        $this->production();
         $this->messages();
     }
 
@@ -138,6 +152,48 @@ final class AppFixtures extends Fixture
                 "### Do I need my own guitar?\n\nYes, an electric or acoustic guitar to begin with.\n\n### What level do I need?\n\nNone: we start from where you are.",
             ),
         ));
+    }
+
+    private function production(): void
+    {
+        $services = [
+            ['Mixing', 'Mixage', ServiceKind::Mix, Pricing::Fixed, 12000, 7, 2],
+            ['Mastering', 'Mastering', ServiceKind::Master, Pricing::Fixed, 4000, null, null],
+            ['Full production', 'Production complète', ServiceKind::Production, Pricing::Quote, 30000, 30, 3],
+            ['Arrangement', 'Arrangement', ServiceKind::Arrangement, Pricing::Quote, 0, null, null],
+        ];
+        foreach ($services as [$en, $fr, $kind, $pricing, $cents, $days, $revisions]) {
+            ($this->addProductionService)(new AddProductionService(new ProductionServiceDetails(
+                new LocalizedText($fr, $en),
+                new LocalizedText('Rock, punk et hard rock, du maquette au master.', 'Rock, punk and hard rock, from demo to master.'),
+                $kind,
+                $pricing,
+                new Price($cents),
+                $days,
+                $revisions,
+            )));
+        }
+
+        ($this->editProductionPage)(new EditProductionPage(
+            new LocalizedText('Mixage, mastering et production de vos morceaux rock, punk et hard rock.', 'Mixing, mastering and production for your rock, punk and hard rock tracks.'),
+            new LocalizedText(
+                "1. **Brief** Vous m'envoyez vos pistes et vos références.\n2. **Mix** Je vous envoie une première version.\n3. **Révisions** On ajuste ensemble.\n4. **Livraison** Fichiers finaux.",
+                "1. **Brief** Send me your stems and references.\n2. **Mix** I send you a first version.\n3. **Revisions** We adjust together.\n4. **Delivery** Final files.",
+            ),
+            new LocalizedText(
+                "### Quels fichiers fournir ?\n\nLes pistes séparées en WAV.\n\n### Combien de révisions ?\n\nSelon l'offre, de 2 à 3.",
+                "### Which files should I send?\n\nSeparate WAV stems.\n\n### How many revisions?\n\nDepending on the offer, 2 to 3.",
+            ),
+        ));
+
+        $works = [
+            ['White Men are the Issue', [ServiceKind::Production, ServiceKind::Mix], 2026],
+            ["Don't tell me who to be", [ServiceKind::Mix, ServiceKind::Master], 2026],
+            ['We are fucked', [ServiceKind::Recording, ServiceKind::MixMaster], 2026],
+        ];
+        foreach ($works as [$title, $roles, $year]) {
+            ($this->addPortfolioItem)(new AddPortfolioItem(new PortfolioItemDetails($title, 'Injust', $roles, $year, null)));
+        }
     }
 
     private function messages(): void

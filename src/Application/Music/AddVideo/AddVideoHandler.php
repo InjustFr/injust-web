@@ -10,6 +10,7 @@ use App\Application\Shared\Images;
 use App\Application\Transaction;
 use App\Domain\Music\Video;
 use App\Domain\Music\VideoRepository;
+use App\Domain\Shared\Positions;
 
 final readonly class AddVideoHandler
 {
@@ -23,7 +24,7 @@ final readonly class AddVideoHandler
 
     public function __invoke(AddVideo $command): VideoView
     {
-        $video = Video::add($command->youtubeId, $command->title, $this->thumbnail($command), \count($this->videos->all()));
+        $video = Video::add($command->youtubeId, $command->title, $this->thumbnail($command), Positions::next($this->videos->all()));
         $this->videos->add($video);
         $this->transaction->commit();
 

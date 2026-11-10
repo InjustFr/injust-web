@@ -27,7 +27,7 @@ final readonly class SitemapController
         $settings = $this->queries->current();
         $pages = [['home', []]];
         foreach ($settings->enabledSections() as $section) {
-            $pages[] = Section::Lessons === $section ? ['lessons', []] : ['section', ['section' => $section->value]];
+            $pages[] = Section::Beats === $section ? ['section', ['section' => $section->value]] : [$section->value, []];
         }
         $pages[] = ['contact', []];
         foreach ($this->legalPages->visible($settings) as $kind) {

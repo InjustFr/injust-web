@@ -8,6 +8,7 @@ use App\Application\Music\SocialLinkView;
 use App\Application\Transaction;
 use App\Domain\Music\SocialLink;
 use App\Domain\Music\SocialLinkRepository;
+use App\Domain\Shared\Positions;
 
 final readonly class AddSocialLinkHandler
 {
@@ -19,7 +20,7 @@ final readonly class AddSocialLinkHandler
 
     public function __invoke(AddSocialLink $command): SocialLinkView
     {
-        $link = SocialLink::add($command->network, $command->url, $command->label, \count($this->links->all()));
+        $link = SocialLink::add($command->network, $command->url, $command->label, Positions::next($this->links->all()));
         $this->links->add($link);
         $this->transaction->commit();
 
