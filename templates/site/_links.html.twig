@@ -13,16 +13,5 @@
                 {% endfor %}
             </ul>
         {% endif %}
-        {% if music.socialLinks is not empty %}
-            <ul class="links-socials" aria-label="{{ 'site.links.socials'|trans }}">
-                {% for social in music.socialLinks %}
-                    <li>
-                        <a class="links-social" href="{{ social.url }}" rel="me noopener" aria-label="{{ social.label ?: ('site.networks.' ~ social.network)|trans }}">
-                            {%- include 'site/_links_icon.html.twig' with {network: social.network} only -%}
-                        </a>
-                    </li>
-                {% endfor %}
-            </ul>
-        {% endif %}
     </section>
 {% endif %}

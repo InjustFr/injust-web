@@ -69,7 +69,7 @@ final class HomeLinksTest extends WebTestCase
         self::assertCount(0, $crawler->filter('#links a[target]'));
         self::assertStringNotContainsString('hidden.injust.test', (string) $client->getResponse()->getContent());
         self::assertStringNotContainsString('shop.injust.test', (string) $client->getResponse()->getContent());
-        self::assertCount(0, $crawler->filter('#links .links-socials'));
+        self::assertCount(0, $crawler->filter('.hero-socials'));
     }
 
     public function testLabelsAreInTheVisitorsLanguageAndFallBackToTheOther(): void
@@ -113,7 +113,7 @@ final class HomeLinksTest extends WebTestCase
         );
     }
 
-    public function testTheSocialLinksAreIconsNamedByTheirLabelOrTheirNetwork(): void
+    public function testTheSocialLinksAreIconsInTheHeroNamedByTheirLabelOrTheirNetwork(): void
     {
         $client = self::createClient();
         self::social(SocialNetwork::Instagram, 'https://instagram.com/injust', null);
@@ -121,12 +121,13 @@ final class HomeLinksTest extends WebTestCase
 
         $crawler = $client->request('GET', '/');
 
-        $socials = $crawler->filter('#links .links-socials a');
+        $socials = $crawler->filter('.hero .hero-socials a');
         self::assertSame(['Instagram', 'Press kit'], $socials->each(static fn (Crawler $a): string => (string) $a->attr('aria-label')));
         self::assertSame(['https://instagram.com/injust', 'https://injust.example/press'], $socials->each(static fn (Crawler $a): string => (string) $a->attr('href')));
         self::assertSame(['me noopener', 'me noopener'], $socials->each(static fn (Crawler $a): string => (string) $a->attr('rel')));
         self::assertCount(2, $socials->filter('svg[aria-hidden="true"]'));
-        self::assertCount(0, $crawler->filter('#links .links-list'));
+        self::assertCount(0, $crawler->filter('#links'));
+        self::assertCount(0, $crawler->filter('.hero a[href="#links"]'));
     }
 
     public function testThereIsNoSeparateFollowSectionAnymore(): void
@@ -157,7 +158,7 @@ final class HomeLinksTest extends WebTestCase
     public function testWithoutAFeaturedReleaseTheHeroStillLeadsToTheLinks(): void
     {
         $client = self::createClient();
-        self::social(SocialNetwork::Instagram, 'https://instagram.com/injust', null);
+        self::bioLink('Boutique', 'Merch', 'https://shop.injust.test');
 
         $crawler = $client->request('GET', '/');
 

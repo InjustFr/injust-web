@@ -2,7 +2,7 @@
 
 {% set og_image = music.featured.cover ?? null %}
 {% set band_image = music.text.portrait %}
-{% set has_links = links is not empty or music.socialLinks is not empty %}
+{% set has_links = links is not empty %}
 {% set band_same_as = music.socialLinks|map(link => link.url) %}
 
 {% block preload %}
