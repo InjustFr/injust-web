@@ -1,0 +1,9 @@
+{
+    "confirm": {
+        "message": "C’est définitif.",
+        "action": "Supprimer"
+    },
+    "toast": {
+        "label": "Notifications"
+    }
+}

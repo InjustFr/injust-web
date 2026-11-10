@@ -1,0 +1,12 @@
+{
+    "nav": {
+        "label": "Sections de l’admin",
+        "dashboard": "Tableau de bord",
+        "site": "Site public",
+        "signOut": "Se déconnecter"
+    },
+    "dashboard": {
+        "title": "Tableau de bord",
+        "subtitle": "Les sections du site apparaîtront ici."
+    }
+}

@@ -1,0 +1,12 @@
+services:
+  app:
+    networks:
+      default:
+      proxy:
+        aliases:
+          - injust-web
+
+networks:
+  proxy:
+    name: ${PROXY_NETWORK:?PROXY_NETWORK is required}
+    external: true

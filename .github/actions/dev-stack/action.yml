@@ -1,0 +1,23 @@
+name: Dev stack
+description: Build the dev image from the cache and pull the service images in the background
+inputs:
+  save-cache:
+    description: Whether this job writes the dev image layers back to the cache
+    default: 'false'
+runs:
+  using: composite
+  steps:
+    - uses: docker/setup-buildx-action@v3
+
+    - name: Pull service images in the background
+      shell: bash
+      run: nohup docker compose --profile e2e pull --quiet --ignore-buildable database oidc mailpit node playwright > /tmp/pull.log 2>&1 &
+
+    - uses: docker/build-push-action@v6
+      with:
+        context: .
+        target: dev
+        load: true
+        tags: injust-web-dev
+        cache-from: type=gha,scope=dev
+        cache-to: ${{ inputs.save-cache == 'true' && 'type=gha,scope=dev,mode=max' || '' }}

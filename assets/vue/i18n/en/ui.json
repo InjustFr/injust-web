@@ -1,0 +1,9 @@
+{
+    "confirm": {
+        "message": "This cannot be undone.",
+        "action": "Delete"
+    },
+    "toast": {
+        "label": "Notifications"
+    }
+}

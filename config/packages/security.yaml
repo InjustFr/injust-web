@@ -1,0 +1,29 @@
+security:
+    providers:
+        app_users:
+            id: App\Infrastructure\Security\UserProvider
+
+    firewalls:
+        dev:
+            pattern: ^/(_profiler|_wdt|assets|build|build-e2e|media)/
+            security: false
+        main:
+            lazy: true
+            provider: app_users
+            entry_point: App\Presentation\Web\Security\AuthenticationEntryPoint
+            custom_authenticators:
+                - App\Infrastructure\Security\Accounts\AccountsAuthenticator
+            remember_me:
+                secret: '%kernel.secret%'
+                lifetime: 2592000
+                always_remember_me: true
+                signature_properties: [email]
+            logout:
+                path: logout
+                target: login
+                enable_csrf: true
+
+    access_control:
+        - { path: ^/admin, roles: ROLE_USER }
+        - { path: ^/api/, roles: ROLE_USER }
+        - { path: ^/, roles: PUBLIC_ACCESS }

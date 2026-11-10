@@ -1,0 +1,23 @@
+{
+	skip_install_trust
+
+	{$CADDY_GLOBAL_OPTIONS}
+
+	frankenphp {
+		{$FRANKENPHP_CONFIG}
+	}
+}
+
+{$SERVER_NAME:localhost} {
+	root public/
+	encode zstd br gzip
+
+	@versioned_assets path /build/assets/*
+	header @versioned_assets Cache-Control "public, max-age=31536000, immutable"
+
+	php_server {
+		worker {
+			file ./public/index.php
+		}
+	}
+}

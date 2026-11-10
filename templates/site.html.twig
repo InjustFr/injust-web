@@ -1,0 +1,28 @@
+{% extends 'base.html.twig' %}
+
+{% block lang %}en{% endblock %}
+
+{% block head %}
+    {% set home = url('home') %}
+    <title>{% block title %}Injust{% endblock %}</title>
+    <meta name="description" content="{% block description %}Injust: protest punk and hard rock.{% endblock %}">
+    <meta name="theme-color" content="#000000">
+    <meta name="robots" content="index, follow, max-image-preview:large">
+    <link rel="canonical" href="{{ app.request.uri }}">
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="Injust">
+    <meta property="og:title" content="{{ block('title') }}">
+    <meta property="og:description" content="{{ block('description') }}">
+    <meta property="og:url" content="{{ app.request.uri }}">
+    <meta name="twitter:card" content="summary">
+    <script type="application/ld+json">{{ {
+        '@context': 'https://schema.org',
+        '@graph': [
+            {'@type': 'MusicGroup', '@id': home ~ '#band', name: 'Injust', url: home},
+            {'@type': 'WebSite', '@id': home ~ '#website', url: home, name: 'Injust', publisher: {'@id': home ~ '#band'}},
+        ],
+    }|json_encode(constant('JSON_HEX_TAG') b-or constant('JSON_HEX_AMP') b-or constant('JSON_UNESCAPED_SLASHES') b-or constant('JSON_UNESCAPED_UNICODE'))|raw }}</script>
+{% endblock %}
+
+{% block stylesheets %}{{ vite_entry_link_tags('site') }}{% endblock %}
+{% block javascripts %}{{ vite_entry_script_tags('site') }}{% endblock %}

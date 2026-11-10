@@ -1,0 +1,8 @@
+twig:
+    file_name_pattern: '*.twig'
+    globals:
+        accounts_url: '%env(ACCOUNTS_URL)%'
+
+when@test:
+    twig:
+        strict_variables: true

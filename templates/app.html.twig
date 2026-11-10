@@ -1,0 +1,15 @@
+{% extends 'base.html.twig' %}
+
+{% block stylesheets %}{{ vite_entry_link_tags('admin') }}{% endblock %}
+{% block javascripts %}{{ vite_entry_script_tags('admin') }}{% endblock %}
+
+{% block body %}
+    <script type="application/json" id="app-session">{{ {
+        email: app.user.email,
+        displayName: app.user.displayName,
+        logoutToken: csrf_token('logout'),
+        accountsUrl: accounts_url,
+    }|json_encode(constant('JSON_HEX_TAG') b-or constant('JSON_HEX_AMP'))|raw }}</script>
+    <script type="application/json" id="app-preload">{{ preloaded|raw }}</script>
+    <div id="app"></div>
+{% endblock %}

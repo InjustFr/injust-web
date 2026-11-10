@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="{% block lang %}{{ app.request.locale }}{% endblock %}"{% block html_attributes %}{% endblock %}>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+        {% block head %}
+            <meta name="theme-color" content="#f5f5f3">
+            <meta name="robots" content="noindex">
+            <title>{% block title %}Injust admin{% endblock %}</title>
+        {% endblock %}
+        <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+        {% block stylesheets %}{% endblock %}
+        {% block javascripts %}{% endblock %}
+    </head>
+    <body data-locale="{{ app.request.locale }}">
+        {% block body %}{% endblock %}
+    </body>
+</html>

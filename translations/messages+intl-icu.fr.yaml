@@ -1,0 +1,12 @@
+problem:
+    business_rule: 'Impossible'
+    cross_origin:
+        title: 'Requête refusée'
+        detail: 'Requête venant d’une autre origine refusée.'
+    signed_out:
+        title: 'Non connecté'
+        detail: 'Votre session a expiré, reconnectez-vous.'
+login:
+    failed: 'Connexion impossible, réessayez.'
+    expired: 'Cette connexion a pris trop de temps ou a été ouverte dans un autre onglet, réessayez.'
+    denied: 'Votre compte mossyleaf n’a pas accès à l’admin d’Injust.'

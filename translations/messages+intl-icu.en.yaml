@@ -1,0 +1,12 @@
+problem:
+    business_rule: 'Not possible'
+    cross_origin:
+        title: 'Request refused'
+        detail: 'Request from another origin refused.'
+    signed_out:
+        title: 'Not signed in'
+        detail: 'Your session has expired, please sign in again.'
+login:
+    failed: 'Unable to sign in, please try again.'
+    expired: 'This sign-in took too long or was opened in another tab, please try again.'
+    denied: 'Your mossyleaf account does not have access to the Injust admin.'

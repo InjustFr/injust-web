@@ -1,0 +1,63 @@
+FROM dunglas/frankenphp:1-php8.5.12-bookworm AS base
+
+RUN install-php-extensions pdo_pgsql intl zip opcache apcu gd
+
+COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
+
+ENV COMPOSER_ALLOW_SUPERUSER=1 \
+    SERVER_NAME=":80"
+
+COPY docker/php/app.ini $PHP_INI_DIR/conf.d/zz-app.ini
+
+WORKDIR /app
+
+
+FROM base AS vendor
+
+COPY composer.json composer.lock symfony.lock ./
+RUN composer install --no-dev --no-scripts --no-autoloader --prefer-dist --no-progress --no-interaction
+
+
+FROM node:26-alpine AS assets
+
+WORKDIR /app
+COPY package.json package-lock.json .npmrc ./
+RUN npm ci --no-audit --no-fund
+COPY vite.config.js ./
+COPY assets assets
+COPY public public
+RUN npm run build
+
+
+FROM base AS prod
+
+ENV APP_ENV=prod \
+    APP_DEBUG=0
+
+RUN mv "$PHP_INI_DIR/php.ini-production" "$PHP_INI_DIR/php.ini"
+COPY docker/php/prod.ini $PHP_INI_DIR/conf.d/zz-prod.ini
+COPY docker/frankenphp/Caddyfile /etc/frankenphp/Caddyfile
+COPY docker/php/docker-entrypoint.sh /usr/local/bin/app-entrypoint
+RUN chmod +x /usr/local/bin/app-entrypoint
+
+COPY --from=vendor /app/vendor vendor
+COPY . .
+COPY --from=assets /app/public/build public/build
+
+RUN composer dump-autoload --no-dev --classmap-authoritative \
+    && composer dump-env prod \
+    && composer run-script --no-dev post-install-cmd \
+    && mkdir -p var/cache var/log var/share \
+    && chown -R www-data:www-data var
+
+ENTRYPOINT ["app-entrypoint"]
+CMD ["--config", "/etc/frankenphp/Caddyfile", "--adapter", "caddyfile"]
+
+
+FROM base AS dev
+
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends git \
+    && rm -rf /var/lib/apt/lists/* \
+    && git config --system --add safe.directory /app \
+    && install-php-extensions pcov

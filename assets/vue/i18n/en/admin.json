@@ -1,0 +1,12 @@
+{
+    "nav": {
+        "label": "Admin sections",
+        "dashboard": "Dashboard",
+        "site": "Public site",
+        "signOut": "Sign out"
+    },
+    "dashboard": {
+        "title": "Dashboard",
+        "subtitle": "The sections of the site will appear here."
+    }
+}

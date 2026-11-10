@@ -1,0 +1,27 @@
+parameters:
+    env(ASSETS_DIR): build
+
+services:
+    _defaults:
+        autowire: true
+        autoconfigure: true
+
+    App\:
+        resource: '../src/'
+
+    Symfony\Component\HttpFoundation\Session\Storage\Handler\PdoSessionHandler:
+        arguments:
+            - !service { class: PDO, factory: ['@doctrine.dbal.default_connection', 'getNativeConnection'] }
+            - { lock_mode: !php/const Symfony\Component\HttpFoundation\Session\Storage\Handler\PdoSessionHandler::LOCK_NONE }
+
+when@test:
+    services:
+        App\Tests\Support\EndToEndSessionStorageFactory:
+            arguments:
+                $mock: '@session.storage.factory.mock_file'
+                $native: '@session.storage.factory.native'
+                $useNative: '%env(bool:default::E2E_NATIVE_SESSIONS)%'
+
+        App\Tests\Support\FakeAccounts:
+            decorates: http_client
+            arguments: ['@.inner']

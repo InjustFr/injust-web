@@ -1,0 +1,8 @@
+shared:
+    not_found: 'This {subject, select, user {account} other {item}} no longer exists.'
+    unsupported_image: 'This file is not an image the site can show: use JPEG, PNG, WebP or AVIF.'
+user:
+    invalid_email: '“{email}” is not a valid email address.'
+    email_taken: 'An account already uses {email}.'
+identity:
+    access_denied: 'Your mossyleaf account does not have access to the Injust admin.'

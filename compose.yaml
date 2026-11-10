@@ -1,0 +1,114 @@
+name: injust-web
+
+x-php: &php-healthcheck
+  test: ["CMD-SHELL", "curl -f http://localhost:2019/metrics || exit 1"]
+  interval: 10s
+  start_period: 60s
+  start_interval: 1s
+
+services:
+  php:
+    image: injust-web-dev
+    build:
+      context: .
+      target: dev
+    healthcheck: *php-healthcheck
+    depends_on:
+      database:
+        condition: service_healthy
+      oidc:
+        condition: service_started
+      mailpit:
+        condition: service_started
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER:-app}:${POSTGRES_PASSWORD:-app}@database:5432/${POSTGRES_DB:-app}?serverVersion=18&charset=utf8
+      CADDY_SERVER_EXTRA_DIRECTIVES: 'header /build/* Cache-Control "no-cache"'
+    volumes:
+      - ./:/app
+    ports:
+      - "${HTTP_PORT:-8098}:80"
+
+  node:
+    image: node:22-alpine
+    working_dir: /app
+    command: sh -c "npm install && npm run dev -- --host 0.0.0.0 --port 5178 --strictPort"
+    environment:
+      VITE_DEV_PORT: ${VITE_DEV_PORT:-5178}
+    volumes:
+      - ./:/app
+    ports:
+      - "${VITE_DEV_PORT:-5178}:5178"
+
+  playwright:
+    image: mcr.microsoft.com/playwright:v1.64.1-noble
+    profiles: [e2e]
+    working_dir: /app/e2e
+    environment:
+      BASE_URL: http://php-e2e
+      CI: ${CI:-}
+    volumes:
+      - ./:/app
+    depends_on:
+      - php-e2e
+      - oidc
+
+  php-e2e:
+    image: injust-web-dev
+    build:
+      context: .
+      target: dev
+    healthcheck: *php-healthcheck
+    profiles: [e2e]
+    depends_on:
+      database:
+        condition: service_healthy
+      oidc:
+        condition: service_started
+    environment:
+      APP_ENV: test
+      APP_DEBUG: 0
+      E2E_NATIVE_SESSIONS: 1
+      APP_SHARE_DIR: var/share/e2e
+      ACCOUNTS_URL: http://oidc:8080/injust
+      OIDC_CLIENT_SECRET: e2e
+      OIDC_AUTHORIZE_URL: http://oidc:8080/injust/authorize
+      OIDC_TOKEN_URL: http://oidc:8080/injust/token
+      OIDC_USERINFO_URL: http://oidc:8080/injust/userinfo
+      OIDC_LOGOUT_URL: http://oidc:8080/injust/endsession
+      ASSETS_DIR: ${E2E_ASSETS_DIR:-build-e2e}
+      DATABASE_URL: postgresql://${POSTGRES_USER:-app}:${POSTGRES_PASSWORD:-app}@database:5432/app_e2e?serverVersion=18&charset=utf8
+    volumes:
+      - ./:/app
+
+  oidc:
+    image: ghcr.io/navikt/mock-oauth2-server:2.1.10
+    environment:
+      JSON_CONFIG: '{"interactiveLogin": true}'
+    ports:
+      - "${OIDC_PORT:-8099}:8080"
+
+  mailpit:
+    image: axllent/mailpit:v1.33.1
+    ports:
+      - "${MAILPIT_PORT:-8028}:8025"
+
+  database:
+    image: postgres:18-alpine
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-app}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-app}
+      POSTGRES_USER: ${POSTGRES_USER:-app}
+    healthcheck:
+      test: ["CMD", "pg_isready", "-d", "${POSTGRES_DB:-app}", "-U", "${POSTGRES_USER:-app}"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+      start_interval: 1s
+    ports:
+      - "${DATABASE_PORT:-5438}:5432"
+    volumes:
+      - database_data:/var/lib/postgresql:rw
+
+volumes:
+  database_data:

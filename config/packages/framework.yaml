@@ -1,0 +1,15 @@
+framework:
+    secret: '%env(APP_SECRET)%'
+
+    session:
+        handler_id: Symfony\Component\HttpFoundation\Session\Storage\Handler\PdoSessionHandler
+
+    csrf_protection: true
+
+when@test:
+    framework:
+        test: true
+        cache:
+            app: cache.adapter.array
+        session:
+            storage_factory_id: App\Tests\Support\EndToEndSessionStorageFactory
