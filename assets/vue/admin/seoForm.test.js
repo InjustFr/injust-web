@@ -24,8 +24,8 @@ describe('seo form', () => {
         expect(seoPayload(form)).toEqual({ title: { fr: 'x', en: '' }, description: { fr: '', en: 'D' } });
     });
 
-    it('lists the four editable pages', () => {
-        expect(PAGE_KEYS).toEqual(['lessons', 'production', 'contact', 'links']);
+    it('lists the three editable pages', () => {
+        expect(PAGE_KEYS).toEqual(['lessons', 'production', 'contact']);
     });
 });
 

@@ -8,7 +8,7 @@ import { useToast } from '../../../composables/useToast.js';
 const { t } = useI18n();
 const toast = useToast();
 const manual = ref(false);
-const publicUrl = `${window.location.origin}/links`;
+const publicUrl = `${window.location.origin}/#links`;
 
 async function copy() {
     try {

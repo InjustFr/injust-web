@@ -32,6 +32,7 @@ site:
         presave: 'Pre-save'
         listen: 'Écouter'
         watch: 'Voir le clip'
+        links: 'Liens'
         out: 'Sortie le {date}'
     countdown:
         days: 'Jours'
@@ -49,7 +50,6 @@ site:
         videos: 'Clips'
         manifesto: 'Manifeste'
         bio: 'Bio'
-        links: 'Suivre'
         tracklist: 'Titres'
         listen_on: 'Écouter sur'
         everywhere: 'Toutes les plateformes'
@@ -104,10 +104,8 @@ site:
         back: 'Retour à l’accueil'
     faq: 'Questions fréquentes'
     links:
-        title: 'Liens'
-        empty: 'Pas encore de liens. Tout est sur le site.'
-        full_site: 'Site complet'
-        more: 'Plus d’Injust'
+        title: 'Écouter & suivre'
+        socials: 'Réseaux sociaux'
     lessons:
         service: 'Cours de guitare'
         offers: 'Formules'

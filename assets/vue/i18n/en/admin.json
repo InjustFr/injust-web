@@ -429,8 +429,8 @@
     },
     "links": {
         "title": "Links",
-        "subtitle": "The link-in-bio page that replaces Linktree.",
-        "publicUrl": "Public page",
+        "subtitle": "Shown on the home page, right under the hero. Put this address in your bios instead of Linktree.",
+        "publicUrl": "Public address",
         "copy": "Copy",
         "copied": "Link copied.",
         "copyFailed": "Could not copy, select the link below and copy it by hand.",
@@ -460,8 +460,7 @@
             "home": "Home",
             "lessons": "Lessons",
             "production": "Production",
-            "contact": "Contact",
-            "links": "Links"
+            "contact": "Contact"
         },
         "homeHint": "The home page uses the SEO fields of the general settings.",
         "editHome": "Edit in Settings",

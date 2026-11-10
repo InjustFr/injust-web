@@ -36,7 +36,6 @@ final readonly class SitemapController
             $pages[] = Section::Beats === $section ? new SitemapPage('section', ['section' => $section->value]) : new SitemapPage($section->value);
         }
         $pages[] = new SitemapPage('contact');
-        $pages[] = new SitemapPage('links');
         foreach ($this->legalPages->visible($settings) as $kind) {
             $pages[] = new SitemapPage('legal', ['kind' => $kind->value], $this->queries->legalDocument($kind)->updatedAt);
         }

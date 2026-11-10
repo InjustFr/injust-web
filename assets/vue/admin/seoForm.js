@@ -1,6 +1,6 @@
 import { pair, trimmed } from './forms.js';
 
-export const PAGE_KEYS = ['lessons', 'production', 'contact', 'links'];
+export const PAGE_KEYS = ['lessons', 'production', 'contact'];
 
 const LIMITS = { title: { warn: 60, max: 70 }, description: { warn: 155, max: 170 } };
 

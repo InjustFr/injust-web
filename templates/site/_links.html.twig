@@ -1,15 +1,28 @@
-{% if music.socialLinks is not empty %}
+{% if has_links %}
     <section class="links" id="links" aria-labelledby="links-title">
-        {% include 'site/_section_head.html.twig' with {id: 'links-title', title: 'site.music.links'|trans} only %}
-        <ul class="link-list">
-            {% for link in music.socialLinks %}
-                <li>
-                    <a class="link" href="{{ link.url }}" rel="me noopener">
-                        <span class="link-name">{{ link.label ?: ('site.networks.' ~ link.network)|trans }}</span>
-                        <span class="link-arrow" aria-hidden="true">↗</span>
-                    </a>
-                </li>
-            {% endfor %}
-        </ul>
+        {% include 'site/_section_head.html.twig' with {id: 'links-title', title: 'site.links.title'|trans} only %}
+        {% if links is not empty %}
+            <ul class="links-list">
+                {% for link in links %}
+                    <li>
+                        <a class="links-button{{ link.highlighted ? ' links-button-primary' }}" href="{{ path('go', {id: link.id}) }}" rel="noopener">
+                            {%- if link.icon %}{% include 'site/_links_icon.html.twig' with {network: link.icon} only %}{% endif -%}
+                            <span class="links-label">{{ link.label.in(locale) }}</span>
+                        </a>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+        {% if music.socialLinks is not empty %}
+            <ul class="links-socials" aria-label="{{ 'site.links.socials'|trans }}">
+                {% for social in music.socialLinks %}
+                    <li>
+                        <a class="links-social" href="{{ social.url }}" rel="me noopener" aria-label="{{ social.label ?: ('site.networks.' ~ social.network)|trans }}">
+                            {%- include 'site/_links_icon.html.twig' with {network: social.network} only -%}
+                        </a>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% endif %}
     </section>
 {% endif %}

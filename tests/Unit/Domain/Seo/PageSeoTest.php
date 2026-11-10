@@ -15,9 +15,9 @@ final class PageSeoTest extends TestCase
 {
     public function testABlankPageHasNoTitleDescriptionOrImage(): void
     {
-        $seo = PageSeo::blank(PageKey::Links);
+        $seo = PageSeo::blank(PageKey::Contact);
 
-        self::assertSame([PageKey::Links, true, true, null], [$seo->key(), $seo->title()->isEmpty(), $seo->description()->isEmpty(), $seo->image()]);
+        self::assertSame([PageKey::Contact, true, true, null], [$seo->key(), $seo->title()->isEmpty(), $seo->description()->isEmpty(), $seo->image()]);
     }
 
     public function testTheTitleAndDescriptionAreEdited(): void

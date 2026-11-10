@@ -429,8 +429,8 @@
     },
     "links": {
         "title": "Liens",
-        "subtitle": "La page de liens qui remplace Linktree.",
-        "publicUrl": "Page publique",
+        "subtitle": "Affichés sur l’accueil, juste sous le hero. Mets cette adresse dans tes bios à la place de Linktree.",
+        "publicUrl": "Adresse publique",
         "copy": "Copier",
         "copied": "Lien copié.",
         "copyFailed": "Copie impossible, sélectionne le lien ci-dessous et copie-le à la main.",
@@ -460,8 +460,7 @@
             "home": "Accueil",
             "lessons": "Cours",
             "production": "Production",
-            "contact": "Contact",
-            "links": "Liens"
+            "contact": "Contact"
         },
         "homeHint": "L'accueil utilise les champs SEO des réglages généraux.",
         "editHome": "Modifier dans Réglages",

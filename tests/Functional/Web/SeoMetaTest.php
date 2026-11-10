@@ -32,7 +32,6 @@ final class SeoMetaTest extends WebTestCase
         yield 'lessons' => ['/lessons', 'http://localhost/lessons', 'en_GB', 'fr_FR'];
         yield 'production' => ['/fr/production', 'http://localhost/fr/production', 'fr_FR', 'en_GB'];
         yield 'contact with a query' => ['/contact?topic=lessons&offer=x', 'http://localhost/contact', 'en_GB', 'fr_FR'];
-        yield 'links' => ['/fr/links', 'http://localhost/fr/links', 'fr_FR', 'en_GB'];
         yield 'legal' => ['/legal/mentions', 'http://localhost/legal/mentions', 'en_GB', 'fr_FR'];
     }
 

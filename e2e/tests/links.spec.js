@@ -5,10 +5,10 @@ const LABEL = 'E2E Target';
 const TARGET = 'https://e2e-target.example/landing';
 const SEO_TITLE = 'E2E Contact Title';
 
-test('a visitor click on a link is counted and lands on the target', async ({ page, visitorPage }) => {
+test('a visitor clicks a link on the home page, it is counted and lands on the target', async ({ page, visitorPage }) => {
     await signIn(page);
     await page.goto('/admin/links');
-    await expect(page.locator('.public-url__link')).toHaveText(new URL('/links', page.url()).href);
+    await expect(page.locator('.public-url__link')).toHaveText(new URL('/#links', page.url()).href);
     await page.getByRole('button', { name: 'New link' }).click();
     await page.locator('input[name="label-en"]').fill(LABEL);
     await page.locator('input[name="label-fr"]').fill(LABEL);
@@ -16,9 +16,13 @@ test('a visitor click on a link is counted and lands on the target', async ({ pa
     await page.getByRole('button', { name: 'Save', exact: true }).click();
     await expect(page.locator('.rows__label', { hasText: LABEL })).toBeVisible();
 
-    await visitorPage.goto('/links');
+    await visitorPage.goto('/');
+    await visitorPage.locator('.hero').getByRole('link', { name: 'Links', exact: true }).click();
+    await expect(visitorPage).toHaveURL(/#links$/);
+    const links = visitorPage.locator('#links');
+    await expect(links.getByRole('heading', { name: 'Listen & follow' })).toBeInViewport();
     const redirect = visitorPage.waitForResponse((response) => response.url().includes('/go/'));
-    await visitorPage.getByRole('link', { name: LABEL }).click();
+    await links.getByRole('link', { name: LABEL }).click();
     const response = await redirect;
     expect(response.status()).toBe(302);
     expect(response.headers().location).toBe(TARGET);

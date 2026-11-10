@@ -29,7 +29,7 @@
                         },
                     }|json_encode }}">{{ 'site.hero.out'|trans({date: featured.releaseDate|date('d.m.Y')}) }}</div>
                 {% endif %}
-                {% if featured.smartLinkUrl or music.videos is not empty %}
+                {% if featured.smartLinkUrl or music.videos is not empty or has_links %}
                     <div class="hero-actions">
                         {% if featured.smartLinkUrl %}
                             <a class="button" href="{{ featured.smartLinkUrl }}" rel="noopener">{{ (featured.upcoming ? 'site.hero.presave' : 'site.hero.listen')|trans }}</a>
@@ -37,12 +37,20 @@
                         {% if music.videos is not empty %}
                             <a class="button-ghost" href="#videos">{{ 'site.hero.watch'|trans }}</a>
                         {% endif %}
+                        {% if has_links %}
+                            <a class="button-ghost" href="#links">{{ 'site.hero.links'|trans }}</a>
+                        {% endif %}
                     </div>
                 {% endif %}
             </article>
         {% else %}
             <div class="hero-release hero-release-empty">
                 <p>{{ 'site.hero.release'|trans }}</p>
+                {% if has_links %}
+                    <div class="hero-actions">
+                        <a class="button-ghost" href="#links">{{ 'site.hero.links'|trans }}</a>
+                    </div>
+                {% endif %}
             </div>
         {% endif %}
     </div>

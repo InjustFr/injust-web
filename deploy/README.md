@@ -62,7 +62,7 @@ Indexing is off by default: the site sends `noindex` and `robots.txt` disallows 
 
 ### Link-in-bio and Search Console
 
-The link-in-bio page is `https://<domain>/links` (FR: `/fr/links`); manage its links in the admin (Links) and put that URL in the social bios in place of Linktree. Clicks are counted without cookies.
+The links live on the home page, right under the hero: `https://<domain>/#links`; manage them in the admin (Links) and put that URL in the social bios in place of Linktree. Clicks are counted without cookies.
 
 Search Console: add the domain as a property, choose the HTML tag method, paste only the `content` value of the `google-site-verification` meta tag in the admin (Settings, general), verify, then submit `https://<domain>/sitemap.xml`.
 

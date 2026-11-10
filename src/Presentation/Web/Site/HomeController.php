@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Presentation\Web\Site;
 
+use App\Application\Links\LinksQueries;
 use App\Application\Music\MusicQueries;
 use App\Application\Shared\LegalMarkdown;
 use Psr\Clock\ClockInterface;
@@ -18,6 +19,7 @@ final readonly class HomeController
 {
     public function __construct(
         private MusicQueries $music,
+        private LinksQueries $links,
         private ClockInterface $clock,
         private LegalMarkdown $markdown,
         private MusicStructuredData $structuredData,
@@ -32,6 +34,7 @@ final readonly class HomeController
 
         return $this->page->render('site/home.html.twig', [
             'music' => $home,
+            'links' => $this->links->visibleLinks(),
             'manifesto' => $this->markdown->toHtml($home->text->manifesto->in($locale), []),
             'bio' => $this->markdown->toHtml($home->text->bio->in($locale), []),
             'page_graph' => $this->structuredData->releases($home->releases),

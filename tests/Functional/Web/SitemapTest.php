@@ -31,7 +31,7 @@ final class SitemapTest extends WebTestCase
         $client->request('GET', '/sitemap.xml');
 
         $urls = self::urls($client->getResponse()->getContent());
-        self::assertSame(['http://localhost/', 'http://localhost/fr', 'http://localhost/contact', 'http://localhost/fr/contact', 'http://localhost/links', 'http://localhost/fr/links'], array_keys($urls));
+        self::assertSame(['http://localhost/', 'http://localhost/fr', 'http://localhost/contact', 'http://localhost/fr/contact'], array_keys($urls));
         foreach ($urls as $url) {
             $alternates = [];
             foreach ($url->children(self::XHTML)->link as $link) {

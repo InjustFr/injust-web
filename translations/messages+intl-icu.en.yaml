@@ -32,6 +32,7 @@ site:
         presave: 'Pre-save'
         listen: 'Listen'
         watch: 'Watch the video'
+        links: 'Links'
         out: 'Out {date}'
     countdown:
         days: 'Days'
@@ -49,7 +50,6 @@ site:
         videos: 'Videos'
         manifesto: 'Manifesto'
         bio: 'Bio'
-        links: 'Follow'
         tracklist: 'Tracklist'
         listen_on: 'Listen on'
         everywhere: 'All platforms'
@@ -104,10 +104,8 @@ site:
         back: 'Back to the home page'
     faq: 'FAQ'
     links:
-        title: 'Links'
-        empty: 'No links yet. The full site has everything.'
-        full_site: 'Full site'
-        more: 'More from Injust'
+        title: 'Listen & follow'
+        socials: 'Social networks'
     lessons:
         service: 'Guitar lessons'
         offers: 'Offers'

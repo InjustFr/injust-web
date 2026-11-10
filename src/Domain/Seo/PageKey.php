@@ -9,5 +9,4 @@ enum PageKey: string
     case Lessons = 'lessons';
     case Production = 'production';
     case Contact = 'contact';
-    case Links = 'links';
 }

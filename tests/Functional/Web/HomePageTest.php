@@ -201,18 +201,6 @@ final class HomePageTest extends WebTestCase
         self::assertMatchesRegularExpression(self::ULID_WEBP, (string) $crawler->filter('#manifesto img.portrait')->attr('src'));
     }
 
-    public function testSocialLinksUseTheirLabelOrTheNetworkName(): void
-    {
-        $client = self::createClient();
-        self::link(SocialNetwork::Instagram, 'https://instagram.com/injust', null);
-        self::link(SocialNetwork::Other, 'https://injust.example/press', 'Press kit');
-
-        $crawler = $client->request('GET', '/');
-
-        self::assertSame([['Instagram', 'https://instagram.com/injust'], ['Press kit', 'https://injust.example/press']], $crawler->filter('#links a')->each(static fn (Crawler $link): array => [$link->filter('.link-name')->text(), $link->attr('href')]));
-        self::assertSame(['me noopener', 'me noopener'], $crawler->filter('#links a')->each(static fn (Crawler $link): ?string => $link->attr('rel')));
-    }
-
     public function testAnEmptyHomeHidesTheMusicSections(): void
     {
         $client = self::createClient();

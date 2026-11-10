@@ -37,8 +37,10 @@ final class SeoApiTest extends WebTestCase
 
         $seo = self::send($client, 'GET', '/api/admin/seo');
 
-        self::assertSame(['lessons', 'production', 'contact', 'links'], array_map(static fn (mixed $page): string => Json::string($page, 'key'), Json::array($seo, 'pages')));
-        self::assertSame(['key' => 'links', 'title' => ['fr' => '', 'en' => ''], 'description' => ['fr' => '', 'en' => ''], 'image' => null], Json::array($seo, 'pages', 3));
+        self::assertSame(['lessons', 'production', 'contact'], array_map(static fn (mixed $page): string => Json::string($page, 'key'), Json::array($seo, 'pages')));
+        self::assertSame(['key' => 'contact', 'title' => ['fr' => '', 'en' => ''], 'description' => ['fr' => '', 'en' => ''], 'image' => null], Json::array($seo, 'pages', 2));
+        $client->jsonRequest('PUT', '/api/admin/seo/links', self::PAGE);
+        self::assertResponseStatusCodeSame(404);
         self::assertSame(['title' => ['fr' => 'Injust', 'en' => 'Injust — punk'], 'description' => ['fr' => '', 'en' => 'Protest punk.']], Json::array($seo, 'home'));
     }
 
@@ -63,9 +65,9 @@ final class SeoApiTest extends WebTestCase
     {
         $client = self::signedInClient();
 
-        self::assertStringContainsString('70', self::refused($client, 'PUT', '/api/admin/seo/links', ['title' => ['fr' => str_repeat('a', 71), 'en' => '']]));
-        self::refused($client, 'PUT', '/api/admin/seo/links', ['description' => ['fr' => '', 'en' => str_repeat('a', 171)]]);
-        self::send($client, 'PUT', '/api/admin/seo/links', ['title' => ['fr' => str_repeat('é', 70), 'en' => ''], 'description' => ['fr' => '', 'en' => str_repeat('a', 170)]]);
+        self::assertStringContainsString('70', self::refused($client, 'PUT', '/api/admin/seo/contact', ['title' => ['fr' => str_repeat('a', 71), 'en' => '']]));
+        self::refused($client, 'PUT', '/api/admin/seo/contact', ['description' => ['fr' => '', 'en' => str_repeat('a', 171)]]);
+        self::send($client, 'PUT', '/api/admin/seo/contact', ['title' => ['fr' => str_repeat('é', 70), 'en' => ''], 'description' => ['fr' => '', 'en' => str_repeat('a', 170)]]);
     }
 
     public function testOnlyTheFourPagesAreEditable(): void
@@ -106,17 +108,17 @@ final class SeoApiTest extends WebTestCase
 
         self::getContainer()->get(EntityManagerInterface::class)->clear();
         self::assertSame($image, self::getContainer()->get(SeoQueries::class)->page(PageKey::Contact)->image);
-        self::assertNull(Json::at(self::send($client, 'DELETE', '/api/admin/seo/links/image'), 'image'));
+        self::assertNull(Json::at(self::send($client, 'DELETE', '/api/admin/seo/contact/image'), 'image'));
     }
 
     public function testAnUploadWithoutAnImageIsRefused(): void
     {
         $client = self::signedInClient();
 
-        $client->request('POST', '/api/admin/seo/links/image', server: ['HTTP_ACCEPT' => 'application/json']);
+        $client->request('POST', '/api/admin/seo/contact/image', server: ['HTTP_ACCEPT' => 'application/json']);
         self::assertResponseStatusCodeSame(422);
 
-        $client->request('POST', '/api/admin/seo/links/image', files: ['file' => new UploadedFile(self::copyOf('not-an-image.png'), 'x.png', 'image/png', test: true)], server: ['HTTP_ACCEPT' => 'application/json']);
+        $client->request('POST', '/api/admin/seo/contact/image', files: ['file' => new UploadedFile(self::copyOf('not-an-image.png'), 'x.png', 'image/png', test: true)], server: ['HTTP_ACCEPT' => 'application/json']);
         self::assertResponseStatusCodeSame(422);
     }
 
@@ -128,7 +130,7 @@ final class SeoApiTest extends WebTestCase
         self::ensureKernelShutdown();
 
         $client = self::signedInClient();
-        $client->jsonRequest('PUT', '/api/admin/seo/links', self::PAGE, ['HTTP_ORIGIN' => 'https://evil.test']);
+        $client->jsonRequest('PUT', '/api/admin/seo/contact', self::PAGE, ['HTTP_ORIGIN' => 'https://evil.test']);
         self::assertResponseStatusCodeSame(403);
     }
 

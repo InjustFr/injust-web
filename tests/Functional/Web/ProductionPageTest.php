@@ -247,7 +247,7 @@ final class ProductionPageTest extends WebTestCase
             $locs[] = (string) $url->loc;
         }
 
-        self::assertSame(['http://localhost/', 'http://localhost/fr', 'http://localhost/production', 'http://localhost/fr/production', 'http://localhost/contact', 'http://localhost/fr/contact', 'http://localhost/links', 'http://localhost/fr/links'], $locs);
+        self::assertSame(['http://localhost/', 'http://localhost/fr', 'http://localhost/production', 'http://localhost/fr/production', 'http://localhost/contact', 'http://localhost/fr/contact'], $locs);
     }
 
     /** @return list<string> */
