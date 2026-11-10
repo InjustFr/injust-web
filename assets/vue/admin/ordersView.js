@@ -1,3 +1,5 @@
+import { eurosToCents } from './forms.js';
+
 export const STATUSES = ['pending', 'paid', 'expired', 'withdrawn', 'refunded'];
 
 const WARNING_SHARE = 0.8;
@@ -35,4 +37,24 @@ export function totalsTable(rows) {
 export function thresholdProgress(cents, threshold) {
     const state = cents >= threshold ? 'crossed' : cents >= threshold * WARNING_SHARE ? 'warning' : 'ok';
     return { percent: Math.min(100, Math.floor((cents / threshold) * 100)), state };
+}
+
+export const remainingCents = (order) => order.amountCents - order.refundedCents;
+
+export const canRefund = (order) => (order.status === 'paid' || order.status === 'withdrawn') && remainingCents(order) > 0;
+
+export const displayStatus = (order) => ((order.status === 'paid' || order.status === 'withdrawn') && order.refundedCents > 0 ? 'partiallyRefunded' : order.status);
+
+export function proRataCents({ amountCents, remainingCents: remaining, mode, done, total, percent }) {
+    let share = 0;
+    if (mode === 'sessions' && total > 0 && done >= 0 && done <= total) share = (total - done) / total;
+    if (mode === 'percent' && percent >= 0 && percent <= 100) share = percent / 100;
+    return Math.min(remaining, Math.round(amountCents * share));
+}
+
+export const REASON_MAX = 500;
+
+export function refundPayload(euros, reason, remaining) {
+    const amountCents = eurosToCents(euros);
+    return amountCents === null || amountCents <= 0 || amountCents > remaining ? null : { amountCents, reason: reason.trim() };
 }

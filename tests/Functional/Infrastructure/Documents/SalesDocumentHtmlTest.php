@@ -4,10 +4,17 @@ declare(strict_types=1);
 
 namespace App\Tests\Functional\Infrastructure\Documents;
 
+use App\Application\Sales\CreditNoteView;
+use App\Application\Sales\InvoiceView;
 use App\Application\Settings\LegalDocumentHtml;
 use App\Application\Shared\LegalMarkdown;
+use App\Domain\Sales\CreditNote;
 use App\Domain\Sales\Customer;
+use App\Domain\Sales\Invoice;
+use App\Domain\Sales\Order;
+use App\Domain\Sales\Seller;
 use App\Domain\Settings\LegalKind;
+use App\Domain\Settings\VatMentions;
 use App\Infrastructure\Documents\SalesDocumentHtml;
 use App\Tests\Support\Sales\DocumentExamples;
 use App\Tests\Support\Sales\SalesExamples;
@@ -141,6 +148,70 @@ final class SalesDocumentHtmlTest extends KernelTestCase
         self::assertStringContainsString('Seller: Louis Injust.', $english);
         self::assertStringContainsString('Terms of sale – production', $english);
         self::assertStringContainsString('Version 3 – 02/11/2026', $english);
+    }
+
+    public function testTheSellerVatNumberIsOnTheInvoiceWhenSet(): void
+    {
+        $text = self::text(self::html()->invoice(InvoiceView::of(self::invoiceWithVatNumber())));
+
+        self::assertStringContainsString('SIREN : 443061841 TVA intracommunautaire : FR12443061841', $text);
+    }
+
+    public function testACreditNoteCreditsItsInvoiceWithANegativeAmount(): void
+    {
+        $text = self::text(self::html()->creditNote(self::creditNote(DocumentExamples::invoiceOf(DocumentExamples::paidOrder()), 1500, 'Cours annulé')));
+
+        foreach ([
+            'Avoir 2026-0008',
+            'Date d’émission : 01/12/2026',
+            'Avoir sur la facture n° 2026-0007',
+            'Commande : INJ-',
+            'Louis Injust',
+            'SIREN : 443061841',
+            'Test Buyer',
+            'France',
+            'Avoir sur facture 2026-0007 — Cours de guitare',
+            '-15,00 €',
+            'Total TTC Total -15,00 €',
+            'TVA non applicable – art. 293 B du CGI',
+            'Remboursement effectué le 01/12/2026 par carte bancaire',
+            'Motif Reason : Cours annulé',
+        ] as $mention) {
+            self::assertStringContainsString($mention, $text);
+        }
+        self::assertStringNotContainsString('TVA intracommunautaire', $text);
+        self::assertStringNotContainsString(' 15,00 €', str_replace('-15,00 €', '', $text));
+    }
+
+    public function testABusinessCreditNoteKeepsTheReverseChargeMentionAndBothVatNumbers(): void
+    {
+        $buyer = new Customer('Hans Muster', 'hans@example.test', 'DE', 'Hauptstraße 1', '', '10115', 'Berlin', null, 'Muster GmbH', 'DE123456789', 'DE');
+        $invoice = self::invoiceWithVatNumber(DocumentExamples::paidOrder(SalesExamples::production(), $buyer, 'en'));
+
+        $text = self::text(self::html()->creditNote(self::creditNote($invoice, 12000, null)));
+
+        foreach (['Avoir Credit note 2026-0008', 'Muster GmbH', 'Allemagne', 'TVA intracommunautaire : DE123456789', 'TVA intracommunautaire : FR12443061841', 'Autoliquidation', '-120,00 €', 'Refunded on 01/12/2026 by card'] as $mention) {
+            self::assertStringContainsString($mention, $text);
+        }
+        self::assertStringNotContainsString('Motif', $text);
+    }
+
+    public function testTheCreditNoteEscapesTheReason(): void
+    {
+        $html = self::html()->creditNote(self::creditNote(DocumentExamples::invoiceOf(DocumentExamples::paidOrder()), 1500, '<b>x</b>'));
+
+        self::assertStringNotContainsString('<b>x</b>', $html);
+        self::assertStringContainsString('&lt;b&gt;x&lt;/b&gt;', $html);
+    }
+
+    public static function creditNote(Invoice $invoice, int $cents, ?string $reason): CreditNoteView
+    {
+        return CreditNoteView::of(CreditNote::issue('2026-0008', $invoice, $cents, 're_test_1', $reason, new \DateTimeImmutable('2026-12-01 09:00:00 Europe/Paris')));
+    }
+
+    private static function invoiceWithVatNumber(?Order $order = null): Invoice
+    {
+        return Invoice::issue('2026-0007', $order ?? DocumentExamples::paidOrder(), Seller::of(DocumentExamples::identity('FR12443061841')), VatMentions::defaults(), new \DateTimeImmutable('2026-11-10 10:06:00'));
     }
 
     private static function html(): SalesDocumentHtml

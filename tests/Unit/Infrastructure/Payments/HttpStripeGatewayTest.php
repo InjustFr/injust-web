@@ -6,6 +6,7 @@ namespace App\Tests\Unit\Infrastructure\Payments;
 
 use App\Application\Sales\CheckoutRequest;
 use App\Application\Sales\CheckoutSession;
+use App\Application\Sales\StripeRefund;
 use App\Domain\Sales\Customer;
 use App\Domain\Sales\PaymentDetails;
 use App\Infrastructure\Payments\HttpStripeGateway;
@@ -156,6 +157,106 @@ final class HttpStripeGatewayTest extends TestCase
         yield 'no currency' => [['currency' => null] + $paid];
         yield 'no billing country' => [['customer_details' => ['email' => 'riot@example.test', 'name' => 'Riot Buyer', 'address' => ['country' => null]]] + $paid];
         yield 'no charge time' => [['payment_intent' => ['id' => 'pi_test_1', 'latest_charge' => ['created' => null]]] + $paid];
+    }
+
+    public function testARefundIsAskedForThePaymentWithItsIdempotencyKeyAndReason(): void
+    {
+        $seen = [];
+        $form = [];
+        $client = new MockHttpClient(static function (string $method, string $url, array $options) use (&$seen, &$form): JsonMockResponse {
+            $seen = [$method, $url, self::header($options, 'authorization'), self::header($options, 'idempotency-key'), $options['timeout'] ?? null];
+            $form = self::form($options);
+
+            return new JsonMockResponse(['id' => 're_test_1', 'object' => 'refund', 'amount' => 1500, 'status' => 'succeeded', 'metadata' => ['reason' => 'Cours annulé']]);
+        });
+
+        $refund = self::gateway($client)->refund('pi_test_1', 1500, 'ORDER-0-1500', 'Cours annulé');
+
+        self::assertEquals(new StripeRefund('re_test_1', 1500, 'succeeded', 'Cours annulé'), $refund);
+        self::assertSame(['POST', 'https://api.stripe.com/v1/refunds', ['Authorization: Bearer sk_test_unit'], ['Idempotency-Key: ORDER-0-1500'], 10.0], $seen);
+        self::assertSame(['payment_intent' => 'pi_test_1', 'amount' => '1500', 'reason' => 'requested_by_customer', 'metadata' => ['reason' => 'Cours annulé']], $form);
+    }
+
+    public function testARefundWithoutReasonSendsNoReasonMetadata(): void
+    {
+        $form = [];
+        $client = new MockHttpClient(static function (string $method, string $url, array $options) use (&$form): JsonMockResponse {
+            $form = self::form($options);
+
+            return new JsonMockResponse(['id' => 're_test_1', 'amount' => 4500, 'status' => 'pending', 'metadata' => []]);
+        });
+
+        $refund = self::gateway($client)->refund('pi_test_1', 4500, 'key', null);
+
+        self::assertEquals(new StripeRefund('re_test_1', 4500, 'pending'), $refund);
+        self::assertSame(['payment_intent' => 'pi_test_1', 'amount' => '4500', 'reason' => 'requested_by_customer'], $form);
+    }
+
+    /** @param list<MockResponse> $responses */
+    #[DataProvider('brokenRefunds')]
+    public function testAFailedRefundIsARuntimeError(array $responses): void
+    {
+        $this->expectException(\RuntimeException::class);
+
+        self::gateway(new MockHttpClient($responses))->refund('pi_test_1', 4500, 'key', null);
+    }
+
+    /** @return iterable<string, array{list<MockResponse>}> */
+    public static function brokenRefunds(): iterable
+    {
+        yield 'refused' => [[new JsonMockResponse(['error' => ['message' => 'Charge already refunded']], ['http_code' => 400])]];
+        yield 'not json' => [[new MockResponse('<html>oops</html>')]];
+        yield 'no id' => [[new JsonMockResponse(['amount' => 4500, 'status' => 'succeeded'])]];
+        yield 'no amount' => [[new JsonMockResponse(['id' => 're_1', 'status' => 'succeeded'])]];
+        yield 'no status' => [[new JsonMockResponse(['id' => 're_1', 'amount' => 4500])]];
+    }
+
+    public function testTheRefundsOfAPaymentAreListedOldestFirst(): void
+    {
+        $seen = [];
+        $client = new MockHttpClient(static function (string $method, string $url, array $options) use (&$seen): JsonMockResponse {
+            $seen = [$method, $url, self::header($options, 'authorization'), $options['timeout'] ?? null];
+
+            return new JsonMockResponse(['object' => 'list', 'has_more' => false, 'data' => [
+                ['id' => 're_2', 'object' => 'refund', 'amount' => 3000, 'status' => 'failed', 'metadata' => []],
+                ['id' => 're_1', 'object' => 'refund', 'amount' => 1500, 'status' => 'succeeded', 'metadata' => ['reason' => 'Retard']],
+            ]]);
+        });
+
+        $refunds = self::gateway($client)->refunds('pi_test&x=1');
+
+        self::assertSame(['GET', 'https://api.stripe.com/v1/refunds?payment_intent=pi_test%26x%3D1&limit=100', ['Authorization: Bearer sk_test_unit'], 10.0], $seen);
+        self::assertEquals([new StripeRefund('re_1', 1500, 'succeeded', 'Retard'), new StripeRefund('re_2', 3000, 'failed')], $refunds);
+    }
+
+    public function testAPaymentWithoutRefundsHasAnEmptyList(): void
+    {
+        self::assertSame([], self::gateway(new MockHttpClient([new JsonMockResponse(['object' => 'list', 'data' => []])]))->refunds('pi_test_1'));
+    }
+
+    public function testRefundsSentAsAKeyedObjectStillComeBackAsAList(): void
+    {
+        $refunds = self::gateway(new MockHttpClient([new JsonMockResponse(['data' => ['first' => ['id' => 're_1', 'amount' => 100, 'status' => 'succeeded']]])]))->refunds('pi_test_1');
+
+        self::assertSame([0], array_keys($refunds));
+    }
+
+    /** @param list<MockResponse> $responses */
+    #[DataProvider('brokenRefundLists')]
+    public function testARefundListThatCannotBeReadIsARuntimeError(array $responses): void
+    {
+        $this->expectException(\RuntimeException::class);
+
+        self::gateway(new MockHttpClient($responses))->refunds('pi_test_1');
+    }
+
+    /** @return iterable<string, array{list<MockResponse>}> */
+    public static function brokenRefundLists(): iterable
+    {
+        yield 'refused' => [[new JsonMockResponse(['error' => ['message' => 'No such payment_intent']], ['http_code' => 404])]];
+        yield 'no data' => [[new JsonMockResponse(['object' => 'list'])]];
+        yield 'a refund without id' => [[new JsonMockResponse(['data' => [['amount' => 1, 'status' => 'succeeded']]])]];
+        yield 'a refund that is not an object' => [[new JsonMockResponse(['data' => ['re_1']])]];
     }
 
     /** @return array<string, mixed> */

@@ -15,6 +15,7 @@ final readonly class RevenueLine
         public string $productType,
         public int $amountCents,
         public string $paymentMethod,
+        public string $label,
     ) {
     }
 }

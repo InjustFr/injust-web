@@ -10,5 +10,7 @@ interface SalesDocuments
 {
     public function invoicePdf(InvoiceView $invoice): string;
 
+    public function creditNotePdf(CreditNoteView $creditNote): string;
+
     public function legalPdf(LegalDocumentView $document, string $locale): string;
 }

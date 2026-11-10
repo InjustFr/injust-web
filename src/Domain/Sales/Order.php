@@ -4,9 +4,13 @@ declare(strict_types=1);
 
 namespace App\Domain\Sales;
 
+use App\Domain\Sales\Exception\InvalidRefundAmount;
 use App\Domain\Sales\Exception\MissingConsent;
 use App\Domain\Sales\Exception\OrderNotPaid;
 use App\Domain\Sales\Exception\PaymentMismatch;
+use App\Domain\Sales\Exception\RefundBeforePayment;
+use App\Domain\Sales\Exception\WithdrawalNotAllowed;
+use App\Domain\Sales\Exception\WithdrawalPeriodOver;
 use App\Domain\Shared\Exception\UnsupportedLocale;
 use App\Domain\Shared\Price;
 use Doctrine\ORM\Mapping as ORM;
@@ -29,8 +33,10 @@ class Order
     public const string REFERENCE_PREFIX = 'INJ-';
     public const int MAX_LABEL = 255;
     public const int MAX_EMAIL = 180;
+    public const int MAX_TYPED_REFERENCE = 20;
     public const int MAX_STRIPE_ID = 255;
     public const string ABANDONED_RETENTION = '-30 days';
+    public const int WITHDRAWAL_DAYS = 14;
 
     #[ORM\Id]
     #[ORM\Column(type: UlidType::NAME, unique: true)]
@@ -92,6 +98,12 @@ class Order
     #[ORM\Column(type: 'datetimetz_immutable', nullable: true)]
     private ?\DateTimeImmutable $confirmationSentAt = null;
 
+    #[ORM\Column(options: ['default' => 0])]
+    private int $refundedCents = 0;
+
+    #[ORM\Column(type: 'datetimetz_immutable', nullable: true)]
+    private ?\DateTimeImmutable $withdrawnAt = null;
+
     /** @param list<Consent> $consents */
     private function __construct(Purchasable $product, string $locale, string $email, array $consents, Terms $terms, \DateTimeImmutable $now)
     {
@@ -144,11 +156,59 @@ class Order
         }
     }
 
-    public function refund(): void
+    public function checkRefund(int $cents): void
     {
-        if (\in_array($this->status, [OrderStatus::Paid, OrderStatus::Withdrawn], true)) {
+        if (\in_array($this->status, [OrderStatus::Pending, OrderStatus::Expired], true)) {
+            throw new RefundBeforePayment($this->reference);
+        }
+        $remaining = $this->price->cents - $this->refundedCents;
+        if ($cents <= 0 || $cents > $remaining) {
+            throw new InvalidRefundAmount($remaining);
+        }
+    }
+
+    public function refund(int $cents): void
+    {
+        $this->checkRefund($cents);
+        $this->refundedCents += $cents;
+        if ($this->refundedCents === $this->price->cents) {
             $this->status = OrderStatus::Refunded;
         }
+    }
+
+    public function checkWithdrawal(\DateTimeImmutable $now): void
+    {
+        $lastDay = $this->withdrawalLastDay();
+        if (OrderStatus::Paid !== $this->status || null === $lastDay) {
+            throw new WithdrawalNotAllowed($this->reference);
+        }
+        if ($now >= new \DateTimeImmutable($lastDay->format('Y-m-d'), new \DateTimeZone(FiscalYear::TIMEZONE))->modify('+1 day')) {
+            throw new WithdrawalPeriodOver($lastDay);
+        }
+    }
+
+    public function withdraw(\DateTimeImmutable $now): void
+    {
+        $this->checkWithdrawal($now);
+        $this->status = OrderStatus::Withdrawn;
+        $this->withdrawnAt = $now;
+    }
+
+    public function withdrawalLastDay(): ?\DateTimeImmutable
+    {
+        if (null === $this->paidAt || ProductType::Beat === $this->productType) {
+            return null;
+        }
+        $paidOn = $this->paidAt->setTimezone(new \DateTimeZone(FiscalYear::TIMEZONE))->format('Y-m-d');
+
+        return WorkingDay::from(new \DateTimeImmutable($paidOn, new \DateTimeZone('UTC'))->add(new \DateInterval('P'.self::WITHDRAWAL_DAYS.'D')));
+    }
+
+    public function belongsTo(string $email): bool
+    {
+        $email = mb_strtolower(trim($email));
+
+        return '' !== $email && mb_strtolower($this->email) === $email;
     }
 
     public function invoiced(string $number): void
@@ -268,6 +328,16 @@ class Order
     public function confirmationSentAt(): ?\DateTimeImmutable
     {
         return $this->confirmationSentAt;
+    }
+
+    public function refundedCents(): int
+    {
+        return $this->refundedCents;
+    }
+
+    public function withdrawnAt(): ?\DateTimeImmutable
+    {
+        return $this->withdrawnAt;
     }
 
     /**

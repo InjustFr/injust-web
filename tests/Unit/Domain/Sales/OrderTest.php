@@ -7,9 +7,11 @@ namespace App\Tests\Unit\Domain\Sales;
 use App\Domain\Sales\Consent;
 use App\Domain\Sales\ConsentKind;
 use App\Domain\Sales\Customer;
+use App\Domain\Sales\Exception\InvalidRefundAmount;
 use App\Domain\Sales\Exception\MissingConsent;
 use App\Domain\Sales\Exception\OrderNotPaid;
 use App\Domain\Sales\Exception\PaymentMismatch;
+use App\Domain\Sales\Exception\RefundBeforePayment;
 use App\Domain\Sales\Order;
 use App\Domain\Sales\OrderStatus;
 use App\Domain\Sales\ProductType;
@@ -17,6 +19,7 @@ use App\Domain\Sales\Purchasable;
 use App\Domain\Shared\Exception\UnsupportedLocale;
 use App\Domain\Shared\Price;
 use App\Tests\Support\Sales\SalesExamples;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 final class OrderTest extends TestCase
@@ -131,7 +134,7 @@ final class OrderTest extends TestCase
     {
         $order = SalesExamples::order();
         $order->pay(SalesExamples::payment($order));
-        $order->refund();
+        $order->refund($order->price()->cents);
 
         self::assertFalse($order->pay(SalesExamples::payment($order)));
         self::assertSame(OrderStatus::Refunded, $order->status());
@@ -179,16 +182,105 @@ final class OrderTest extends TestCase
         self::assertSame([OrderStatus::Expired, OrderStatus::Paid], [$pending->status(), $paid->status()]);
     }
 
-    public function testOnlyAPaidOrderIsRefunded(): void
+    public function testAPartialRefundKeepsTheOrderPaidAndAFullOneMarksItRefunded(): void
     {
-        $pending = SalesExamples::order();
-        $paid = SalesExamples::paid();
+        $order = SalesExamples::paid(SalesExamples::lesson(4500));
 
-        $pending->refund();
-        $paid->refund();
+        $order->refund(1500);
+        self::assertSame([OrderStatus::Paid, 1500], [$order->status(), $order->refundedCents()]);
 
-        self::assertSame([OrderStatus::Pending, OrderStatus::Refunded], [$pending->status(), $paid->status()]);
-        self::assertFalse($paid->needsConfirmation());
+        $order->refund(3000);
+        self::assertSame([OrderStatus::Refunded, 4500], [$order->status(), $order->refundedCents()]);
+        self::assertFalse($order->needsConfirmation());
+    }
+
+    public function testAWithdrawnOrderStaysWithdrawnUntilFullyRefunded(): void
+    {
+        $order = SalesExamples::paid(SalesExamples::lesson(4500), paidAt: '2026-11-10 10:05:00 UTC');
+        $order->withdraw(new \DateTimeImmutable('2026-11-11 10:00:00 UTC'));
+
+        $order->refund(2000);
+        self::assertSame(OrderStatus::Withdrawn, $order->status());
+
+        $order->refund(2500);
+        self::assertSame(OrderStatus::Refunded, $order->status());
+    }
+
+    public function testANewOrderHasNothingRefunded(): void
+    {
+        $order = SalesExamples::order(SalesExamples::lesson(4500));
+
+        self::assertSame([0, null], [$order->refundedCents(), $order->withdrawnAt()]);
+    }
+
+    /** @return iterable<string, array{\Closure(Order): void}> */
+    public static function unpaid(): iterable
+    {
+        yield 'pending' => [static function (Order $order): void {
+        }];
+        yield 'expired' => [static function (Order $order): void {
+            $order->expire();
+        }];
+    }
+
+    /** @param \Closure(Order): void $prepare */
+    #[DataProvider('unpaid')]
+    public function testARefundBeforeThePaymentIsRefused(\Closure $prepare): void
+    {
+        $order = SalesExamples::order();
+        $prepare($order);
+
+        try {
+            $order->refund(100);
+            self::fail('A refund before the payment was accepted.');
+        } catch (RefundBeforePayment $refused) {
+            self::assertSame(['sales.refund_before_payment', ['reference' => $order->reference()]], [$refused->getMessage(), $refused->parameters()]);
+        }
+
+        self::assertSame(0, $order->refundedCents());
+    }
+
+    /** @return iterable<string, array{int, int}> */
+    public static function invalidAmounts(): iterable
+    {
+        yield 'above the remaining amount' => [3001, 3000];
+        yield 'zero' => [0, 3000];
+        yield 'negative' => [-1, 3000];
+    }
+
+    #[DataProvider('invalidAmounts')]
+    public function testARefundMustBeAPositiveAmountWithinWhatRemains(int $cents, int $remaining): void
+    {
+        $order = SalesExamples::paid(SalesExamples::lesson(4500));
+        $order->refund(1500);
+
+        try {
+            $order->refund($cents);
+            self::fail('The refund was accepted.');
+        } catch (InvalidRefundAmount $refused) {
+            self::assertSame(['sales.invalid_refund_amount', ['remaining' => $remaining / 100]], [$refused->getMessage(), $refused->parameters()]);
+        }
+
+        self::assertSame([1500, OrderStatus::Paid], [$order->refundedCents(), $order->status()]);
+    }
+
+    public function testNothingMoreIsRefundedOnceFullyRefunded(): void
+    {
+        $order = SalesExamples::paid(SalesExamples::lesson(4500));
+        $order->refund(4500);
+
+        $this->expectExceptionObject(new InvalidRefundAmount(0));
+
+        $order->checkRefund(1);
+    }
+
+    public function testTheRefundCheckAloneChangesNothing(): void
+    {
+        $order = SalesExamples::paid(SalesExamples::lesson(4500));
+
+        $order->checkRefund(4500);
+
+        self::assertSame([0, OrderStatus::Paid], [$order->refundedCents(), $order->status()]);
     }
 
     public function testTheConfirmationIsSentOnce(): void

@@ -5,12 +5,14 @@ declare(strict_types=1);
 namespace App\Tests\Support\Payments;
 
 use App\Infrastructure\Payments\StripeObject;
+use App\Presentation\Web\Webhooks\StripeSignature;
 use Psr\Cache\CacheItemPoolInterface;
 use Psr\Clock\ClockInterface;
 use Symfony\Component\HttpClient\DecoratorTrait;
 use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\HttpClient\Response\JsonMockResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Contracts\HttpClient\ResponseInterface;
 
@@ -27,6 +29,8 @@ final class FakeStripe implements HttpClientInterface
         HttpClientInterface $client,
         private readonly CacheItemPoolInterface $sessions,
         private readonly ClockInterface $clock,
+        private readonly HttpKernelInterface $kernel,
+        private readonly StripeSignature $signature,
     ) {
         $this->client = $client;
     }
@@ -50,6 +54,8 @@ final class FakeStripe implements HttpClientInterface
         return match (true) {
             'POST checkout/sessions' === $route => $this->open($form),
             1 === preg_match('{^GET checkout/sessions/('.self::ID.')$}', $route, $match) => $this->show($match[1]),
+            'POST refunds' === $route => $this->refund($form),
+            'GET refunds' === $route => new JsonMockResponse(['object' => 'list', 'has_more' => false, 'data' => $this->refundsOf(self::query($url, 'payment_intent'))]),
             1 === preg_match('{^POST test_helpers/checkout/sessions/('.self::ID.')/pay$}', $route, $match) => $this->pay($match[1], $form),
             default => self::missing(),
         };
@@ -113,6 +119,55 @@ final class FakeStripe implements HttpClientInterface
                 'latest_charge' => ['id' => 'ch_test_'.$suffix, 'created' => $this->clock->now()->getTimestamp(), 'payment_method_details' => ['type' => 'card', 'card' => ['country' => 'FR', 'brand' => 'visa', 'last4' => '4242']]],
             ],
         ] + $session));
+    }
+
+    private function refund(StripeObject $form): JsonMockResponse
+    {
+        $intent = (string) $form->optional('payment_intent');
+        $refund = [
+            'id' => 're_test_'.bin2hex(random_bytes(12)),
+            'object' => 'refund',
+            'amount' => (int) $form->optional('amount'),
+            'currency' => 'eur',
+            'payment_intent' => $intent,
+            'reason' => $form->optional('reason'),
+            'status' => 'succeeded',
+            'metadata' => array_filter(['reason' => $form->optional('metadata.reason')]),
+            'created' => $this->clock->now()->getTimestamp(),
+        ];
+        $refunds = [$refund, ...$this->refundsOf($intent)];
+        $this->sessions->save($this->sessions->getItem('refunds_'.$intent)->set($refunds));
+        $this->dispatchRefunded($intent, $refunds);
+
+        return new JsonMockResponse($refund);
+    }
+
+    /** @return list<mixed> */
+    private function refundsOf(string $intent): array
+    {
+        $refunds = $this->sessions->getItem('refunds_'.$intent)->get();
+
+        return \is_array($refunds) ? array_values($refunds) : [];
+    }
+
+    /** @param list<mixed> $refunds */
+    private function dispatchRefunded(string $intent, array $refunds): void
+    {
+        $event = json_encode(['id' => 'evt_test_'.bin2hex(random_bytes(8)), 'object' => 'event', 'type' => 'charge.refunded', 'data' => ['object' => [
+            'object' => 'charge',
+            'payment_intent' => $intent,
+            'amount_refunded' => array_sum(array_column($refunds, 'amount')),
+            'refunds' => ['object' => 'list', 'data' => $refunds],
+        ]]], \JSON_THROW_ON_ERROR);
+        $this->kernel->handle(Request::create('/webhooks/stripe', 'POST', server: ['CONTENT_TYPE' => 'application/json', 'HTTP_STRIPE_SIGNATURE' => $this->signature->sign($event)], content: $event), HttpKernelInterface::SUB_REQUEST);
+    }
+
+    private static function query(string $url, string $key): string
+    {
+        parse_str((string) parse_url($url, \PHP_URL_QUERY), $query);
+        $value = $query[$key] ?? '';
+
+        return \is_string($value) ? $value : '';
     }
 
     /** @return ?array<mixed> */

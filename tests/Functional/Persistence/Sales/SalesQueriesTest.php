@@ -8,16 +8,20 @@ use App\Application\Sales\CountryTotal;
 use App\Application\Sales\RevenueLine;
 use App\Application\Sales\StoredSalesQueries;
 use App\Application\Sales\Totals;
+use App\Domain\Sales\CreditNote;
 use App\Domain\Sales\Customer;
 use App\Domain\Sales\Invoice;
 use App\Domain\Sales\Order;
 use App\Domain\Sales\OrderStatus;
 use App\Domain\Sales\Purchasable;
 use App\Domain\Sales\Seller;
+use App\Domain\Sales\WithdrawalRequest;
 use App\Domain\Settings\LegalIdentity;
 use App\Domain\Settings\VatMentions;
+use App\Infrastructure\Persistence\Doctrine\Sales\DoctrineCreditNoteRepository;
 use App\Infrastructure\Persistence\Doctrine\Sales\DoctrineInvoiceRepository;
 use App\Infrastructure\Persistence\Doctrine\Sales\DoctrineOrderRepository;
+use App\Infrastructure\Persistence\Doctrine\Sales\DoctrineWithdrawalRequestRepository;
 use App\Tests\Support\Sales\SalesExamples;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
@@ -29,10 +33,13 @@ final class SalesQueriesTest extends KernelTestCase
 
     private StoredSalesQueries $queries;
 
+    /** @var array<string, Invoice> */
+    private array $issued = [];
+
     protected function setUp(): void
     {
         $this->entityManager = self::getContainer()->get(EntityManagerInterface::class);
-        $this->queries = new StoredSalesQueries(new DoctrineOrderRepository($this->entityManager), new DoctrineInvoiceRepository($this->entityManager));
+        $this->queries = new StoredSalesQueries(new DoctrineOrderRepository($this->entityManager), new DoctrineInvoiceRepository($this->entityManager), new DoctrineCreditNoteRepository($this->entityManager), new DoctrineWithdrawalRequestRepository($this->entityManager));
     }
 
     public function testTheRevenueBookListsThePaidAndRefundedOrdersOfTheParisYearByPaymentDate(): void
@@ -48,9 +55,9 @@ final class SalesQueriesTest extends KernelTestCase
         $this->store($expired);
 
         self::assertEquals([
-            new RevenueLine(new \DateTimeImmutable('2026-02-01 11:00:00', new \DateTimeZone('Europe/Paris')), '2026-0001', $february->reference(), 'Léa', 'FR', 'production', 12000, 'card'),
-            new RevenueLine(new \DateTimeImmutable('2026-03-01 11:00:00', new \DateTimeZone('Europe/Paris')), '2026-0002', $march->reference(), 'Max', 'DE', 'lesson', 4500, 'card'),
-            new RevenueLine(new \DateTimeImmutable('2026-04-01 12:00:00', new \DateTimeZone('Europe/Paris')), '2026-0003', $refunded->reference(), 'Gia', 'IT', 'lesson', 3000, 'card'),
+            new RevenueLine(new \DateTimeImmutable('2026-02-01 11:00:00', new \DateTimeZone('Europe/Paris')), '2026-0001', $february->reference(), 'Léa', 'FR', 'production', 12000, 'card', 'Facture'),
+            new RevenueLine(new \DateTimeImmutable('2026-03-01 11:00:00', new \DateTimeZone('Europe/Paris')), '2026-0002', $march->reference(), 'Max', 'DE', 'lesson', 4500, 'card', 'Facture'),
+            new RevenueLine(new \DateTimeImmutable('2026-04-01 12:00:00', new \DateTimeZone('Europe/Paris')), '2026-0003', $refunded->reference(), 'Gia', 'IT', 'lesson', 3000, 'card', 'Facture'),
         ], $this->queries->revenueBook(2026));
         self::assertCount(1, $this->queries->revenueBook(2025));
         self::assertCount(1, $this->queries->revenueBook(2027));
@@ -81,6 +88,75 @@ final class SalesQueriesTest extends KernelTestCase
             new CountryTotal('US', 'lesson', 4000, 1),
         ], 3000, 10000), $this->queries->totals(2026));
         self::assertEquals(new Totals([], 0, 0), $this->queries->totals(2024));
+    }
+
+    public function testTheRevenueBookSubtractsEachCreditNoteOnItsIssueDate(): void
+    {
+        $withdrawn = $this->sold(SalesExamples::lesson(4500, 'online'), SalesExamples::customer('DE', name: 'Max'), '2026-03-01 10:00:00 UTC', '2026-0003', withdrawnAt: '2026-03-02 10:00:00 UTC');
+        $lastYear = $this->sold(SalesExamples::production(12000), SalesExamples::customer('FR', name: 'Léa'), '2025-12-20 10:00:00 UTC', '2025-0009');
+        $this->credit($withdrawn, '2026-0004', 4500, '2026-03-05 10:00:00 UTC');
+        $this->credit($lastYear, '2026-0001', 3000, '2026-01-10 10:00:00 UTC');
+
+        self::assertEquals([
+            new RevenueLine(new \DateTimeImmutable('2026-01-10 11:00:00', new \DateTimeZone('Europe/Paris')), '2026-0001', $lastYear->reference(), 'Léa', 'FR', 'production', -3000, 'card', 'Avoir'),
+            new RevenueLine(new \DateTimeImmutable('2026-03-01 11:00:00', new \DateTimeZone('Europe/Paris')), '2026-0003', $withdrawn->reference(), 'Max', 'DE', 'lesson', 4500, 'card', 'Facture'),
+            new RevenueLine(new \DateTimeImmutable('2026-03-05 11:00:00', new \DateTimeZone('Europe/Paris')), '2026-0004', $withdrawn->reference(), 'Max', 'DE', 'lesson', -4500, 'card', 'Avoir'),
+        ], $this->queries->revenueBook(2026));
+        self::assertEquals([
+            new RevenueLine(new \DateTimeImmutable('2025-12-20 11:00:00', new \DateTimeZone('Europe/Paris')), '2025-0009', $lastYear->reference(), 'Léa', 'FR', 'production', 12000, 'card', 'Facture'),
+        ], $this->queries->revenueBook(2025));
+    }
+
+    public function testTheTotalsAreNetOfTheCreditNotesOfTheYear(): void
+    {
+        $online = $this->sold(SalesExamples::lesson(4500, 'online'), SalesExamples::customer('DE'), '2026-03-01 10:00:00 UTC', '2026-0001');
+        $this->sold(SalesExamples::lesson(5500, 'online'), SalesExamples::customer('DE'), '2026-03-02 10:00:00 UTC', '2026-0002');
+        $beat = $this->sold(SalesExamples::beat(3000), SalesExamples::customer('ES'), '2026-03-03 10:00:00 UTC', '2026-0003');
+        $lastYear = $this->sold(SalesExamples::production(12000), SalesExamples::customer('FR'), '2025-12-20 10:00:00 UTC', '2025-0009');
+        $this->credit($online, '2026-0004', 1500, '2026-03-05 10:00:00 UTC');
+        $this->credit($beat, '2026-0005', 3000, '2026-03-06 10:00:00 UTC');
+        $this->credit($lastYear, '2026-0006', 2000, '2026-01-10 10:00:00 UTC');
+        $this->credit($online, '2027-0001', 1000, '2027-01-10 10:00:00 UTC');
+
+        self::assertEquals(new Totals([
+            new CountryTotal('DE', 'lesson', 8500, 2),
+            new CountryTotal('ES', 'beat', 0, 1),
+            new CountryTotal('FR', 'production', -2000, 0),
+        ], 0, 8500), $this->queries->totals(2026));
+        self::assertEquals(new Totals([new CountryTotal('DE', 'lesson', -1000, 0)], 0, -1000), $this->queries->totals(2027));
+    }
+
+    public function testTheOrderShowsItsRefundsWithdrawalAndCreditNotes(): void
+    {
+        $order = $this->sold(SalesExamples::lesson(4500), SalesExamples::customer('FR'), '2026-03-01 10:00:00 UTC', '2026-0001', withdrawnAt: '2026-03-02 10:00:00 UTC');
+        $request = WithdrawalRequest::receive($order, 'stripe@example.test', 'Test Buyer', 'Changed my mind', 'en', new \DateTimeImmutable('2026-03-02 10:00:00 UTC'));
+        new DoctrineWithdrawalRequestRepository($this->entityManager)->add($request);
+        $note = $this->credit($order, '2026-0002', 1500, '2026-03-05 10:00:00 UTC');
+        $this->credit($order, '2026-0003', 3000, '2026-03-06 10:00:00 UTC');
+
+        $view = $this->queries->order($order->id()->toBase32());
+        $creditNote = $this->queries->creditNote($note->id()->toBase32());
+
+        self::assertNotNull($view);
+        self::assertSame([4500, 'refunded'], [$view->refundedCents, $view->status]);
+        self::assertSame(new \DateTimeImmutable('2026-03-02 10:00:00 UTC')->getTimestamp(), $view->withdrawnAt?->getTimestamp());
+        self::assertSame('2026-03-16', $view->withdrawalLastDay?->format('Y-m-d'));
+        self::assertSame([$request->id()->toBase32(), 'Test Buyer', 'Changed my mind', null], [$view->withdrawal?->id, $view->withdrawal?->name, $view->withdrawal?->reason, $view->withdrawal?->acknowledgedAt]);
+        self::assertSame(['2026-0002', '2026-0003'], array_map(static fn ($note): string => $note->number, $view->creditNotes));
+        self::assertNotNull($creditNote);
+        self::assertSame([$note->id()->toBase32(), '2026-0002', '2026-0001', $order->id()->toBase32(), $order->reference(), 1500, 're_2026-0002', null], [$creditNote->id, $creditNote->number, $creditNote->invoiceNumber, $creditNote->orderId, $creditNote->orderReference, $creditNote->amount->cents, $creditNote->stripeRefundId, $creditNote->reason]);
+        self::assertNull($this->queries->creditNote((string) new Ulid()));
+        self::assertNull($this->queries->creditNote('nope'));
+    }
+
+    public function testTheOrderListLeavesTheWithdrawalAndCreditNotesOut(): void
+    {
+        $order = $this->sold(SalesExamples::lesson(4500), SalesExamples::customer('FR'), '2026-03-01 10:00:00 UTC', '2026-0001');
+        $this->credit($order, '2026-0002', 1500, '2026-03-05 10:00:00 UTC');
+
+        $listed = $this->queries->orders()[0];
+
+        self::assertSame([1500, null, []], [$listed->refundedCents, $listed->withdrawal, $listed->creditNotes]);
     }
 
     public function testTheOrdersAreListedWithTheirDetails(): void
@@ -129,14 +205,29 @@ final class SalesQueriesTest extends KernelTestCase
         self::assertNull($this->queries->invoice('nope'));
     }
 
-    private function sold(Purchasable $product, Customer $customer, string $paidAt, string $invoiceNumber, bool $refund = false): Order
+    private function credit(Order $order, string $number, int $cents, string $issuedAt): CreditNote
+    {
+        new DoctrineOrderRepository($this->entityManager)->get($order->id())->refund($cents);
+        $note = CreditNote::issue($number, $this->issued[$order->reference()], $cents, 're_'.$number, null, new \DateTimeImmutable($issuedAt));
+        new DoctrineCreditNoteRepository($this->entityManager)->add($note);
+        $this->entityManager->flush();
+        $this->entityManager->clear();
+
+        return $note;
+    }
+
+    private function sold(Purchasable $product, Customer $customer, string $paidAt, string $invoiceNumber, bool $refund = false, ?string $withdrawnAt = null): Order
     {
         $order = SalesExamples::order($product, new \DateTimeImmutable($paidAt)->modify('-10 minutes')->format('Y-m-d H:i:s e'));
         $order->attachSession('cs_'.$order->reference());
         $order->pay(SalesExamples::payment($order, $customer, $paidAt));
         $order->invoiced($invoiceNumber);
+        $this->issued[$order->reference()] = Invoice::issue($invoiceNumber, $order, Seller::of(LegalIdentity::blank()), VatMentions::defaults(), new \DateTimeImmutable($paidAt));
+        if (null !== $withdrawnAt) {
+            $order->withdraw(new \DateTimeImmutable($withdrawnAt));
+        }
         if ($refund) {
-            $order->refund();
+            $order->refund($order->price()->cents);
         }
         $this->store($order);
 

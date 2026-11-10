@@ -5,6 +5,8 @@ framework:
                 adapter: cache.adapter.filesystem
             cache.checkout_limiter:
                 adapter: cache.adapter.filesystem
+            cache.withdrawal_limiter:
+                adapter: cache.adapter.filesystem
     rate_limiter:
         contact:
             policy: sliding_window
@@ -29,4 +31,10 @@ framework:
             limit: 10
             interval: '10 minutes'
             cache_pool: cache.checkout_limiter
+            lock_factory: lock.factory
+        withdrawal:
+            policy: sliding_window
+            limit: 5
+            interval: '10 minutes'
+            cache_pool: cache.withdrawal_limiter
             lock_factory: lock.factory

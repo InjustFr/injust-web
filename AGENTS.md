@@ -14,6 +14,8 @@ The stack is decided: Doctrine ORM with PostgreSQL, server-rendered Twig for the
 public site plus a JSON API for the Vue admin, SecurityBundle with the mossyleaf
 accounts OIDC authenticator. Don't ask about these.
 
+The M5 section of `CLAUDE.md` describes the withdrawal page, refunds and credit notes (the `charge.refunded` webhook is the only place credit notes are issued).
+
 ## Adding features: Flex, not hand-wiring
 
 Install new capabilities with `composer require <package>` (e.g. `symfony/lock`,

@@ -88,7 +88,9 @@
             "mediatorUrl": "Mediator website",
             "hostName": "Host",
             "hostAddress": "Host address",
-            "hostPhone": "Host phone"
+            "hostPhone": "Host phone",
+            "vatNumber": "VAT number (optional)",
+            "vatNumberInvalid": "Enter a valid EU VAT number, like FR12345678901."
         },
         "general": {
             "title": "General",
@@ -366,7 +368,8 @@
             "paid": "Paid",
             "expired": "Expired",
             "withdrawn": "Withdrawn",
-            "refunded": "Refunded"
+            "refunded": "Refunded",
+            "partiallyRefunded": "Partially refunded"
         },
         "types": {
             "lesson": "Lesson",
@@ -393,21 +396,37 @@
             "vatId": "VAT ID",
             "cardCountry": "Card country",
             "none": "Not provided",
-            "cgvVersion": "Terms of sale version",
+            "cgvVersion": "Terms of sale version: {version}",
             "consents": "Consents",
             "acceptedAt": "accepted on {date}",
             "invoice": "Invoice",
             "invoiceNumber": "Invoice {number}",
             "openInvoice": "Open invoice",
             "noInvoice": "No invoice yet.",
-            "confirmation": "Confirmation email",
+            "confirmation": "Confirmation email: {status}",
             "sentAt": "Sent on {date}",
             "notSent": "Not sent",
             "resend": "Resend confirmation",
             "resendMessage": "The confirmation email with the invoice and the terms of sale will be sent again to the customer.",
             "resendAction": "Resend",
             "resent": "Confirmation sent.",
-            "format": "Format: {format}"
+            "format": "Format: {format}",
+            "refunded": "Refunded: {amount} of {total}",
+            "withdrawal": "Withdrawal",
+            "withdrawalReceived": "Received on {date}",
+            "withdrawalName": "Name: {name}",
+            "withdrawalReason": "Reason: {reason}",
+            "withdrawalAcknowledged": "Acknowledgement sent on {date}",
+            "withdrawalNotAcknowledged": "Acknowledgement not sent",
+            "resendAcknowledgement": "Resend acknowledgement",
+            "resendAcknowledgementMessage": "The acknowledgement of the withdrawal will be sent again to the customer.",
+            "resendAcknowledgementAction": "Resend",
+            "acknowledgementResent": "Acknowledgement sent.",
+            "creditNotes": "Credit notes",
+            "creditNote": "Credit note {number}",
+            "creditNoteDetail": "{amount} on {date}",
+            "noCreditNotes": "No credit note.",
+            "withdrawalDeadline": "Withdrawal possible until {date}"
         },
         "totals": {
             "title": "Revenue {year}",
@@ -425,6 +444,26 @@
             "progress": "{amount} of {threshold}",
             "warning": "Close to the threshold.",
             "crossed": "Threshold crossed."
+        },
+        "refund": {
+            "button": "Refund",
+            "title": "Refund this order",
+            "remaining": "Remaining to refund: {amount}",
+            "info": "The money goes back to the customer through Stripe. The credit note is created and emailed automatically once Stripe confirms the refund.",
+            "proRata": "Pro-rata helper",
+            "modeNone": "No helper",
+            "modeSessions": "Sessions given",
+            "modePercent": "Percentage",
+            "done": "Sessions given",
+            "total": "Total sessions",
+            "percent": "Percentage refunded",
+            "suggest": "Suggested amount: {amount}",
+            "use": "Use this amount",
+            "amount": "Amount (EUR)",
+            "reason": "Reason",
+            "invalid": "Enter an amount above 0 and up to {amount}.",
+            "submit": "Refund {amount}",
+            "requested": "Refund requested. The credit note will appear once Stripe confirms."
         }
     },
     "links": {

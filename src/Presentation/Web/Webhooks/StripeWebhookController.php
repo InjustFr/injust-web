@@ -8,9 +8,10 @@ use App\Application\Sales\ConfirmPayment\ConfirmPayment;
 use App\Application\Sales\ConfirmPayment\ConfirmPaymentHandler;
 use App\Application\Sales\ExpireCheckout\ExpireCheckout;
 use App\Application\Sales\ExpireCheckout\ExpireCheckoutHandler;
-use App\Application\Sales\RefundPayment\RefundPayment;
-use App\Application\Sales\RefundPayment\RefundPaymentHandler;
+use App\Application\Sales\RecordRefund\RecordRefund;
+use App\Application\Sales\RecordRefund\RecordRefundHandler;
 use App\Domain\Sales\Exception\OrderNotFound;
+use App\Domain\Sales\Exception\RefundBeforePayment;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Attribute\AsController;
@@ -21,13 +22,13 @@ use Symfony\Component\Routing\Attribute\Route;
 final readonly class StripeWebhookController
 {
     private const array PAID = ['checkout.session.completed', 'checkout.session.async_payment_succeeded'];
-    private const string REFUNDED = 'charge.refunded';
+    private const array REFUNDED = ['charge.refunded', 'charge.refund.updated'];
 
     public function __construct(
         private StripeSignature $signature,
         private ConfirmPaymentHandler $confirmPayment,
         private ExpireCheckoutHandler $expireCheckout,
-        private RefundPaymentHandler $refundPayment,
+        private RecordRefundHandler $recordRefund,
     ) {
     }
 
@@ -41,8 +42,8 @@ final readonly class StripeWebhookController
 
         try {
             $this->handle($event);
-        } catch (OrderNotFound) {
-            return new Response('', self::REFUNDED === $event->type ? Response::HTTP_SERVICE_UNAVAILABLE : Response::HTTP_OK);
+        } catch (OrderNotFound|RefundBeforePayment) {
+            return new Response('', \in_array($event->type, self::REFUNDED, true) ? Response::HTTP_SERVICE_UNAVAILABLE : Response::HTTP_OK);
         }
 
         return new Response();
@@ -54,8 +55,8 @@ final readonly class StripeWebhookController
             ($this->confirmPayment)(new ConfirmPayment($event->text('id')));
         } elseif ('checkout.session.expired' === $event->type) {
             ($this->expireCheckout)(new ExpireCheckout($event->text('id')));
-        } elseif (self::REFUNDED === $event->type && $event->flag('refunded')) {
-            ($this->refundPayment)(new RefundPayment($event->text('payment_intent')));
+        } elseif (\in_array($event->type, self::REFUNDED, true)) {
+            ($this->recordRefund)(new RecordRefund($event->text('payment_intent')));
         }
     }
 }

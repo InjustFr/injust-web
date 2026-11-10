@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tests\Functional\Infrastructure\Mail\Sales;
 
+use App\Application\Sales\CreditNoteView;
 use App\Application\Sales\InvoiceView;
 use App\Application\Sales\SalesDocuments;
 use App\Application\Settings\LegalDocumentView;
@@ -51,6 +52,7 @@ final class SymfonySalesMailsTest extends KernelTestCase
                 'Je vous contacte par e-mail sous 2 jours ouvrés',
                 'jusqu’au 24/11/2026',
                 'proportionnel au service déjà fourni',
+                'http://localhost/fr/withdrawal',
                 'hello@injust.test',
                 'Médiateur Test',
                 'https://mediator.test',
@@ -78,9 +80,21 @@ final class SymfonySalesMailsTest extends KernelTestCase
             self::assertStringContainsString('https://cal.example.test/injust', $body);
             self::assertStringNotContainsString('2 working days', $body);
             self::assertStringContainsString('until 2026-11-24', $body);
+            self::assertStringContainsString('http://localhost/withdrawal', $body);
         }
         self::assertSame('CGV-3.pdf', $email->getAttachments()[1]->getFilename());
         self::assertSame('cgv-production v3 en Terms v3 2026-11-01', $email->getAttachments()[1]->getBody());
+    }
+
+    public function testABeatConfirmationConfirmsTheWaiverInsteadOfOfferingAWithdrawal(): void
+    {
+        self::send(SalesExamples::paid(SalesExamples::beat()), DocumentExamples::settings());
+
+        foreach ([self::text(self::sent()->getHtmlBody()), self::text(self::sent()->getTextBody())] as $body) {
+            self::assertStringContainsString('Vous avez expressément accepté que le contenu numérique soit fourni dès le paiement et reconnu renoncer ainsi à votre droit de rétractation', $body);
+            self::assertStringNotContainsString('/withdrawal', $body);
+            self::assertStringNotContainsString('14 jours', $body);
+        }
     }
 
     public function testWithoutAContactAddressTheSellerAddressReceivesTheReplies(): void
@@ -143,6 +157,11 @@ final class SymfonySalesMailsTest extends KernelTestCase
                 return 'invoice '.$invoice->number;
             }
 
+            public function creditNotePdf(CreditNoteView $creditNote): string
+            {
+                return 'credit note '.$creditNote->number;
+            }
+
             public function legalPdf(LegalDocumentView $document, string $locale): string
             {
                 return $document->kind->value.' v'.$document->version.' '.$locale.' '.$document->body->in($locale).' '.$document->updatedAt->format('Y-m-d');
@@ -150,7 +169,7 @@ final class SymfonySalesMailsTest extends KernelTestCase
         };
         $cgv = [DocumentExamples::document(LegalKind::CgvLessons, edits: 1), DocumentExamples::document(LegalKind::CgvProduction, edits: 1)];
 
-        return new SymfonySalesMails($mailer, self::getContainer()->get('translator'), DocumentExamples::queries($settings, $cgv), $documents, 'Injust <noreply@injust.test>');
+        return new SymfonySalesMails($mailer, self::getContainer()->get('translator'), DocumentExamples::queries($settings, $cgv), $documents, 'Injust <noreply@injust.test>', 'en');
     }
 
     private static function sent(): Email

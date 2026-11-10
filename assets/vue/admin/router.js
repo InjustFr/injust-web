@@ -21,7 +21,7 @@ export const router = createRouter({
         { path: '/links', name: 'links', component: LinksPage },
         { path: '/seo', name: 'seo', component: SeoPage },
         { path: '/messages', name: 'messages', component: MessagesPage },
-        { path: '/orders', name: 'orders', component: OrdersPage },
+        { path: '/orders', name: 'orders', component: OrdersPage, meta: { wide: true } },
         { path: '/settings', name: 'settings', component: SettingsPage },
         { path: '/legal', name: 'legal', component: LegalPage },
         { path: '/:path(.*)*', name: 'not-found', component: NotFoundPage },

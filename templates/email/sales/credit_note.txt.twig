@@ -1,0 +1,13 @@
+{{ 'sales.confirmation.greeting'|trans({}, 'emails') }}
+
+{{ 'sales.credit_note.refunded'|trans({amount: creditNote.amount.cents / 100, reference: order.reference}, 'emails') }}
+{{ 'sales.credit_note.delay'|trans({}, 'emails') }}
+{% if creditNote.reason %}
+
+{{ 'sales.credit_note.reason'|trans({reason: creditNote.reason}, 'emails') }}
+{% endif %}
+
+{{ 'sales.credit_note.attachment'|trans({number: creditNote.number, invoice: creditNote.invoiceNumber}, 'emails') }}
+
+--
+{{ 'sales.confirmation.signature'|trans({}, 'emails') }}

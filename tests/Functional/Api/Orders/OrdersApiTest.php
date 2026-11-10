@@ -4,19 +4,26 @@ declare(strict_types=1);
 
 namespace App\Tests\Functional\Api\Orders;
 
+use App\Application\Sales\CreditNoteView;
 use App\Application\Sales\InvoiceView;
+use App\Application\Sales\PaymentGateway;
 use App\Application\Sales\SalesDocuments;
 use App\Application\Sales\SalesMails;
 use App\Application\Settings\LegalDocumentView;
+use App\Domain\Sales\CreditNote;
 use App\Domain\Sales\Invoice;
 use App\Domain\Sales\Order;
 use App\Domain\Sales\Purchasable;
 use App\Domain\Sales\Seller;
+use App\Domain\Sales\WithdrawalRequest;
 use App\Domain\Settings\LegalIdentity;
 use App\Domain\Settings\VatMentions;
+use App\Infrastructure\Persistence\Doctrine\Sales\DoctrineCreditNoteRepository;
 use App\Infrastructure\Persistence\Doctrine\Sales\DoctrineInvoiceRepository;
 use App\Infrastructure\Persistence\Doctrine\Sales\DoctrineOrderRepository;
+use App\Infrastructure\Persistence\Doctrine\Sales\DoctrineWithdrawalRequestRepository;
 use App\Tests\Support\Json;
+use App\Tests\Support\Sales\FakePaymentGateway;
 use App\Tests\Support\Sales\RecordingSalesMails;
 use App\Tests\Support\Sales\SalesExamples;
 use App\Tests\Support\SignsInClient;
@@ -79,6 +86,11 @@ final class OrdersApiTest extends WebTestCase
             public function invoicePdf(InvoiceView $invoice): string
             {
                 return '%PDF '.$invoice->number;
+            }
+
+            public function creditNotePdf(CreditNoteView $creditNote): string
+            {
+                return '%PDF '.$creditNote->number;
             }
 
             public function legalPdf(LegalDocumentView $document, string $locale): string
@@ -157,9 +169,193 @@ final class OrdersApiTest extends WebTestCase
         self::assertStringStartsWith("\xEF\xBB\xBF", $content);
         $rows = array_map(static fn (string $line): array => str_getcsv($line, ';', escape: ''), explode("\r\n", trim(substr($content, 3))));
         self::assertCount(2, $rows);
-        self::assertSame(['date', 'invoice', 'reference', 'customer', 'country', 'type', 'amount', 'payment'], $rows[0]);
+        self::assertSame(['date', 'invoice', 'reference', 'customer', 'country', 'type', 'amount', 'payment', 'kind'], $rows[0]);
         self::assertSame(['2026-06-01', '2026-0001'], \array_slice($rows[1], 0, 2));
-        self::assertSame(["'=HYPERLINK(\"x\")", 'FR', 'lesson', '45,00', 'card'], \array_slice($rows[1], 3));
+        self::assertSame(["'=HYPERLINK(\"x\")", 'FR', 'lesson', '45,00', 'card'], \array_slice($rows[1], 3, 5));
+    }
+
+    public function testTheOrderDetailExposesTheRefundsTheWithdrawalAndTheCreditNotes(): void
+    {
+        $client = self::signedInClient();
+        $order = self::sell(SalesExamples::lesson(4500), '2026-06-01 10:00:00', 'cs_a', '2026-0001');
+        $note = self::credit($order, '2026-0002', 1500, 're_1', 'Pro rata');
+        $request = self::withdraw($order);
+        $request->acknowledged(new \DateTimeImmutable('2026-06-02 09:01:00'));
+        self::flush();
+
+        $body = self::get($client, '/api/admin/orders/'.$order->id()->toBase32());
+
+        self::assertSame(0, Json::at($body, 'refundedCents'));
+        self::assertSame('Rick', Json::at($body, 'withdrawal', 'name'));
+        self::assertSame('Too late', Json::at($body, 'withdrawal', 'reason'));
+        self::assertSame('2026-06-02T09:00:00+00:00', Json::at($body, 'withdrawal', 'receivedAt'));
+        self::assertSame('2026-06-02T09:01:00+00:00', Json::at($body, 'withdrawal', 'acknowledgedAt'));
+        self::assertSame([['id' => $note->id()->toBase32(), 'number' => '2026-0002', 'amountCents' => 1500, 'issuedAt' => '2026-06-02T10:00:00+00:00', 'reason' => 'Pro rata']], Json::at($body, 'creditNotes'));
+    }
+
+    public function testAnOrderWithoutWithdrawalOrRefundHasNoneOfThem(): void
+    {
+        $client = self::signedInClient();
+        $order = self::sell(SalesExamples::lesson(), '2026-06-01 10:00:00', 'cs_a', '2026-0001');
+
+        $body = self::get($client, '/api/admin/orders/'.$order->id()->toBase32());
+
+        self::assertNull(Json::at($body, 'withdrawal'));
+        self::assertSame([], Json::at($body, 'creditNotes'));
+    }
+
+    public function testARefundIsRequestedFromStripeWithoutCreatingTheCreditNote(): void
+    {
+        $client = self::signedInClient();
+        $order = self::sell(SalesExamples::lesson(4500), '2026-06-01 10:00:00', 'cs_a', '2026-0001');
+        $gateway = new FakePaymentGateway();
+        self::getContainer()->set(PaymentGateway::class, $gateway);
+
+        $client->jsonRequest('POST', '/api/admin/orders/'.$order->id()->toBase32().'/refunds', ['amountCents' => 1500, 'reason' => 'Pro rata']);
+
+        self::assertResponseStatusCodeSame(202);
+        self::assertSame(['refundId' => 're_1'], Json::decode((string) $client->getResponse()->getContent()));
+        self::assertSame(1500, $gateway->refundRequests[0][1]);
+        self::assertSame('Pro rata', $gateway->refundRequests[0][3]);
+        self::assertSame([], Json::at(self::get($client, '/api/admin/orders/'.$order->id()->toBase32()), 'creditNotes'));
+    }
+
+    public function testARefundAboveWhatRemainsIsRefused(): void
+    {
+        $client = self::signedInClient();
+        $order = self::sell(SalesExamples::lesson(4500), '2026-06-01 10:00:00', 'cs_a', '2026-0001');
+        self::getContainer()->set(PaymentGateway::class, new FakePaymentGateway());
+
+        $client->jsonRequest('POST', '/api/admin/orders/'.$order->id()->toBase32().'/refunds', ['amountCents' => 4501, 'reason' => '']);
+
+        self::assertResponseStatusCodeSame(422);
+    }
+
+    public function testAMalformedRefundIsRefused(): void
+    {
+        $client = self::signedInClient();
+        $order = self::sell(SalesExamples::lesson(4500), '2026-06-01 10:00:00', 'cs_a', '2026-0001');
+
+        $client->jsonRequest('POST', '/api/admin/orders/'.$order->id()->toBase32().'/refunds', ['amountCents' => 'x']);
+
+        self::assertResponseStatusCodeSame(422);
+    }
+
+    public function testACreditNoteIsServedInlineAsPdf(): void
+    {
+        $client = self::signedInClient();
+        $order = self::sell(SalesExamples::lesson(4500), '2026-06-01 10:00:00', 'cs_a', '2026-0001');
+        $note = self::credit($order, '2026-0002', 1500, 're_1', null);
+        self::flush();
+        self::getContainer()->set(SalesDocuments::class, self::pdfs());
+
+        $client->request('GET', '/api/admin/orders/'.$order->id()->toBase32().'/credit-notes/'.$note->id()->toBase32());
+
+        self::assertResponseIsSuccessful();
+        self::assertSame('%PDF 2026-0002', $client->getResponse()->getContent());
+        self::assertResponseHeaderSame('Content-Type', 'application/pdf');
+        self::assertStringContainsString('inline', (string) $client->getResponse()->headers->get('Content-Disposition'));
+        self::assertStringContainsString('credit-note-2026-0002.pdf', (string) $client->getResponse()->headers->get('Content-Disposition'));
+    }
+
+    public function testACreditNoteOfAnotherOrderIsNotFound(): void
+    {
+        $client = self::signedInClient();
+        $order = self::sell(SalesExamples::lesson(4500), '2026-06-01 10:00:00', 'cs_a', '2026-0001');
+        $other = self::sell(SalesExamples::production(), '2026-06-01 11:00:00', 'cs_b', '2026-0002');
+        $note = self::credit($order, '2026-0003', 1500, 're_1', null);
+        self::flush();
+        self::getContainer()->set(SalesDocuments::class, self::pdfs());
+
+        $client->request('GET', '/api/admin/orders/'.$other->id()->toBase32().'/credit-notes/'.$note->id()->toBase32());
+        self::assertResponseStatusCodeSame(404);
+        $client->request('GET', '/api/admin/orders/'.$order->id()->toBase32().'/credit-notes/'.new Ulid()->toBase32());
+        self::assertResponseStatusCodeSame(404);
+    }
+
+    public function testTheWithdrawalAcknowledgementIsSentAgain(): void
+    {
+        $client = self::signedInClient();
+        $order = self::sell(SalesExamples::lesson(), '2026-06-01 10:00:00', 'cs_a', '2026-0001');
+        self::withdraw($order);
+        self::flush();
+        self::getContainer()->set(SalesMails::class, new RecordingSalesMails());
+
+        $client->jsonRequest('POST', '/api/admin/orders/'.$order->id()->toBase32().'/withdrawal/resend');
+
+        self::assertResponseIsSuccessful();
+        self::assertNotNull(Json::at(Json::decode((string) $client->getResponse()->getContent()), 'withdrawal', 'acknowledgedAt'));
+    }
+
+    public function testNothingIsResentWithoutAWithdrawal(): void
+    {
+        $client = self::signedInClient();
+        $order = self::sell(SalesExamples::lesson(), '2026-06-01 10:00:00', 'cs_a', '2026-0001');
+        self::getContainer()->set(SalesMails::class, new RecordingSalesMails());
+
+        $client->jsonRequest('POST', '/api/admin/orders/'.$order->id()->toBase32().'/withdrawal/resend');
+
+        self::assertResponseStatusCodeSame(404);
+    }
+
+    public function testTheRevenueBookExportAddsTheLineKind(): void
+    {
+        $client = self::signedInClient();
+        $order = self::sell(SalesExamples::lesson(4500), '2026-06-01 10:00:00', 'cs_a', '2026-0001');
+        self::credit($order, '2026-0002', 1500, 're_1', null);
+        self::flush();
+
+        $client->request('GET', '/api/admin/orders/export?year=2026');
+
+        $rows = array_map(static fn (string $line): array => str_getcsv($line, ';', escape: ''), explode("\r\n", trim(substr((string) $client->getResponse()->getContent(), 3))));
+        self::assertSame('kind', $rows[0][8]);
+        self::assertSame(['Facture', 'Avoir'], [$rows[1][8], $rows[2][8]]);
+        self::assertSame('-15,00', $rows[2][6]);
+    }
+
+    private static function pdfs(): SalesDocuments
+    {
+        return new class implements SalesDocuments {
+            public function invoicePdf(InvoiceView $invoice): string
+            {
+                return '';
+            }
+
+            public function creditNotePdf(CreditNoteView $creditNote): string
+            {
+                return '%PDF '.$creditNote->number;
+            }
+
+            public function legalPdf(LegalDocumentView $document, string $locale): string
+            {
+                return '';
+            }
+        };
+    }
+
+    private static function credit(Order $order, string $number, int $cents, string $refundId, ?string $reason): CreditNote
+    {
+        $manager = self::getContainer()->get(EntityManagerInterface::class);
+        $invoice = $manager->getRepository(Invoice::class)->findOneBy(['orderId' => $order->id()]);
+        \assert($invoice instanceof Invoice);
+        $note = CreditNote::issue($number, $invoice, $cents, $refundId, $reason, new \DateTimeImmutable('2026-06-02 10:00:00'));
+        new DoctrineCreditNoteRepository($manager)->add($note);
+
+        return $note;
+    }
+
+    private static function withdraw(Order $order): WithdrawalRequest
+    {
+        $manager = self::getContainer()->get(EntityManagerInterface::class);
+        $request = WithdrawalRequest::receive($order, 'buyer@example.test', 'Rick', 'Too late', 'en', new \DateTimeImmutable('2026-06-02 09:00:00'));
+        new DoctrineWithdrawalRequestRepository($manager)->add($request);
+
+        return $request;
+    }
+
+    private static function flush(): void
+    {
+        self::getContainer()->get(EntityManagerInterface::class)->flush();
     }
 
     public function testTheTotalsAreReturnedForTheYear(): void

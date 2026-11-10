@@ -23,7 +23,7 @@ final class ExportRevenueBookController extends AbstractController
         $file = fopen('php://temp', 'r+');
         \assert(false !== $file);
         fwrite($file, "\xEF\xBB\xBF");
-        self::put($file, ['date', 'invoice', 'reference', 'customer', 'country', 'type', 'amount', 'payment']);
+        self::put($file, ['date', 'invoice', 'reference', 'customer', 'country', 'type', 'amount', 'payment', 'kind']);
         foreach ($queries->revenueBook($year) as $line) {
             self::put($file, self::row($line));
         }
@@ -56,6 +56,7 @@ final class ExportRevenueBookController extends AbstractController
             $line->productType,
             number_format($line->amountCents / 100, 2, ',', ''),
             $line->paymentMethod,
+            $line->label,
         ];
     }
 }

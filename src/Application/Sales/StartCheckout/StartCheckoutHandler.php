@@ -10,6 +10,7 @@ use App\Application\Sales\CheckoutSession;
 use App\Application\Sales\CheckoutUrls;
 use App\Application\Sales\ConsentTexts;
 use App\Application\Sales\PaymentGateway;
+use App\Application\Settings\LegalDocumentHtml;
 use App\Application\Settings\SettingsQueries;
 use App\Application\Transaction;
 use App\Domain\Sales\Consent;
@@ -22,7 +23,9 @@ use App\Domain\Sales\Order;
 use App\Domain\Sales\OrderRepository;
 use App\Domain\Sales\Purchasable;
 use App\Domain\Sales\Terms;
+use App\Domain\Shared\LocalizedText;
 use Psr\Clock\ClockInterface;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 final readonly class StartCheckoutHandler
 {
@@ -35,6 +38,9 @@ final readonly class StartCheckoutHandler
         private PaymentGateway $gateway,
         private ClockInterface $clock,
         private Transaction $transaction,
+        private LegalDocumentHtml $legal,
+        #[Autowire(env: 'DEFAULT_URI')]
+        private string $siteUrl,
     ) {
     }
 
@@ -74,7 +80,9 @@ final readonly class StartCheckoutHandler
             throw new TermsChanged();
         }
 
-        return new Terms($cgv->version, $cgv->body, $cgv->updatedAt);
+        $settings = $this->settings->current();
+
+        return new Terms($cgv->version, new LocalizedText($this->legal->fill($cgv, $settings, 'fr', $this->siteUrl), $this->legal->fill($cgv, $settings, 'en', $this->siteUrl)), $cgv->updatedAt);
     }
 
     /** @return list<Consent> */

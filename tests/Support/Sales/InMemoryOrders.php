@@ -51,6 +51,25 @@ final class InMemoryOrders implements OrderRepository
         return array_find($this->orders, static fn (Order $order): bool => $order->paymentIntentId() === $paymentIntentId);
     }
 
+    public function lockByPaymentIntent(string $paymentIntentId): ?Order
+    {
+        $this->journal->write('lock order '.$paymentIntentId);
+
+        return $this->byPaymentIntent($paymentIntentId);
+    }
+
+    public function byReference(string $reference): ?Order
+    {
+        return array_find($this->orders, static fn (Order $order): bool => $order->reference() === $reference);
+    }
+
+    public function lockByReference(string $reference): ?Order
+    {
+        $this->journal->write('lock order '.$reference);
+
+        return $this->byReference($reference);
+    }
+
     public function newestFirst(?OrderStatus $status, ?int $year): array
     {
         throw new \LogicException('Covered by the Doctrine repository tests.');

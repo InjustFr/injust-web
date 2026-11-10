@@ -1,0 +1,25 @@
+{% set dateFormat = 'sales.date_format'|trans({}, 'emails') %}
+<!doctype html>
+<html lang="{{ withdrawal.locale }}">
+<head><meta charset="utf-8"></head>
+<body style="font-family: sans-serif; font-size: 15px; line-height: 1.5; color: #111; background: #fff;">
+<p>{{ withdrawal.name ? 'sales.withdrawal_acknowledgement.greeting_name'|trans({name: withdrawal.name}, 'emails') : 'sales.withdrawal_acknowledgement.greeting'|trans({}, 'emails') }}</p>
+<p><strong>{{ 'sales.withdrawal_acknowledgement.received'|trans({date: withdrawal.receivedAt|date(dateFormat, 'Europe/Paris'), time: withdrawal.receivedAt|date('H:i', 'Europe/Paris')}, 'emails') }}</strong></p>
+<p>{{ 'sales.withdrawal_acknowledgement.order'|trans({}, 'emails') }}</p>
+<ul>
+    <li>{{ 'sales.confirmation.reference'|trans({reference: order.reference}, 'emails') }}</li>
+    <li>{{ 'sales.confirmation.product'|trans({product: order.productLabel}, 'emails') }}</li>
+    <li>{{ 'sales.confirmation.price'|trans({amount: order.price.cents / 100}, 'emails') }}</li>
+    <li>{{ 'sales.withdrawal_acknowledgement.paid_on'|trans({date: order.paidAt|date(dateFormat, 'Europe/Paris')}, 'emails') }}</li>
+</ul>
+{% if withdrawal.reason %}
+<p>{{ 'sales.withdrawal_acknowledgement.message'|trans({reason: withdrawal.reason}, 'emails') }}</p>
+{% endif %}
+<p><strong>{{ 'sales.withdrawal_acknowledgement.next'|trans({}, 'emails') }}</strong><br>
+{{ 'sales.withdrawal_acknowledgement.refund'|trans({}, 'emails') }}
+{{ 'sales.withdrawal_acknowledgement.pro_rata'|trans({}, 'emails') }}
+{{ 'sales.withdrawal_acknowledgement.credit_note'|trans({}, 'emails') }}</p>
+<p>{{ 'sales.withdrawal_acknowledgement.keep'|trans({}, 'emails') }}</p>
+<p>-- <br>{{ 'sales.withdrawal_acknowledgement.signature'|trans({}, 'emails') }}</p>
+</body>
+</html>

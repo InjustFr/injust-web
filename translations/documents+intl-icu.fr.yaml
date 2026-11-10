@@ -16,6 +16,11 @@ invoice:
     category: 'Catégorie de l’opération : prestation de services'
     penalties: 'Pénalités de retard : trois fois le taux d’intérêt légal. Indemnité forfaitaire pour frais de recouvrement : 40 €.'
     discount: 'Escompte pour paiement anticipé : néant.'
+credit_note:
+    title: 'Avoir'
+    credits: 'Avoir sur la facture n° {number}'
+    refunded: 'Remboursement effectué le {date} par carte bancaire'
+    reason: 'Motif'
 legal:
     version: 'Version {version} – {date}'
     mentions: 'Mentions légales'

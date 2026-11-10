@@ -1,8 +1,10 @@
+import { EMAIL, failure, length } from './siteForms.js';
+
+export { failure };
+
 const SERVICE = ['terms', 'early-start', 'pro-rata'];
 
 const CONSENTS = { lesson: SERVICE, production: SERVICE, beat: ['terms', 'digital-waiver', 'licence'] };
-
-const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 const EMAIL_MAX = 180;
 
@@ -13,7 +15,7 @@ export function requiredConsents(productType) {
 export function validEmail(email) {
     const trimmed = email.trim();
 
-    return [...trimmed].length <= EMAIL_MAX && EMAIL.test(trimmed);
+    return length(trimmed) <= EMAIL_MAX && EMAIL.test(trimmed);
 }
 
 export function ready(form, productType) {
@@ -33,12 +35,3 @@ export function checkoutPayload(form, product) {
     };
 }
 
-export function failure(status, problem, labels) {
-    const violations = problem?.violations ?? [];
-    if (violations.length > 0) {
-        return { fields: Object.fromEntries(violations.map((violation) => [violation.propertyPath, violation.title])), message: labels.invalid };
-    }
-    const fallback = { 422: labels.invalid, 429: labels.tooMany }[status] ?? labels.error;
-
-    return { fields: {}, message: problem?.detail ?? fallback };
-}

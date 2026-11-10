@@ -1,0 +1,23 @@
+{% import 'pdf/_macros.html.twig' as doc %}
+<table class="parties">
+    <tr>
+        <td>
+            <h2>{{ doc.label('invoice.seller') }}</h2>
+            <p>{{ seller.name }} {{ seller.businessForm }}<br>
+            {{ seller.address|nl2br }}<br>
+            {{ 'invoice.siren'|trans({siren: seller.siren}, 'documents', 'fr') }}<br>
+            {% if seller.vatNumber %}{{ 'invoice.vat_id'|trans({vatId: seller.vatNumber}, 'documents', 'fr') }}<br>{% endif %}
+            {{ seller.email }}</p>
+        </td>
+        <td>
+            <h2>{{ doc.label('invoice.buyer') }}</h2>
+            <p>{% if buyer.company %}{{ buyer.company }}<br>{% endif %}
+            {{ buyer.name }}<br>
+            {{ buyer.line1 }}<br>
+            {% if buyer.line2 %}{{ buyer.line2 }}<br>{% endif %}
+            {{ buyer.postalCode }} {{ buyer.city }}{% if buyer.state %} {{ buyer.state }}{% endif %}<br>
+            {{ country }}
+            {% if buyer.vatId %}<br>{{ 'invoice.vat_id'|trans({vatId: buyer.vatId}, 'documents', 'fr') }}{% endif %}</p>
+        </td>
+    </tr>
+</table>

@@ -54,7 +54,7 @@ const unread = computed(() => open.value.filter((message) => !message.handled).l
                     </form>
                 </div>
             </header>
-            <main id="main" class="admin__main">
+            <main id="main" class="admin__main" :class="{ 'admin__main--wide': $route.meta.wide }">
                 <RouterView v-slot="{ Component }">
                     <Suspense><component :is="Component" /></Suspense>
                 </RouterView>
@@ -131,6 +131,8 @@ const unread = computed(() => open.value.filter((message) => !message.handled).l
     margin-inline: auto;
     padding: var(--space-6) var(--space-5) var(--space-7);
 }
+
+.admin__main--wide { max-width: 76rem; }
 
 @media (max-width: 40rem) {
     .admin__bar { padding-inline: var(--space-4); }

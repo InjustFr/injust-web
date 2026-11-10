@@ -7,6 +7,7 @@ namespace App\Infrastructure\Payments;
 use App\Application\Sales\CheckoutRequest;
 use App\Application\Sales\CheckoutSession;
 use App\Application\Sales\PaymentGateway;
+use App\Application\Sales\StripeRefund;
 use App\Domain\Sales\Customer;
 use App\Domain\Sales\PaymentDetails;
 use Psr\Clock\ClockInterface;
@@ -16,7 +17,9 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 final readonly class HttpStripeGateway implements PaymentGateway
 {
-    private const string API = 'https://api.stripe.com/v1/checkout/sessions';
+    private const string API = 'https://api.stripe.com/v1/';
+    private const string SESSIONS = self::API.'checkout/sessions';
+    private const string REFUNDS = self::API.'refunds';
     private const int SESSION_LIFETIME = 1860;
     private const float TIMEOUT = 10.0;
 
@@ -30,7 +33,7 @@ final readonly class HttpStripeGateway implements PaymentGateway
 
     public function startCheckout(CheckoutRequest $request): CheckoutSession
     {
-        $session = $this->call('POST', self::API, ['Idempotency-Key' => $request->orderId], [
+        $session = $this->call('POST', self::SESSIONS, ['Idempotency-Key' => $request->orderId], [
             'body' => [
                 'mode' => 'payment',
                 'payment_method_types' => ['card'],
@@ -52,7 +55,7 @@ final readonly class HttpStripeGateway implements PaymentGateway
 
     public function paymentDetails(string $sessionId): PaymentDetails
     {
-        $session = $this->call('GET', self::API.'/'.rawurlencode($sessionId), [], ['query' => ['expand' => ['payment_intent.latest_charge']]]);
+        $session = $this->call('GET', self::SESSIONS.'/'.rawurlencode($sessionId), [], ['query' => ['expand' => ['payment_intent.latest_charge']]]);
         if ('paid' !== $session->string('payment_status')) {
             throw new \UnexpectedValueException(\sprintf('Checkout session %s is not paid.', $sessionId));
         }
@@ -65,6 +68,29 @@ final readonly class HttpStripeGateway implements PaymentGateway
             self::customer($session),
             new \DateTimeImmutable('@'.$session->int('payment_intent.latest_charge.created')),
         );
+    }
+
+    public function refund(string $paymentIntentId, int $amountCents, string $idempotencyKey, ?string $reason): StripeRefund
+    {
+        return self::refundOf($this->call('POST', self::REFUNDS, ['Idempotency-Key' => $idempotencyKey], [
+            'body' => [
+                'payment_intent' => $paymentIntentId,
+                'amount' => $amountCents,
+                'reason' => 'requested_by_customer',
+            ] + (null === $reason ? [] : ['metadata' => ['reason' => $reason]]),
+        ]));
+    }
+
+    public function refunds(string $paymentIntentId): array
+    {
+        $list = $this->call('GET', self::REFUNDS, [], ['query' => ['payment_intent' => $paymentIntentId, 'limit' => 100]]);
+
+        return array_reverse(array_map(self::refundOf(...), $list->list('data')));
+    }
+
+    private static function refundOf(StripeObject $refund): StripeRefund
+    {
+        return new StripeRefund($refund->string('id'), $refund->int('amount'), $refund->string('status'), $refund->optional('metadata.reason'));
     }
 
     private static function customer(StripeObject $session): Customer

@@ -5,14 +5,19 @@ declare(strict_types=1);
 namespace App\Application\Sales;
 
 use App\Domain\Sales\Consent;
+use App\Domain\Sales\CreditNote;
 use App\Domain\Sales\Customer;
 use App\Domain\Sales\Order;
 use App\Domain\Sales\Terms;
+use App\Domain\Sales\WithdrawalRequest;
 use App\Domain\Shared\Price;
 
 final readonly class OrderView
 {
-    /** @param list<Consent> $consents */
+    /**
+     * @param list<Consent>        $consents
+     * @param list<CreditNoteView> $creditNotes
+     */
     private function __construct(
         public string $id,
         public string $reference,
@@ -34,10 +39,16 @@ final readonly class OrderView
         public ?Customer $customer,
         public ?string $invoiceNumber,
         public ?\DateTimeImmutable $confirmationSentAt,
+        public int $refundedCents,
+        public ?\DateTimeImmutable $withdrawnAt,
+        public ?\DateTimeImmutable $withdrawalLastDay,
+        public ?WithdrawalRequestView $withdrawal,
+        public array $creditNotes,
     ) {
     }
 
-    public static function of(Order $order): self
+    /** @param list<CreditNote> $creditNotes */
+    public static function of(Order $order, ?WithdrawalRequest $withdrawal = null, array $creditNotes = []): self
     {
         return new self(
             $order->id()->toBase32(),
@@ -60,6 +71,11 @@ final readonly class OrderView
             $order->customer(),
             $order->invoiceNumber(),
             $order->confirmationSentAt(),
+            $order->refundedCents(),
+            $order->withdrawnAt(),
+            $order->withdrawalLastDay(),
+            null === $withdrawal ? null : WithdrawalRequestView::of($withdrawal),
+            array_map(CreditNoteView::of(...), $creditNotes),
         );
     }
 }

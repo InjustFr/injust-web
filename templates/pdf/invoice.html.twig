@@ -1,49 +1,26 @@
 {% extends 'pdf/_layout.html.twig' %}
 
-{% macro label(key, parameters = {}) %}{{ key|trans(parameters, 'documents', 'fr') }} <span class="en">{{ key|trans(parameters, 'documents', 'en') }}</span>{% endmacro %}
-{% macro price(price) %}{{ 'price'|trans({amount: price.cents / 100}, 'documents', 'fr') }}{% endmacro %}
+{% import 'pdf/_macros.html.twig' as doc %}
 
 {% block title %}{{ 'invoice.title'|trans({}, 'documents', 'fr') }} {{ invoice.number }}{% endblock %}
 
 {% block body %}
-    {% set seller = invoice.seller %}
-    {% set buyer = invoice.buyer %}
     {% set paidOn = invoice.paidAt|date('d/m/Y', 'Europe/Paris') %}
-    <h1>{{ _self.label('invoice.title') }} {{ invoice.number }}</h1>
+    <h1>{{ doc.label('invoice.title') }} {{ invoice.number }}</h1>
     <p class="meta">
-        {{ _self.label('invoice.issued_at', {date: invoice.issuedAt|date('d/m/Y', 'Europe/Paris')}) }}<br>
-        {{ _self.label('invoice.order', {reference: invoice.orderReference}) }}
+        {{ doc.label('invoice.issued_at', {date: invoice.issuedAt|date('d/m/Y', 'Europe/Paris')}) }}<br>
+        {{ doc.label('invoice.order', {reference: invoice.orderReference}) }}
     </p>
 
-    <table class="parties">
-        <tr>
-            <td>
-                <h2>{{ _self.label('invoice.seller') }}</h2>
-                <p>{{ seller.name }} {{ seller.businessForm }}<br>
-                {{ seller.address|nl2br }}<br>
-                {{ 'invoice.siren'|trans({siren: seller.siren}, 'documents', 'fr') }}<br>
-                {{ seller.email }}</p>
-            </td>
-            <td>
-                <h2>{{ _self.label('invoice.buyer') }}</h2>
-                <p>{% if buyer.company %}{{ buyer.company }}<br>{% endif %}
-                {{ buyer.name }}<br>
-                {{ buyer.line1 }}<br>
-                {% if buyer.line2 %}{{ buyer.line2 }}<br>{% endif %}
-                {{ buyer.postalCode }} {{ buyer.city }}{% if buyer.state %} {{ buyer.state }}{% endif %}<br>
-                {{ country }}
-                {% if buyer.vatId %}<br>{{ 'invoice.vat_id'|trans({vatId: buyer.vatId}, 'documents', 'fr') }}{% endif %}</p>
-            </td>
-        </tr>
-    </table>
+    {% include 'pdf/_parties.html.twig' with {seller: invoice.seller, buyer: invoice.buyer, country: country} only %}
 
     <table class="lines">
         <thead>
             <tr>
-                <th>{{ _self.label('invoice.description') }}</th>
-                <th class="number">{{ _self.label('invoice.quantity') }}</th>
-                <th class="number">{{ _self.label('invoice.unit_price') }}</th>
-                <th class="number">{{ _self.label('invoice.line_total') }}</th>
+                <th>{{ doc.label('invoice.description') }}</th>
+                <th class="number">{{ doc.label('invoice.quantity') }}</th>
+                <th class="number">{{ doc.label('invoice.unit_price') }}</th>
+                <th class="number">{{ doc.label('invoice.line_total') }}</th>
             </tr>
         </thead>
         <tbody>
@@ -51,26 +28,26 @@
                 <tr>
                     <td>{{ line.label }}</td>
                     <td class="number">{{ line.quantity }}</td>
-                    <td class="number">{{ _self.price(line.unitPrice) }}</td>
-                    <td class="number">{{ _self.price(line.total) }}</td>
+                    <td class="number">{{ doc.price(line.unitPrice) }}</td>
+                    <td class="number">{{ doc.price(line.total) }}</td>
                 </tr>
             {% endfor %}
         </tbody>
         <tfoot>
             <tr>
-                <td colspan="3" class="number">{{ _self.label('invoice.total') }}</td>
-                <td class="number">{{ _self.price(invoice.total) }}</td>
+                <td colspan="3" class="number">{{ doc.label('invoice.total') }}</td>
+                <td class="number">{{ doc.price(invoice.total) }}</td>
             </tr>
         </tfoot>
     </table>
 
     <div class="mentions">
         <p>{{ invoice.vatMention }}</p>
-        <p>{{ _self.label('invoice.paid', {date: paidOn}) }}</p>
-        <p>{{ _self.label('invoice.category') }}</p>
+        <p>{{ doc.label('invoice.paid', {date: paidOn}) }}</p>
+        <p>{{ doc.label('invoice.category') }}</p>
         {% if business %}
-            <p>{{ _self.label('invoice.penalties') }}</p>
-            <p>{{ _self.label('invoice.discount') }}</p>
+            <p>{{ doc.label('invoice.penalties') }}</p>
+            <p>{{ doc.label('invoice.discount') }}</p>
         {% endif %}
     </div>
 {% endblock %}

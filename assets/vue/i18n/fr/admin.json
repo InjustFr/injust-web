@@ -88,7 +88,9 @@
             "mediatorUrl": "Site du médiateur",
             "hostName": "Hébergeur",
             "hostAddress": "Adresse de l’hébergeur",
-            "hostPhone": "Téléphone de l’hébergeur"
+            "hostPhone": "Téléphone de l’hébergeur",
+            "vatNumber": "Numéro de TVA intracommunautaire (facultatif)",
+            "vatNumberInvalid": "Saisis un numéro de TVA UE valide, par exemple FR12345678901."
         },
         "general": {
             "title": "Général",
@@ -366,7 +368,8 @@
             "paid": "Payée",
             "expired": "Expirée",
             "withdrawn": "Rétractée",
-            "refunded": "Remboursée"
+            "refunded": "Remboursée",
+            "partiallyRefunded": "Partiellement remboursée"
         },
         "types": {
             "lesson": "Cours",
@@ -393,21 +396,37 @@
             "vatId": "N° de TVA",
             "cardCountry": "Pays de la carte",
             "none": "Non renseigné",
-            "cgvVersion": "Version des CGV",
+            "cgvVersion": "Version des CGV : {version}",
             "consents": "Consentements",
             "acceptedAt": "accepté le {date}",
             "invoice": "Facture",
             "invoiceNumber": "Facture {number}",
             "openInvoice": "Ouvrir la facture",
             "noInvoice": "Pas encore de facture.",
-            "confirmation": "E-mail de confirmation",
+            "confirmation": "E-mail de confirmation : {status}",
             "sentAt": "Envoyé le {date}",
             "notSent": "Non envoyé",
             "resend": "Renvoyer la confirmation",
             "resendMessage": "L’e-mail de confirmation avec la facture et les CGV sera renvoyé au client.",
             "resendAction": "Renvoyer",
             "resent": "Confirmation envoyée.",
-            "format": "Format : {format}"
+            "format": "Format : {format}",
+            "refunded": "Remboursé : {amount} sur {total}",
+            "withdrawal": "Rétractation",
+            "withdrawalReceived": "Reçue le {date}",
+            "withdrawalName": "Nom : {name}",
+            "withdrawalReason": "Motif : {reason}",
+            "withdrawalAcknowledged": "Accusé de réception envoyé le {date}",
+            "withdrawalNotAcknowledged": "Accusé de réception non envoyé",
+            "resendAcknowledgement": "Renvoyer l’accusé de réception",
+            "resendAcknowledgementMessage": "L’accusé de réception de la rétractation sera renvoyé au client.",
+            "resendAcknowledgementAction": "Renvoyer",
+            "acknowledgementResent": "Accusé de réception envoyé.",
+            "creditNotes": "Avoirs",
+            "creditNote": "Avoir {number}",
+            "creditNoteDetail": "{amount} le {date}",
+            "noCreditNotes": "Aucun avoir.",
+            "withdrawalDeadline": "Rétractation possible jusqu’au {date}"
         },
         "totals": {
             "title": "Chiffre d’affaires {year}",
@@ -425,6 +444,26 @@
             "progress": "{amount} sur {threshold}",
             "warning": "Proche du seuil.",
             "crossed": "Seuil dépassé."
+        },
+        "refund": {
+            "button": "Rembourser",
+            "title": "Rembourser cette commande",
+            "remaining": "Reste à rembourser : {amount}",
+            "info": "L’argent retourne au client via Stripe. L’avoir est créé et envoyé automatiquement dès que Stripe confirme le remboursement.",
+            "proRata": "Aide au prorata",
+            "modeNone": "Sans aide",
+            "modeSessions": "Séances effectuées",
+            "modePercent": "Pourcentage",
+            "done": "Séances effectuées",
+            "total": "Nombre total de séances",
+            "percent": "Pourcentage remboursé",
+            "suggest": "Montant suggéré : {amount}",
+            "use": "Utiliser ce montant",
+            "amount": "Montant (EUR)",
+            "reason": "Motif",
+            "invalid": "Saisis un montant supérieur à 0 et au plus {amount}.",
+            "submit": "Rembourser {amount}",
+            "requested": "Remboursement demandé. L’avoir apparaîtra dès que Stripe confirme."
         }
     },
     "links": {

@@ -4,7 +4,7 @@ import { ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import IconButton from '../../../components/ui/IconButton.vue';
 import { intlLocale } from '../../../i18n/locale.js';
-import { formatMoney } from '../../ordersView.js';
+import { displayStatus, formatMoney } from '../../ordersView.js';
 import OrderDetail from './OrderDetail.vue';
 
 defineProps({ orders: { type: Array, required: true } });
@@ -40,7 +40,7 @@ const toggle = (id) => { openId.value = openId.value === id ? null : id; };
                     <td>{{ order.customer?.name ?? order.email }}</td>
                     <td>{{ order.customer?.country ?? '' }}</td>
                     <td class="orders-table__amount tabular">{{ formatMoney(order.amountCents, intlLocale()) }}</td>
-                    <td><span class="orders-table__chip" :class="`orders-table__chip--${order.status}`">{{ t(`admin.orders.statuses.${order.status}`) }}</span></td>
+                    <td><span class="orders-table__chip" :class="`orders-table__chip--${displayStatus(order)}`">{{ t(`admin.orders.statuses.${displayStatus(order)}`) }}</span></td>
                 </tr>
                 <tr v-if="openId === order.id">
                     <td colspan="8"><OrderDetail :order="order" /></td>
@@ -60,7 +60,7 @@ tbody { border-top: 0.0625rem solid var(--color-border); }
 .orders-table__product { min-width: 12rem; white-space: normal; }
 .orders-table__chip { padding: 0 var(--space-2); border: 0.0625rem solid var(--color-border-strong); border-radius: var(--radius); font-size: var(--font-size-sm); }
 .orders-table__chip--paid { border-color: var(--color-accent); color: var(--color-accent-strong); background: var(--color-accent-soft); }
-.orders-table__chip--refunded, .orders-table__chip--withdrawn { color: var(--color-muted); }
+.orders-table__chip--refunded, .orders-table__chip--withdrawn, .orders-table__chip--partiallyRefunded { color: var(--color-muted); }
 .orders-table__chip--expired { color: var(--color-subtle); }
 .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
 </style>

@@ -1,8 +1,8 @@
+import { EMAIL, failure, length } from './siteForms.js';
+
+export { failure };
+
 export const LIMITS = { name: 100, email: 180, bodyMin: 10, bodyMax: 5000 };
-
-const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-const length = (text) => [...text].length;
 
 export function contactPayload(form) {
     return {
@@ -37,12 +37,3 @@ export function validate(payload) {
     return Object.fromEntries(Object.entries(errors).filter(([, error]) => error !== null));
 }
 
-export function failure(status, problem, labels) {
-    const violations = problem?.violations ?? [];
-    if (violations.length > 0) {
-        return { fields: Object.fromEntries(violations.map((violation) => [violation.propertyPath, violation.title])), message: labels.invalid };
-    }
-    const fallback = { 422: labels.invalid, 429: labels.tooMany }[status] ?? labels.error;
-
-    return { fields: {}, message: problem?.detail ?? fallback };
-}

@@ -116,3 +116,16 @@ test('google verification token is kept, trimmed and always sent', () => {
     expect(generalForm(settings).googleSiteVerification).toBe('');
     expect(generalPayload({ ...form, googleSiteVerification: '  tok_en-1234567  ' }).googleSiteVerification).toBe('tok_en-1234567');
 });
+
+test('the seller VAT number is part of the identity form, empty by default, and trimmed in the payload', () => {
+    expect(identityForm({}).vatNumber).toBe('');
+    expect(identityForm({ vatNumber: 'FR12443061841' }).vatNumber).toBe('FR12443061841');
+    expect(identityPayload({ ...identityForm({}), vatNumber: ' FR12443061841 ' }).vatNumber).toBe('FR12443061841');
+});
+
+test('the VAT number is checked loosely, spaces ignored, empty allowed', () => {
+    expect(identityErrors({ siren: '', vatNumber: '' })).toEqual({});
+    expect(identityErrors({ siren: '', vatNumber: 'fr 12 443061841' })).toEqual({});
+    expect(identityErrors({ siren: '', vatNumber: '12' })).toEqual({ vatNumber: 'admin.settings.identity.vatNumberInvalid' });
+    expect(identityErrors({ siren: '', vatNumber: 'FR1' })).toEqual({ vatNumber: 'admin.settings.identity.vatNumberInvalid' });
+});

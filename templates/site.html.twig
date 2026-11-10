@@ -126,6 +126,7 @@
             <a class="footer-contact-link" href="{{ path('contact') }}">{{ 'site.footer.contact'|trans }}</a>
             {%- if settings.contactEmail %} · <a href="mailto:{{ settings.contactEmail }}">{{ settings.contactEmail }}</a>{% endif %}
         </p>
+        <p class="footer-withdrawal-line"><a class="footer-withdrawal" href="{{ path('withdrawal') }}">{{ 'site.footer.withdrawal'|trans }}</a></p>
         <p class="footer-copy">© {{ 'now'|date('Y') }} {{ brand }}</p>
     </footer>
 {% endblock %}

@@ -16,6 +16,11 @@ invoice:
     category: 'Type of transaction: provision of services'
     penalties: 'Late payment penalties: three times the legal interest rate. Fixed recovery fee: €40.'
     discount: 'No discount for early payment.'
+credit_note:
+    title: 'Credit note'
+    credits: 'Credit note for invoice no. {number}'
+    refunded: 'Refunded on {date} by card'
+    reason: 'Reason'
 legal:
     version: 'Version {version} – {date}'
     mentions: 'Legal notice'

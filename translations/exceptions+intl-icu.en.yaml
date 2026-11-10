@@ -14,6 +14,7 @@ settings:
     invalid_siren: '“{siren}” is not a valid SIREN: it has 9 digits and passes the Luhn check.'
     legal_identity_incomplete: 'Fill in every field of the legal identity before switching online checkout on.'
     invalid_verification_token: 'Paste only the Search Console verification token: the content value of the meta tag, 10 to 100 letters, digits, - or _.'
+    invalid_vat_number: '“{vatNumber}” is not an intra-EU VAT number: two country letters followed by 2 to 12 letters or digits, such as FR12345678901.'
 legal:
     empty_document: 'A legal text needs at least one language filled in.'
 music:
@@ -37,6 +38,7 @@ production:
     invalid_year: 'The year must be between {min} and {max}.'
 sales:
     too_many_checkouts: 'You have started several orders in a short time: wait 10 minutes and try again.'
+    too_many_withdrawals: 'You have made several withdrawal attempts in a short time: wait 10 minutes and try again.'
     checkout_closed: 'Online payment is not open yet: contact me to book.'
     section_closed: 'This part of the site is closed for now: contact me to book.'
     product_unavailable: 'This offer cannot be paid online: it may have changed or need a quote. Contact me to book it.'
@@ -46,6 +48,12 @@ sales:
     payment_mismatch: 'The payment received for order {reference} does not match its price.'
     order_not_paid: 'Order {reference} is not paid.'
     order_not_found: 'No order matches this {by, select, session {checkout session} other {payment}} ({id}).'
+    no_matching_order: 'No order matches this reference and email address: check both in your order confirmation email.'
+    withdrawal_not_allowed: 'Order {reference} cannot be withdrawn online: only paid lessons and production services can be, once. Contact me if you think this is a mistake.'
+    withdrawal_period_over: 'The withdrawal period ended on {endDate, date, long}: contact me if you think this is a mistake.'
+    refund_before_payment: 'Order {reference} is not paid yet, so it cannot be refunded.'
+    invalid_refund_amount: 'Refund between €0.01 and {remaining, number, ::currency/EUR}, the amount not refunded yet.'
+    refund_unavailable: 'Stripe did not accept the refund: try again in a few minutes or refund from the Stripe dashboard.'
 links:
     invalid_label: 'A link needs a label in at least one language, {max} characters at most in each.'
 seo:

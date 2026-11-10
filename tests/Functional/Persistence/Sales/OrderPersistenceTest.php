@@ -93,6 +93,50 @@ final class OrderPersistenceTest extends KernelTestCase
         self::assertSame(OrderStatus::Expired, $locked->status());
     }
 
+    public function testTheRefundAndWithdrawalAreKept(): void
+    {
+        $order = SalesExamples::paid(paidAt: '2026-11-10 10:05:00 UTC', session: 'cs_withdrawn');
+        $order->withdraw(new \DateTimeImmutable('2026-11-11 10:00:00 UTC'));
+        $order->refund(1500);
+        $this->store($order);
+
+        $stored = $this->orders->get($order->id());
+
+        self::assertSame([OrderStatus::Withdrawn, 1500], [$stored->status(), $stored->refundedCents()]);
+        self::assertSame(new \DateTimeImmutable('2026-11-11 10:00:00 UTC')->getTimestamp(), $stored->withdrawnAt()?->getTimestamp());
+    }
+
+    public function testAnOrderIsFoundAndLockedByItsReferenceOrItsPayment(): void
+    {
+        $order = SalesExamples::paid(session: 'cs_reference');
+        $this->store($order);
+        $this->entityManager->getConnection()->executeStatement("UPDATE sales_order SET email = 'changed@example.test' WHERE checkout_session_id = 'cs_reference'");
+
+        self::assertSame($order->id()->toBase32(), $this->orders->byReference($order->reference())?->id()->toBase32());
+        self::assertNull($this->orders->byReference('INJ-ZZZZZZ'));
+        [$byReference, $byPayment, $missing] = new DoctrineTransaction($this->entityManager)->atomically(fn (): array => [
+            $this->orders->lockByReference($order->reference()),
+            $this->orders->lockByPaymentIntent('pi_'.$order->reference()),
+            $this->orders->lockByPaymentIntent('pi_other'),
+        ]);
+
+        self::assertSame([$order->reference(), 'changed@example.test'], [$byReference?->reference(), $byReference?->email()]);
+        self::assertSame($byReference, $byPayment);
+        self::assertNull($missing);
+        $this->expectException(TransactionRequiredException::class);
+        $this->orders->lockByReference($order->reference());
+    }
+
+    public function testThePaymentLookupLocksTheRowSoItNeedsATransaction(): void
+    {
+        $order = SalesExamples::paid(session: 'cs_payment_lock');
+        $this->store($order);
+
+        $this->expectException(TransactionRequiredException::class);
+
+        $this->orders->lockByPaymentIntent('pi_'.$order->reference());
+    }
+
     public function testOrdersAreListedNewestFirstByStatusAndParisYear(): void
     {
         $old = SalesExamples::order(at: '2025-12-31 22:30:00 UTC');

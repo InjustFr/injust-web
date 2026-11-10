@@ -1,0 +1,17 @@
+{% set dateFormat = 'sales.date_format'|trans({}, 'emails') %}
+{{ 'sales.withdrawal_notice.intro'|trans({}, 'emails') }}
+
+{{ 'sales.withdrawal_notice.received'|trans({date: withdrawal.receivedAt|date(dateFormat, 'Europe/Paris'), time: withdrawal.receivedAt|date('H:i', 'Europe/Paris')}, 'emails') }}
+
+{{ 'sales.confirmation.reference'|trans({reference: order.reference}, 'emails') }}
+{{ 'sales.confirmation.product'|trans({product: order.productLabel}, 'emails') }}
+{{ 'sales.confirmation.price'|trans({amount: order.price.cents / 100}, 'emails') }}
+{{ 'sales.withdrawal_acknowledgement.paid_on'|trans({date: order.paidAt|date(dateFormat, 'Europe/Paris')}, 'emails') }}
+{{ withdrawal.name ? 'sales.withdrawal_notice.customer_named'|trans({name: withdrawal.name, email: withdrawal.email}, 'emails') : 'sales.withdrawal_notice.customer'|trans({email: withdrawal.email}, 'emails') }}
+{% if withdrawal.reason %}
+{{ 'sales.withdrawal_notice.message'|trans({reason: withdrawal.reason}, 'emails') }}
+{% endif %}
+
+{{ 'sales.withdrawal_notice.refund'|trans({}, 'emails') }}
+
+{{ 'sales.withdrawal_notice.reply'|trans({}, 'emails') }}

@@ -1,4 +1,5 @@
 {% set dateFormat = 'sales.date_format'|trans({}, 'emails') %}
+{% set withdrawalUrl = url('withdrawal', {_locale: order.locale}) %}
 <!doctype html>
 <html lang="{{ order.locale }}">
 <head><meta charset="utf-8"></head>
@@ -24,9 +25,14 @@
     {{ 'sales.confirmation.contact_soon'|trans({}, 'emails') }}
 {% endif %}</p>
 <p><strong>{{ 'sales.confirmation.withdrawal_title'|trans({}, 'emails') }}</strong><br>
-{{ 'sales.confirmation.withdrawal'|trans({date: paidAt|date_modify('+14 days')|date(dateFormat, 'Europe/Paris')}, 'emails') }}
+{% if order.withdrawalLastDay %}
+{{ 'sales.confirmation.withdrawal'|trans({date: order.withdrawalLastDay|date(dateFormat, 'UTC')}, 'emails') }}
 {{ 'sales.confirmation.pro_rata'|trans({}, 'emails') }}
-{{ 'sales.confirmation.how_to_withdraw'|trans({email: contactEmail, reference: order.reference}, 'emails') }}</p>
+{{ 'sales.confirmation.how_to_withdraw'|trans({reference: order.reference}, 'emails') }} <a href="{{ withdrawalUrl }}">{{ withdrawalUrl }}</a><br>
+{{ 'sales.confirmation.or_email'|trans({email: contactEmail}, 'emails') }}
+{% else %}
+{{ 'sales.confirmation.digital_waiver'|trans({}, 'emails') }}
+{% endif %}</p>
 <p>{{ 'sales.confirmation.mediator'|trans({name: mediatorName, url: mediatorUrl}, 'emails') }}</p>
 <p>{{ 'sales.confirmation.attachments'|trans({}, 'emails') }}</p>
 <p>-- <br>{{ 'sales.confirmation.signature'|trans({}, 'emails') }}</p>

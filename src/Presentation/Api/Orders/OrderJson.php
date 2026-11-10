@@ -29,6 +29,20 @@ final class OrderJson
             'customer' => null === $order->customer ? null : get_object_vars($order->customer),
             'invoiceNumber' => $order->invoiceNumber,
             'confirmationSentAt' => $order->confirmationSentAt?->format(\DATE_ATOM),
+            'refundedCents' => $order->refundedCents,
+            'withdrawal' => null === $order->withdrawal ? null : [
+                'receivedAt' => $order->withdrawal->receivedAt->format(\DATE_ATOM),
+                'name' => $order->withdrawal->name,
+                'reason' => $order->withdrawal->reason,
+                'acknowledgedAt' => $order->withdrawal->acknowledgedAt?->format(\DATE_ATOM),
+            ],
+            'creditNotes' => array_map(static fn ($note): array => [
+                'id' => $note->id,
+                'number' => $note->number,
+                'amountCents' => $note->amount->cents,
+                'issuedAt' => $note->issuedAt->format(\DATE_ATOM),
+                'reason' => $note->reason,
+            ], $order->creditNotes),
         ];
     }
 }

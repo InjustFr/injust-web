@@ -1,21 +1,30 @@
 <script setup>
-import { FileText, Send } from '@lucide/vue';
-import { computed } from 'vue';
+import { FileText } from '@lucide/vue';
+import { computed, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import BaseButton from '../../../components/ui/BaseButton.vue';
 import ConfirmButton from '../../../components/ui/ConfirmButton.vue';
 import { useApi } from '../../../composables/useApi.js';
 import { useToast } from '../../../composables/useToast.js';
 import { intlLocale } from '../../../i18n/locale.js';
+import { canRefund, formatMoney } from '../../ordersView.js';
+import RefundModal from './RefundModal.vue';
 
-const props = defineProps({ order: { type: Object, required: true } });
+const source = defineProps({ order: { type: Object, required: true } });
 const { t } = useI18n();
 const api = useApi();
 const toast = useToast();
-const customer = computed(() => props.order.customer);
+const detail = ref(source.order);
+api.load(`/api/admin/orders/${source.order.id}`, detail).catch(() => {});
+const order = computed(() => ({ refundedCents: 0, withdrawal: null, creditNotes: [], ...source.order, ...detail.value }));
+const refunding = ref(false);
+const money = (cents) => formatMoney(cents, intlLocale());
+const day = (value) => new Intl.DateTimeFormat(intlLocale(), { dateStyle: 'medium' }).format(new Date(value));
+const customer = computed(() => order.value.customer);
 const address = computed(() => customer.value && [customer.value.line1, customer.value.line2, `${customer.value.postalCode} ${customer.value.city}`.trim(), customer.value.state, customer.value.country].filter(Boolean).join(', '));
 const when = (value) => new Intl.DateTimeFormat(intlLocale(), { dateStyle: 'medium', timeStyle: 'short' }).format(new Date(value));
-const resend = () => toast.attempt(() => api.post(`/api/admin/orders/${props.order.id}/resend`), t('admin.orders.detail.resent'));
+const resendAcknowledgement = () => toast.attempt(() => api.post(`/api/admin/orders/${order.value.id}/withdrawal/resend`), t('admin.orders.detail.acknowledgementResent'));
+const resend = () => toast.attempt(() => api.post(`/api/admin/orders/${order.id}/resend`), t('admin.orders.detail.resent'));
 </script>
 
 <template>
@@ -34,7 +43,7 @@ const resend = () => toast.attempt(() => api.post(`/api/admin/orders/${props.ord
         </section>
         <section>
             <h3>{{ t('admin.orders.detail.consents') }}</h3>
-            <p class="order-detail__muted">{{ t('admin.orders.detail.cgvVersion') }} : {{ order.cgvVersion }}</p>
+            <p class="order-detail__muted">{{ t('admin.orders.detail.cgvVersion', { version: order.cgvVersion }) }}</p>
             <ul>
                 <li v-for="consent in order.consents" :key="consent.kind">
                     {{ consent.text }} <span class="order-detail__muted">({{ t('admin.orders.detail.acceptedAt', { date: when(consent.acceptedAt) }) }})</span>
@@ -49,8 +58,31 @@ const resend = () => toast.attempt(() => api.post(`/api/admin/orders/${props.ord
             </p>
             <p v-else class="order-detail__muted">{{ t('admin.orders.detail.noInvoice') }}</p>
             <template v-if="order.status === 'paid'">
-                <p class="order-detail__muted">{{ t('admin.orders.detail.confirmation') }} : {{ order.confirmationSentAt ? t('admin.orders.detail.sentAt', { date: when(order.confirmationSentAt) }) : t('admin.orders.detail.notSent') }}</p>
+                <p class="order-detail__muted">{{ t('admin.orders.detail.confirmation', { status: order.confirmationSentAt ? t('admin.orders.detail.sentAt', { date: when(order.confirmationSentAt) }) : t('admin.orders.detail.notSent') }) }}</p>
                 <ConfirmButton :label="t('admin.orders.detail.resend')" :message="t('admin.orders.detail.resendMessage')" :confirm-label="t('admin.orders.detail.resendAction')" @confirm="resend" />
+            </template>
+        </section>
+        <section v-if="order.withdrawal">
+            <h3>{{ t('admin.orders.detail.withdrawal') }}</h3>
+            <p>{{ t('admin.orders.detail.withdrawalReceived', { date: when(order.withdrawal.receivedAt) }) }}</p>
+            <p v-if="order.withdrawal.name">{{ t('admin.orders.detail.withdrawalName', { name: order.withdrawal.name }) }}</p>
+            <p v-if="order.withdrawal.reason">{{ t('admin.orders.detail.withdrawalReason', { reason: order.withdrawal.reason }) }}</p>
+            <p class="order-detail__muted">{{ order.withdrawal.acknowledgedAt ? t('admin.orders.detail.withdrawalAcknowledged', { date: when(order.withdrawal.acknowledgedAt) }) : t('admin.orders.detail.withdrawalNotAcknowledged') }}</p>
+            <ConfirmButton :label="t('admin.orders.detail.resendAcknowledgement')" :message="t('admin.orders.detail.resendAcknowledgementMessage')" :confirm-label="t('admin.orders.detail.resendAcknowledgementAction')" @confirm="resendAcknowledgement" />
+        </section>
+        <section v-if="order.invoiceNumber">
+            <h3>{{ t('admin.orders.detail.creditNotes') }}</h3>
+            <p v-if="order.refundedCents > 0">{{ t('admin.orders.detail.refunded', { amount: money(order.refundedCents), total: money(order.amountCents) }) }}</p>
+            <ul v-if="order.creditNotes.length > 0" class="order-detail__notes">
+                <li v-for="note in order.creditNotes" :key="note.id">
+                    <BaseButton variant="ghost" :href="`/api/admin/orders/${order.id}/credit-notes/${note.id}`"><FileText size="1rem" aria-hidden="true" />{{ t('admin.orders.detail.creditNote', { number: note.number }) }}</BaseButton>
+                    <span class="order-detail__muted">{{ t('admin.orders.detail.creditNoteDetail', { amount: money(note.amountCents), date: day(note.issuedAt) }) }}<template v-if="note.reason"> · {{ note.reason }}</template></span>
+                </li>
+            </ul>
+            <p v-else class="order-detail__muted">{{ t('admin.orders.detail.noCreditNotes') }}</p>
+            <template v-if="canRefund(order)">
+                <BaseButton variant="ghost" @click="refunding = true">{{ t('admin.orders.refund.button') }}</BaseButton>
+                <RefundModal v-model:open="refunding" :order="order" />
             </template>
         </section>
     </div>
@@ -65,4 +97,5 @@ const resend = () => toast.attempt(() => api.post(`/api/admin/orders/${props.ord
 .order-detail dt { color: var(--color-muted); }
 .order-detail dd { margin: 0; overflow-wrap: anywhere; }
 .order-detail__muted { color: var(--color-muted); }
+.order-detail .order-detail__notes { padding-left: 0; list-style: none; }
 </style>

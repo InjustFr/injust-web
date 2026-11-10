@@ -49,8 +49,11 @@ Register this webhook endpoint in Stripe (Developers, Webhooks): `https://injust
 - `checkout.session.async_payment_succeeded`
 - `checkout.session.expired`
 - `charge.refunded`
+- `charge.refund.updated`
 
-Copy its signing secret into `STRIPE_WEBHOOK_SECRET`. The endpoint verifies the `Stripe-Signature` header (5 minute tolerance). A failed mail makes it answer 500 so Stripe retries; a refund of a payment the site has not recorded yet answers 503 for the same reason; a payment whose amount differs from the order answers 422 and stays unpaid. Sessions are card only (Apple Pay, Google Pay and Link still work), because invoices say "paid by card". Online checkout stays off until it is switched on in the admin (Settings), which needs a complete legal identity.
+Copy its signing secret into `STRIPE_WEBHOOK_SECRET`. The endpoint verifies the `Stripe-Signature` header (5 minute tolerance). A failed mail makes it answer 500 so Stripe retries; a refund of a payment the site has not recorded yet answers 503 for the same reason; a payment whose amount differs from the order answers 422 and stays unpaid. Sessions are card only (Apple Pay, Google Pay and Link still work), because invoices say "paid by card". Refunds: the admin asks Stripe for the refund (Orders, Refund); the `charge.refunded` event then makes the site record it, issue the credit note (same numbering as invoices) and email it with its PDF. A refund made in the Stripe dashboard follows the same path. Only succeeded refunds are credited; a pending one is credited when `charge.refund.updated` reports it succeeded. Visitors withdraw on `/withdrawal` within 14 days of payment (extended to the next working day after a weekend or public holiday); the owner then refunds from the admin (pro-rata if the service started). Online checkout must not be switched on before the lawyer has reviewed the legal texts and `vatNumber` is set if invoicing businesses.
+
+Online checkout stays off until it is switched on in the admin (Settings), which needs a complete legal identity.
 
 ## Who can sign in to `/admin`
 

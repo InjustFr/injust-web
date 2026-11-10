@@ -1,0 +1,77 @@
+{% extends 'site.html.twig' %}
+
+{% set page_title = 'site.withdrawal.title'|trans %}
+{% set contact_email = settings.contactEmail ?: settings.legal.email %}
+
+{% block main %}
+    <div class="withdrawal">
+        <header class="withdrawal-head">
+            <p class="page-kicker">{{ 'site.withdrawal.kicker'|trans }}</p>
+            <h1 class="withdrawal-title">{{ page_title }}</h1>
+            <p class="withdrawal-lead">{{ 'site.withdrawal.lead'|trans }}</p>
+        </header>
+        <section class="withdrawal-rules" aria-labelledby="withdrawal-rules-title">
+            <h2 class="withdrawal-label" id="withdrawal-rules-title">{{ 'site.withdrawal.rules.title'|trans }}</h2>
+            <ul>
+                <li>{{ 'site.withdrawal.rules.period'|trans }}</li>
+                <li>{{ 'site.withdrawal.rules.scope'|trans }}</li>
+                <li>{{ 'site.withdrawal.rules.pro_rata'|trans }}</li>
+                <li>{{ 'site.withdrawal.rules.refund'|trans }}</li>
+            </ul>
+        </section>
+        {% set errors = {
+            reference: {required: 'site.withdrawal.errors.reference_required'|trans, tooLong: 'site.withdrawal.errors.reference_too_long'|trans},
+            email: {required: 'site.withdrawal.errors.email_required'|trans, invalid: 'site.withdrawal.errors.email_invalid'|trans, tooLong: 'site.withdrawal.errors.email_too_long'|trans},
+            name: {tooLong: 'site.withdrawal.errors.name_too_long'|trans},
+            reason: {tooLong: 'site.withdrawal.errors.reason_too_long'|trans},
+        } %}
+        <div class="withdrawal-form" data-island="WithdrawalForm" data-props="{{ {
+            previewEndpoint: path('api_withdrawal_preview'),
+            endpoint: path('api_withdrawal_request'),
+            locale: locale,
+            labels: {
+                reference: 'site.withdrawal.form.reference'|trans,
+                referenceHint: 'site.withdrawal.form.reference_hint'|trans,
+                email: 'site.withdrawal.form.email'|trans,
+                emailHint: 'site.withdrawal.form.email_hint'|trans,
+                name: 'site.withdrawal.form.name'|trans,
+                reason: 'site.withdrawal.form.reason'|trans,
+                reasonHint: 'site.withdrawal.form.reason_hint'|trans,
+                optional: 'site.withdrawal.form.optional'|trans,
+                required: 'site.withdrawal.form.required'|trans,
+                next: 'site.withdrawal.form.next'|trans,
+                checking: 'site.withdrawal.form.checking'|trans,
+                confirmTitle: 'site.withdrawal.confirm.title'|trans,
+                order: 'site.withdrawal.confirm.reference'|trans,
+                product: 'site.withdrawal.confirm.product'|trans,
+                amount: 'site.withdrawal.confirm.amount'|trans,
+                paidOn: 'site.withdrawal.confirm.paid_on'|trans,
+                lastDay: 'site.withdrawal.confirm.last_day'|trans,
+                what: 'site.withdrawal.confirm.what'|trans,
+                consequences: [
+                    'site.withdrawal.confirm.withdrawn'|trans,
+                    'site.withdrawal.confirm.receipt'|trans,
+                    'site.withdrawal.confirm.refund'|trans,
+                    'site.withdrawal.confirm.pro_rata'|trans,
+                ],
+                confirm: 'site.withdrawal.confirm.submit'|trans,
+                confirming: 'site.withdrawal.confirm.submitting'|trans,
+                back: 'site.withdrawal.confirm.back'|trans,
+                doneTitle: 'site.withdrawal.done.title'|trans,
+                doneReference: 'site.withdrawal.done.reference'|trans({reference: '{reference}'}),
+                received: 'site.withdrawal.done.received'|trans({date: '{date}', time: '{time}'}),
+                acknowledged: 'site.withdrawal.done.acknowledged'|trans,
+                pending: 'site.withdrawal.done.pending'|trans,
+                invalid: 'site.withdrawal.invalid'|trans,
+                tooMany: 'site.withdrawal.too_many'|trans,
+                error: 'site.withdrawal.error'|trans,
+                errors: errors,
+            },
+        }|json_encode }}">
+            <p class="withdrawal-fallback">
+                {{ 'site.withdrawal.fallback'|trans }}
+                {%- if contact_email %} <a href="mailto:{{ contact_email }}">{{ contact_email }}</a>{% endif %}
+            </p>
+        </div>
+    </div>
+{% endblock %}

@@ -33,6 +33,7 @@ final readonly class EditLegalIdentityHandler
             $command->hostName,
             $command->hostAddress,
             $command->hostPhone,
+            $command->vatNumber,
         ));
         $this->settings->save($settings);
         $this->transaction->commit();

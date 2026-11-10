@@ -31,6 +31,7 @@ const FIELDS = [
     { name: 'hostName', type: 'text' },
     { name: 'hostAddress', type: 'text' },
     { name: 'hostPhone', type: 'tel' },
+    { name: 'vatNumber', type: 'text' },
 ];
 
 async function save() {

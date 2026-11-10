@@ -1,6 +1,6 @@
 export const LEGAL_KINDS = ['mentions', 'privacy', 'cgv-lessons', 'cgv-production', 'cgv-beats', 'licence'];
 
-const IDENTITY_FIELDS = ['name', 'businessForm', 'siren', 'address', 'email', 'phone', 'publicationDirector', 'mediatorName', 'mediatorUrl', 'hostName', 'hostAddress', 'hostPhone'];
+const IDENTITY_FIELDS = ['name', 'businessForm', 'siren', 'address', 'email', 'phone', 'publicationDirector', 'mediatorName', 'mediatorUrl', 'hostName', 'hostAddress', 'hostPhone', 'vatNumber'];
 
 export function isSirenValid(value) {
     const digits = String(value).replace(/\s/g, '');
@@ -60,7 +60,11 @@ export function legalDraftChanged(document, draft) {
 
 export function identityErrors(form) {
     const siren = form.siren.trim();
-    return siren === '' || isSirenValid(siren) ? {} : { siren: 'admin.settings.identity.sirenInvalid' };
+    const vat = (form.vatNumber ?? '').replace(/\s/g, '').toUpperCase();
+    return {
+        ...(siren === '' || isSirenValid(siren) ? {} : { siren: 'admin.settings.identity.sirenInvalid' }),
+        ...(vat === '' || /^[A-Z]{2}[A-Z0-9]{2,12}$/.test(vat) ? {} : { vatNumber: 'admin.settings.identity.vatNumberInvalid' }),
+    };
 }
 
 export function imageUpload(files) {

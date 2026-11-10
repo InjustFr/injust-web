@@ -19,6 +19,7 @@ final readonly class EditLegalIdentity
         public string $hostName,
         public string $hostAddress,
         public string $hostPhone,
+        public string $vatNumber = '',
     ) {
     }
 }

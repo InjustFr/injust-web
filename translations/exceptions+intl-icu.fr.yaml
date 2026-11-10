@@ -14,6 +14,7 @@ settings:
     invalid_siren: '« {siren} » n’est pas un SIREN valide : il compte 9 chiffres et passe le contrôle de Luhn.'
     legal_identity_incomplete: 'Remplissez tous les champs de l’identité légale avant d’activer le paiement en ligne.'
     invalid_verification_token: 'Collez seulement le jeton de validation de la Search Console : la valeur content de la balise meta, de 10 à 100 lettres, chiffres, - ou _.'
+    invalid_vat_number: '« {vatNumber} » n’est pas un numéro de TVA intracommunautaire : deux lettres de pays suivies de 2 à 12 lettres ou chiffres, comme FR12345678901.'
 legal:
     empty_document: 'Un texte légal doit être rempli dans au moins une langue.'
 music:
@@ -37,6 +38,7 @@ production:
     invalid_year: 'L’année doit être comprise entre {min} et {max}.'
 sales:
     too_many_checkouts: 'Vous avez lancé plusieurs commandes en peu de temps : attendez 10 minutes et réessayez.'
+    too_many_withdrawals: 'Vous avez fait plusieurs tentatives de rétractation en peu de temps : attendez 10 minutes et réessayez.'
     checkout_closed: 'Le paiement en ligne n’est pas encore ouvert : contactez-moi pour réserver.'
     section_closed: 'Cette partie du site est fermée pour le moment : contactez-moi pour réserver.'
     product_unavailable: 'Cette offre ne peut pas être payée en ligne : elle a peut-être changé ou se fait sur devis. Contactez-moi pour la réserver.'
@@ -46,6 +48,12 @@ sales:
     payment_mismatch: 'Le paiement reçu pour la commande {reference} ne correspond pas à son prix.'
     order_not_paid: 'La commande {reference} n’est pas payée.'
     order_not_found: 'Aucune commande ne correspond à {by, select, session {cette session de paiement} other {ce paiement}} ({id}).'
+    no_matching_order: 'Aucune commande ne correspond à cette référence et à cette adresse e-mail : vérifiez les deux dans l’e-mail de confirmation de commande.'
+    withdrawal_not_allowed: 'La commande {reference} ne peut pas faire l’objet d’une rétractation en ligne : seuls les cours et prestations de production payés le peuvent, une seule fois. Contactez-moi si vous pensez qu’il s’agit d’une erreur.'
+    withdrawal_period_over: 'Le délai de rétractation a pris fin le {endDate, date, long} : contactez-moi si vous pensez qu’il s’agit d’une erreur.'
+    refund_before_payment: 'La commande {reference} n’est pas encore payée, elle ne peut donc pas être remboursée.'
+    invalid_refund_amount: 'Remboursez entre 0,01 € et {remaining, number, ::currency/EUR}, le montant pas encore remboursé.'
+    refund_unavailable: 'Stripe n’a pas accepté le remboursement : réessayez dans quelques minutes ou remboursez depuis le tableau de bord Stripe.'
 links:
     invalid_label: 'Un lien a besoin d’un libellé dans au moins une langue, {max} caractères au plus dans chacune.'
 seo:

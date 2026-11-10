@@ -15,6 +15,8 @@ interface SalesQueries
 
     public function invoice(string $orderId): ?InvoiceView;
 
+    public function creditNote(string $id): ?CreditNoteView;
+
     /** @return list<RevenueLine> */
     public function revenueBook(int $year): array;
 

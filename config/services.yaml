@@ -36,6 +36,8 @@ when@test:
                 $client: '@.inner'
                 $sessions: !service { class: Symfony\Component\Cache\Adapter\FilesystemAdapter, arguments: ['fake_stripe', 0, '%kernel.cache_dir%'] }
                 $clock: '@clock'
+                $kernel: '@http_kernel'
+                $signature: '@App\Presentation\Web\Webhooks\StripeSignature'
 
 when@dev:
     services:

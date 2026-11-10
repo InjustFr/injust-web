@@ -39,8 +39,25 @@ final class InvoiceTest extends TestCase
     {
         $seller = Seller::of(self::identity());
 
-        self::assertSame(['Louis Injust', 'EI', '443061841', '1 rue du Son, 75000 Paris', 'louis@injust.test', '+33 6 00 00 00 00'], [$seller->name, $seller->businessForm, $seller->siren, $seller->address, $seller->email, $seller->phone]);
+        self::assertSame(['Louis Injust', 'EI', '443061841', '1 rue du Son, 75000 Paris', 'louis@injust.test', '+33 6 00 00 00 00', ''], [$seller->name, $seller->businessForm, $seller->siren, $seller->address, $seller->email, $seller->phone, $seller->vatNumber]);
         self::assertEquals($seller, Seller::fromArray($seller->toArray()));
+    }
+
+    public function testTheSellerKeepsItsVatNumberWhenItHasOne(): void
+    {
+        $identity = new LegalIdentity('Louis Injust', 'EI', '443061841', 'A', 'e@x.test', 'P', 'D', 'M', 'https://m.test', 'H', 'HA', 'HP', 'FR12443061841');
+        $seller = Seller::of($identity);
+
+        self::assertSame('FR12443061841', $seller->vatNumber);
+        self::assertSame('FR12443061841', $seller->toArray()['vatNumber'] ?? null);
+        self::assertEquals($seller, Seller::fromArray($seller->toArray()));
+    }
+
+    public function testASellerSnapshotTakenBeforeVatNumbersHasNone(): void
+    {
+        $seller = Seller::fromArray(['name' => 'N', 'businessForm' => 'EI', 'siren' => '443061841', 'address' => 'A', 'email' => 'e@x.test', 'phone' => 'P']);
+
+        self::assertSame('', $seller->vatNumber);
     }
 
     public function testAnUnpaidOrderIsNotInvoiced(): void

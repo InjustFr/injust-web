@@ -99,3 +99,64 @@ test('with checkout off there is no Book & pay and the checkout page is a 404', 
     await expect(visitorPage.getByRole('link', { name: 'Book & pay' })).toHaveCount(0);
     expect((await visitorPage.goto(path)).status()).toBe(404);
 });
+
+test('a visitor withdraws from the footer link, the admin sees it and refunds pro-rata with a credit note', async ({ page, visitorPage }) => {
+    await signIn(page);
+    await configure(page, { checkout: true });
+
+    await startOrder(visitorPage);
+    await visitorPage.getByRole('button', { name: 'Pay' }).click();
+    await expect(visitorPage).toHaveURL(/\/checkout\/success\?order=/);
+    const reference = (await visitorPage.locator('.checkout-reference').textContent()).trim();
+
+    await visitorPage.getByRole('link', { name: 'Withdraw from a contract here' }).click();
+    await expect(visitorPage).toHaveURL(/\/withdrawal$/);
+    await visitorPage.locator('#withdrawal-reference').fill(reference.toLowerCase());
+    await visitorPage.locator('#withdrawal-email').fill('Buyer@Example.com');
+    await visitorPage.locator('#withdrawal-name').fill('Buyer Example');
+    await visitorPage.locator('#withdrawal-reason').fill('Changed my mind.');
+    await visitorPage.getByRole('button', { name: 'Continue' }).click();
+    await expect(visitorPage.getByText(reference, { exact: true })).toBeVisible();
+    await visitorPage.getByRole('button', { name: 'Confirm my withdrawal' }).click();
+    await expect(visitorPage.getByRole('heading', { name: 'Withdrawal received' })).toBeVisible();
+    await expect(visitorPage.getByText(/Received on .+ at \d{1,2}:\d{2}/)).toBeVisible();
+    await expect(visitorPage.getByText(/An acknowledgement has been sent/)).toBeVisible();
+
+    await page.goto('/admin/orders');
+    const row = page.locator('tbody', { hasText: reference });
+    await expect(row).toContainText('Withdrawn');
+    await row.getByRole('button', { name: 'Show details' }).click();
+    await expect(row).toContainText('Buyer Example');
+    await expect(row).toContainText('Changed my mind.');
+    await expect(row).toContainText('Acknowledgement sent on');
+
+    await row.getByRole('button', { name: 'Refund', exact: true }).click();
+    const dialog = page.getByRole('dialog');
+    await dialog.getByLabel('Percentage').check();
+    await dialog.getByLabel('Percentage refunded').fill('50');
+    await dialog.getByRole('button', { name: 'Use this amount' }).click();
+    await dialog.getByLabel('Reason').fill('Two sessions given.');
+    await dialog.getByRole('button', { name: /^Refund / }).click();
+    await expect(dialog).toBeHidden();
+
+    await page.goto('/admin/orders');
+    const refunded = page.locator('tbody', { hasText: reference });
+    await refunded.getByRole('button', { name: 'Show details' }).click();
+    await expect(refunded).toContainText(/Credit note \d{4}-\d{4}/);
+    await expect(refunded).toContainText('Refunded:');
+
+    const id = await refunded.locator('a[href*="/credit-notes/"]').first().getAttribute('href');
+    const pdf = await page.request.get(id);
+    expect(pdf.status()).toBe(200);
+    expect(pdf.headers()['content-type']).toContain('application/pdf');
+    expect((await pdf.body()).subarray(0, 4).toString()).toBe('%PDF');
+
+    const listing = await (await page.request.get('/api/admin/orders')).json();
+    const order = (listing.items ?? listing).find((candidate) => candidate.reference === reference);
+    const detail = await (await page.request.get(`/api/admin/orders/${order.id}`)).json();
+    expect(detail.creditNotes).toHaveLength(1);
+    const tooMuch = await page.request.post(`/api/admin/orders/${order.id}/refunds`, { data: { amountCents: detail.amountCents, reason: 'replay' } });
+    expect(tooMuch.status()).toBe(422);
+    const after = await (await page.request.get(`/api/admin/orders/${order.id}`)).json();
+    expect(after.creditNotes).toHaveLength(1);
+});

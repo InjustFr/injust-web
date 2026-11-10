@@ -121,6 +121,28 @@ final class SettingsApiTest extends WebTestCase
         self::assertStringContainsString('SIREN', Json::string(Json::decode((string) $client->getResponse()->getContent()), 'detail'));
     }
 
+    public function testTheVatNumberIsOptionalAndSavedInCapitals(): void
+    {
+        $client = self::signedInClient();
+
+        $settings = self::send($client, 'PUT', '/api/admin/settings/legal-identity', self::IDENTITY);
+        self::assertSame(['', true], [Json::string($settings, 'legal', 'vatNumber'), Json::at($settings, 'legal', 'complete')]);
+
+        $settings = self::send($client, 'PUT', '/api/admin/settings/legal-identity', ['vatNumber' => 'fr 12 443061841'] + self::IDENTITY);
+        self::assertSame('FR12443061841', Json::string($settings, 'legal', 'vatNumber'));
+        self::assertSame('FR12443061841', self::getContainer()->get(SettingsQueries::class)->current()->legal->vatNumber);
+    }
+
+    public function testAnInvalidVatNumberIsRefused(): void
+    {
+        $client = self::signedInClient();
+
+        $client->jsonRequest('PUT', '/api/admin/settings/legal-identity', ['vatNumber' => 'FR-12'] + self::IDENTITY);
+
+        self::assertResponseStatusCodeSame(422);
+        self::assertStringContainsString('FR-12', Json::string(Json::decode((string) $client->getResponse()->getContent()), 'detail'));
+    }
+
     public function testAnInvalidIdentityEmailIsRefused(): void
     {
         $client = self::signedInClient();

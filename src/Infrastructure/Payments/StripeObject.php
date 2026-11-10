@@ -32,6 +32,17 @@ final readonly class StripeObject
         return \is_int($value) ? $value : throw self::unexpected($path);
     }
 
+    /** @return list<self> */
+    public function list(string $path): array
+    {
+        $items = $this->at($path);
+        if (!\is_array($items)) {
+            throw self::unexpected($path);
+        }
+
+        return array_values(array_map(static fn (mixed $item): self => \is_array($item) ? new self($item) : throw self::unexpected($path), $items));
+    }
+
     private function at(string $path): mixed
     {
         $value = $this->data;

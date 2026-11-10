@@ -21,6 +21,7 @@ final readonly class LegalIdentityView
         public string $hostName,
         public string $hostAddress,
         public string $hostPhone,
+        public string $vatNumber,
         public bool $complete,
     ) {
     }
@@ -40,6 +41,7 @@ final readonly class LegalIdentityView
             $identity->hostName,
             $identity->hostAddress,
             $identity->hostPhone,
+            $identity->vatNumber,
             $identity->isComplete(),
         );
     }

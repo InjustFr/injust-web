@@ -14,7 +14,7 @@ use Twig\Environment;
 
 final class DompdfSalesDocumentsTest extends KernelTestCase
 {
-    public function testTheInvoiceAndTheLegalDocumentArePdfFiles(): void
+    public function testTheInvoiceTheCreditNoteAndTheLegalDocumentArePdfFiles(): void
     {
         $documents = new DompdfSalesDocuments(new SalesDocumentHtml(
             self::getContainer()->get(Environment::class),
@@ -24,9 +24,12 @@ final class DompdfSalesDocumentsTest extends KernelTestCase
         ));
 
         $invoice = $documents->invoicePdf(DocumentExamples::invoice(DocumentExamples::paidOrder()));
+        $creditNote = $documents->creditNotePdf(SalesDocumentHtmlTest::creditNote(DocumentExamples::invoiceOf(DocumentExamples::paidOrder()), 1500, null));
         $legal = $documents->legalPdf(DocumentExamples::document(), 'fr');
 
         self::assertStringStartsWith('%PDF-', $invoice);
+        self::assertStringStartsWith('%PDF-', $creditNote);
+        self::assertStringContainsString('/MediaBox [0.000 0.000 595.280 841.890]', $creditNote);
         self::assertStringStartsWith('%PDF-', $legal);
         self::assertStringContainsString('DejaVuSans', $invoice);
         self::assertStringContainsString('/MediaBox [0.000 0.000 595.280 841.890]', $invoice);

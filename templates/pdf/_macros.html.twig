@@ -1,0 +1,2 @@
+{% macro label(key, parameters = {}) %}{{ key|trans(parameters, 'documents', 'fr') }} <span class="en">{{ key|trans(parameters, 'documents', 'en') }}</span>{% endmacro %}
+{% macro price(price, sign = 1) %}{{ 'price'|trans({amount: sign * price.cents / 100}, 'documents', 'fr') }}{% endmacro %}

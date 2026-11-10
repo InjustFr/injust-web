@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Domain\Settings;
 
 use App\Domain\Settings\Exception\InvalidSiren;
+use App\Domain\Settings\Exception\InvalidVatNumber;
 use App\Domain\Shared\HttpsUrl;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -14,6 +15,7 @@ final readonly class LegalIdentity
     public const int MAX_TEXT = 255;
     public const int MAX_BUSINESS_FORM = 20;
     public const int MAX_PHONE = 40;
+    public const int MAX_VAT_NUMBER = 14;
 
     #[ORM\Column(length: self::MAX_TEXT)]
     public string $name;
@@ -51,6 +53,9 @@ final readonly class LegalIdentity
     #[ORM\Column(length: self::MAX_PHONE)]
     public string $hostPhone;
 
+    #[ORM\Column(length: self::MAX_VAT_NUMBER, options: ['default' => ''])]
+    public string $vatNumber;
+
     public function __construct(
         string $name,
         string $businessForm,
@@ -64,6 +69,7 @@ final readonly class LegalIdentity
         string $hostName,
         string $hostAddress,
         string $hostPhone,
+        string $vatNumber = '',
     ) {
         $this->name = trim($name);
         $this->businessForm = trim($businessForm);
@@ -77,6 +83,7 @@ final readonly class LegalIdentity
         $this->hostName = trim($hostName);
         $this->hostAddress = trim($hostAddress);
         $this->hostPhone = trim($hostPhone);
+        $this->vatNumber = self::vatNumber($vatNumber);
     }
 
     public static function blank(): self
@@ -86,7 +93,17 @@ final readonly class LegalIdentity
 
     public function isComplete(): bool
     {
-        return !\in_array('', get_object_vars($this), true);
+        return !\in_array('', array_diff_key(get_object_vars($this), ['vatNumber' => true]), true);
+    }
+
+    private static function vatNumber(string $vatNumber): string
+    {
+        $compact = strtoupper(preg_replace('/\s+/', '', $vatNumber) ?? '');
+        if ('' !== $compact && 1 !== preg_match('/^[A-Z]{2}[A-Z0-9]{2,12}$/', $compact)) {
+            throw new InvalidVatNumber($vatNumber);
+        }
+
+        return $compact;
     }
 
     private static function siren(string $siren): string

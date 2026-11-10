@@ -13,9 +13,11 @@ use App\Application\Sales\CheckoutRequest;
 use App\Application\Sales\StartCheckout\CheckoutStarted;
 use App\Application\Sales\StartCheckout\StartCheckout;
 use App\Application\Sales\StartCheckout\StartCheckoutHandler;
+use App\Application\Settings\LegalDocumentHtml;
 use App\Application\Settings\LegalDocumentView;
 use App\Application\Settings\SettingsQueries;
 use App\Application\Settings\SettingsView;
+use App\Application\Shared\LegalMarkdown;
 use App\Domain\Lessons\LessonFormat;
 use App\Domain\Lessons\LessonOffer;
 use App\Domain\Lessons\LessonOfferDetails;
@@ -69,6 +71,8 @@ final class StartCheckoutTest extends TestCase
 
     private Journal $journal;
 
+    private ?LocalizedText $cgvBody = null;
+
     protected function setUp(): void
     {
         $this->settings = Settings::initial();
@@ -117,6 +121,26 @@ final class StartCheckoutTest extends TestCase
         $order = $this->onlyOrder();
         self::assertSame(['Mixage', null, 12000, 5, 'fr:terms:v5'], [$order->productLabel(), $order->productFormat(), $order->price()->cents, $order->cgvVersion(), $order->consents()[0]->text]);
         self::assertNull($this->gateway->requests[0]->email);
+    }
+
+    public function testTheAcceptedTermsAreFrozenWithTheSellerIdentityOfTheDay(): void
+    {
+        $this->cgvBody = new LocalizedText('CGV de {name} ({siren}), {siteUrl}, {updatedAt}, {unknown}', 'Terms of {name}, {updatedAt}');
+
+        $this->start(new StartCheckout(ProductType::Lesson, $this->lesson->id, 'en', '', self::SERVICE_CONSENTS, 3));
+
+        $body = $this->onlyOrder()->terms()->body;
+        self::assertSame(['CGV de Louis Injust (443061841), https://injust.test, 1 novembre 2026, {unknown}', 'Terms of Louis Injust, November 1, 2026'], [$body->fr, $body->en]);
+    }
+
+    public function testAnEmptyLanguageOfTheTermsStaysEmpty(): void
+    {
+        $this->cgvBody = new LocalizedText('Vendeur {name}');
+
+        $this->start(new StartCheckout(ProductType::Lesson, $this->lesson->id, 'en', '', self::SERVICE_CONSENTS, 3));
+
+        $body = $this->onlyOrder()->terms()->body;
+        self::assertSame(['Vendeur Louis Injust', ''], [$body->fr, $body->en]);
     }
 
     public function testTermsEditedAfterThePageWasShownMustBeReadAgain(): void
@@ -202,10 +226,10 @@ final class StartCheckoutTest extends TestCase
         $production->method('service')->willReturnCallback(fn (string $id): ?ProductionServiceView => [$this->fixed->id => $this->fixed, $this->quote->id => $this->quote][$id] ?? null);
         $settings = self::createStub(SettingsQueries::class);
         $settings->method('current')->willReturnCallback(fn (): SettingsView => SettingsView::of($this->settings));
-        $settings->method('legalDocument')->willReturnCallback(static function (LegalKind $kind): LegalDocumentView {
+        $settings->method('legalDocument')->willReturnCallback(function (LegalKind $kind): LegalDocumentView {
             $document = LegalDocument::draft($kind, new LocalizedText('CGV'), new \DateTimeImmutable('2026-10-01 09:00:00'));
             foreach (range(2, LegalKind::CgvLessons === $kind ? 3 : 5) as $version) {
-                $document->edit(new LocalizedText('CGV v'.$version), new \DateTimeImmutable('2026-11-01 09:00:00'));
+                $document->edit($this->cgvBody ?? new LocalizedText('CGV v'.$version), new \DateTimeImmutable('2026-11-01 09:00:00'));
             }
 
             return LegalDocumentView::of($document);
@@ -220,6 +244,8 @@ final class StartCheckoutTest extends TestCase
             $this->gateway,
             new MockClock('2026-11-10 10:00:00'),
             new RecordingTransaction($this->journal),
+            new LegalDocumentHtml(new LegalMarkdown()),
+            'https://injust.test',
         )($command);
     }
 

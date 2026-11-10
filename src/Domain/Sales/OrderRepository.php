@@ -20,6 +20,12 @@ interface OrderRepository
 
     public function byPaymentIntent(string $paymentIntentId): ?Order;
 
+    public function lockByPaymentIntent(string $paymentIntentId): ?Order;
+
+    public function byReference(string $reference): ?Order;
+
+    public function lockByReference(string $reference): ?Order;
+
     /** @return list<Order> */
     public function newestFirst(?OrderStatus $status, ?int $year): array;
 

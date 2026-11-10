@@ -18,11 +18,17 @@ final readonly class LegalMarkdown
     /** @param array<string, string> $placeholders */
     public function toHtml(string $markdown, array $placeholders): string
     {
+        return $this->converter->convert(self::fill($markdown, $placeholders))->getContent();
+    }
+
+    /** @param array<string, string> $placeholders */
+    public static function fill(string $markdown, array $placeholders): string
+    {
         $values = [];
         foreach ($placeholders as $name => $value) {
             $values['{'.$name.'}'] = $value;
         }
 
-        return $this->converter->convert(strtr($markdown, $values))->getContent();
+        return strtr($markdown, $values);
     }
 }

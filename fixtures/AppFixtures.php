@@ -28,6 +28,12 @@ use App\Application\Production\EditProductionPage\EditProductionPage;
 use App\Application\Production\EditProductionPage\EditProductionPageHandler;
 use App\Application\Sales\ConfirmPayment\ConfirmPayment;
 use App\Application\Sales\ConfirmPayment\ConfirmPaymentHandler;
+use App\Application\Sales\OrderView;
+use App\Application\Sales\RefundOrder\RefundOrder;
+use App\Application\Sales\RefundOrder\RefundOrderHandler;
+use App\Application\Sales\RequestWithdrawal\RequestWithdrawal;
+use App\Application\Sales\RequestWithdrawal\RequestWithdrawalHandler;
+use App\Application\Sales\SalesQueries;
 use App\Application\Sales\StartCheckout\StartCheckout;
 use App\Application\Sales\StartCheckout\StartCheckoutHandler;
 use App\Application\Seo\EditPageSeo\EditPageSeo;
@@ -125,6 +131,9 @@ final class AppFixtures extends Fixture
         private readonly InstallLegalDefaultsHandler $installLegalDefaults,
         private readonly StartCheckoutHandler $startCheckout,
         private readonly ConfirmPaymentHandler $confirmPayment,
+        private readonly RequestWithdrawalHandler $requestWithdrawal,
+        private readonly RefundOrderHandler $refundOrder,
+        private readonly SalesQueries $sales,
         private readonly HttpClientInterface $httpClient,
         private readonly SettingsQueries $settings,
         #[Autowire('%kernel.environment%')]
@@ -278,6 +287,12 @@ final class AppFixtures extends Fixture
 
         $this->paidOrder(ProductType::Lesson, $this->first($manager, LessonOffer::class, [])->id()->toBase32(), 'buyer-one@example.com', 'fr');
         $this->paidOrder(ProductType::Production, $this->first($manager, ProductionService::class, ['pricing' => Pricing::Fixed])->id()->toBase32(), 'buyer-two@example.com', 'en');
+
+        $withdrawn = $this->paidOrder(ProductType::Lesson, $this->first($manager, LessonOffer::class, [])->id()->toBase32(), 'buyer-three@example.com', 'en');
+        ($this->requestWithdrawal)(new RequestWithdrawal($withdrawn->reference, 'buyer-three@example.com', 'Buyer Three', 'I changed my mind.', 'en'));
+
+        $refunded = $this->paidOrder(ProductType::Production, $this->first($manager, ProductionService::class, ['pricing' => Pricing::Fixed])->id()->toBase32(), 'buyer-four@example.com', 'fr');
+        ($this->refundOrder)(new RefundOrder(Ulid::fromString($refunded->id), intdiv($refunded->price->cents, 2), 'Partial refund, service not delivered in full.'));
     }
 
     /**
@@ -293,11 +308,13 @@ final class AppFixtures extends Fixture
         return $manager->getRepository($class)->findOneBy($criteria, ['position' => 'ASC']) ?? throw new \LogicException($class);
     }
 
-    private function paidOrder(ProductType $type, string $productId, string $email, string $locale): void
+    private function paidOrder(ProductType $type, string $productId, string $email, string $locale): OrderView
     {
         $started = ($this->startCheckout)(new StartCheckout($type, $productId, $locale, $email, array_map(static fn (ConsentKind $kind) => $kind->value, $type->requiredConsents()), $this->settings->legalDocument($type->cgvKind())->version));
         $session = basename((string) parse_url($started->url, \PHP_URL_PATH));
         $this->httpClient->request('POST', 'https://api.stripe.com/v1/test_helpers/checkout/sessions/'.$session.'/pay')->getContent();
         ($this->confirmPayment)(new ConfirmPayment($session));
+
+        return $this->sales->orders()[0];
     }
 }

@@ -1,4 +1,5 @@
 {% set dateFormat = 'sales.date_format'|trans({}, 'emails') %}
+{% set withdrawalUrl = url('withdrawal', {_locale: order.locale}) %}
 {{ 'sales.confirmation.greeting'|trans({}, 'emails') }}
 
 {{ 'sales.confirmation.intro'|trans({}, 'emails') }}
@@ -21,9 +22,14 @@
 {% endif %}
 
 {{ 'sales.confirmation.withdrawal_title'|trans({}, 'emails') }}
-{{ 'sales.confirmation.withdrawal'|trans({date: paidAt|date_modify('+14 days')|date(dateFormat, 'Europe/Paris')}, 'emails') }}
+{% if order.withdrawalLastDay %}
+{{ 'sales.confirmation.withdrawal'|trans({date: order.withdrawalLastDay|date(dateFormat, 'UTC')}, 'emails') }}
 {{ 'sales.confirmation.pro_rata'|trans({}, 'emails') }}
-{{ 'sales.confirmation.how_to_withdraw'|trans({email: contactEmail, reference: order.reference}, 'emails') }}
+{{ 'sales.confirmation.how_to_withdraw'|trans({reference: order.reference}, 'emails') }} {{ withdrawalUrl }}
+{{ 'sales.confirmation.or_email'|trans({email: contactEmail}, 'emails') }}
+{% else %}
+{{ 'sales.confirmation.digital_waiver'|trans({}, 'emails') }}
+{% endif %}
 
 {{ 'sales.confirmation.mediator'|trans({name: mediatorName, url: mediatorUrl}, 'emails') }}
 

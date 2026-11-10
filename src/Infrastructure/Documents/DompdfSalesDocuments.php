@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Infrastructure\Documents;
 
+use App\Application\Sales\CreditNoteView;
 use App\Application\Sales\InvoiceView;
 use App\Application\Sales\SalesDocuments;
 use App\Application\Settings\LegalDocumentView;
@@ -18,6 +19,11 @@ final readonly class DompdfSalesDocuments implements SalesDocuments
     public function invoicePdf(InvoiceView $invoice): string
     {
         return self::pdf($this->html->invoice($invoice));
+    }
+
+    public function creditNotePdf(CreditNoteView $creditNote): string
+    {
+        return self::pdf($this->html->creditNote($creditNote));
     }
 
     public function legalPdf(LegalDocumentView $document, string $locale): string

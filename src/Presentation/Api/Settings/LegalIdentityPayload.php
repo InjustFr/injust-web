@@ -32,6 +32,7 @@ final readonly class LegalIdentityPayload
         public string $hostAddress = '',
         #[Assert\Length(max: LegalIdentity::MAX_PHONE)]
         public string $hostPhone = '',
+        public string $vatNumber = '',
     ) {
     }
 }

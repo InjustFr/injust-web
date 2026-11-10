@@ -4,10 +4,12 @@ declare(strict_types=1);
 
 namespace App\Infrastructure\Documents;
 
+use App\Application\Sales\CreditNoteView;
 use App\Application\Sales\InvoiceView;
 use App\Application\Settings\LegalDocumentHtml;
 use App\Application\Settings\LegalDocumentView;
 use App\Application\Settings\SettingsQueries;
+use App\Domain\Sales\Customer;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\Intl\Countries;
 use Twig\Environment;
@@ -29,8 +31,16 @@ final readonly class SalesDocumentHtml
 
         return $this->twig->render('pdf/invoice.html.twig', [
             'invoice' => $invoice,
-            'country' => Countries::exists($buyer->country) ? Countries::getName($buyer->country, 'fr') : $buyer->country,
+            'country' => self::country($buyer),
             'business' => null !== $buyer->company || null !== $buyer->vatId,
+        ]);
+    }
+
+    public function creditNote(CreditNoteView $creditNote): string
+    {
+        return $this->twig->render('pdf/credit_note.html.twig', [
+            'creditNote' => $creditNote,
+            'country' => self::country($creditNote->buyer),
         ]);
     }
 
@@ -43,5 +53,10 @@ final readonly class SalesDocumentHtml
             'updatedAt' => $document->updatedAt,
             'body' => $this->legal->render($document, $this->settings->current(), $locale, $this->siteUrl),
         ]);
+    }
+
+    private static function country(Customer $buyer): string
+    {
+        return Countries::exists($buyer->country) ? Countries::getName($buyer->country, 'fr') : $buyer->country;
     }
 }

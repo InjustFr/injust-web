@@ -1,0 +1,50 @@
+{% extends 'pdf/_layout.html.twig' %}
+
+{% import 'pdf/_macros.html.twig' as doc %}
+
+{% block title %}{{ 'credit_note.title'|trans({}, 'documents', 'fr') }} {{ creditNote.number }}{% endblock %}
+
+{% block body %}
+    {% set issuedOn = creditNote.issuedAt|date('d/m/Y', 'Europe/Paris') %}
+    <h1>{{ doc.label('credit_note.title') }} {{ creditNote.number }}</h1>
+    <p class="meta">
+        {{ doc.label('invoice.issued_at', {date: issuedOn}) }}<br>
+        {{ doc.label('credit_note.credits', {number: creditNote.invoiceNumber}) }}<br>
+        {{ doc.label('invoice.order', {reference: creditNote.orderReference}) }}
+    </p>
+
+    {% include 'pdf/_parties.html.twig' with {seller: creditNote.seller, buyer: creditNote.buyer, country: country} only %}
+
+    <table class="lines">
+        <thead>
+            <tr>
+                <th>{{ doc.label('invoice.description') }}</th>
+                <th class="number">{{ doc.label('invoice.quantity') }}</th>
+                <th class="number">{{ doc.label('invoice.unit_price') }}</th>
+                <th class="number">{{ doc.label('invoice.line_total') }}</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for line in creditNote.lines %}
+                <tr>
+                    <td>{{ line.label }}</td>
+                    <td class="number">{{ line.quantity }}</td>
+                    <td class="number">{{ doc.price(line.unitPrice, -1) }}</td>
+                    <td class="number">{{ doc.price(line.total, -1) }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+        <tfoot>
+            <tr>
+                <td colspan="3" class="number">{{ doc.label('invoice.total') }}</td>
+                <td class="number">{{ doc.price(creditNote.amount, -1) }}</td>
+            </tr>
+        </tfoot>
+    </table>
+
+    <div class="mentions">
+        <p>{{ creditNote.vatMention }}</p>
+        <p>{{ doc.label('credit_note.refunded', {date: issuedOn}) }}</p>
+        {% if creditNote.reason %}<p>{{ doc.label('credit_note.reason') }} : {{ creditNote.reason }}</p>{% endif %}
+    </div>
+{% endblock %}

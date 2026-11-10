@@ -39,15 +39,22 @@ final readonly class DoctrineOrderRepository implements OrderRepository
 
     public function lockBySession(string $sessionId): ?Order
     {
-        $order = $this->orders()
-            ->where('o.checkoutSessionId = :session')
-            ->setParameter('session', $sessionId)
-            ->getQuery()
-            ->setLockMode(LockMode::PESSIMISTIC_WRITE)
-            ->setHint(Query::HINT_REFRESH, true)
-            ->getOneOrNullResult();
+        return $this->lock('checkoutSessionId', $sessionId);
+    }
 
-        return $order instanceof Order ? $order : null;
+    public function lockByPaymentIntent(string $paymentIntentId): ?Order
+    {
+        return $this->lock('paymentIntentId', $paymentIntentId);
+    }
+
+    public function byReference(string $reference): ?Order
+    {
+        return $this->entityManager->getRepository(Order::class)->findOneBy(['reference' => $reference]);
+    }
+
+    public function lockByReference(string $reference): ?Order
+    {
+        return $this->lock('reference', $reference);
     }
 
     public function bySession(string $sessionId): ?Order
@@ -77,7 +84,7 @@ final readonly class DoctrineOrderRepository implements OrderRepository
     {
         $query = $this->orders()
             ->where('o.status IN (:statuses)')
-            ->setParameter('statuses', [OrderStatus::Paid, OrderStatus::Refunded])
+            ->setParameter('statuses', [OrderStatus::Paid, OrderStatus::Withdrawn, OrderStatus::Refunded])
             ->orderBy('o.paidAt')
             ->addOrderBy('o.id');
 
@@ -93,6 +100,19 @@ final readonly class DoctrineOrderRepository implements OrderRepository
             ->setParameter('before', $before, Types::DATETIMETZ_IMMUTABLE)
             ->getQuery()
             ->execute();
+    }
+
+    private function lock(string $field, string $value): ?Order
+    {
+        $order = $this->orders()
+            ->where('o.'.$field.' = :value')
+            ->setParameter('value', $value)
+            ->getQuery()
+            ->setLockMode(LockMode::PESSIMISTIC_WRITE)
+            ->setHint(Query::HINT_REFRESH, true)
+            ->getOneOrNullResult();
+
+        return $order instanceof Order ? $order : null;
     }
 
     private function orders(): QueryBuilder

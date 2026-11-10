@@ -56,7 +56,7 @@ final class CheckoutReturnPagesTest extends WebTestCase
         $expired = SalesExamples::order();
         $expired->expire();
         $refunded = SalesExamples::paid(session: 'cs_refunded');
-        $refunded->refund();
+        $refunded->refund($refunded->price()->cents);
 
         foreach ([self::store($expired), self::store($refunded)] as $order) {
             $crawler = $client->request('GET', '/checkout/success?order='.$order->id()->toBase32());

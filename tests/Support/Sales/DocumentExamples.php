@@ -24,15 +24,15 @@ use App\Domain\Shared\LocalizedText;
 
 final class DocumentExamples
 {
-    public static function identity(): LegalIdentity
+    public static function identity(string $vatNumber = ''): LegalIdentity
     {
-        return new LegalIdentity('Louis Injust', 'EI', '443061841', "1 rue du Son\n75000 Paris", 'louis@injust.test', '+33600000000', 'Louis Injust', 'Médiateur Test', 'https://mediator.test', 'OVH SAS', 'Roubaix', '+33972101007');
+        return new LegalIdentity('Louis Injust', 'EI', '443061841', "1 rue du Son\n75000 Paris", 'louis@injust.test', '+33600000000', 'Louis Injust', 'Médiateur Test', 'https://mediator.test', 'OVH SAS', 'Roubaix', '+33972101007', $vatNumber);
     }
 
-    public static function settings(?string $bookingUrl = null, string $contactEmail = 'hello@injust.test'): SettingsView
+    public static function settings(?string $bookingUrl = null, string $contactEmail = 'hello@injust.test', string $vatNumber = ''): SettingsView
     {
         $settings = Settings::initial();
-        $settings->editLegalIdentity(self::identity());
+        $settings->editLegalIdentity(self::identity($vatNumber));
         $settings->editGeneral($contactEmail, $bookingUrl, VatMentions::defaults(), new LocalizedText(), new LocalizedText(), false, '');
 
         return SettingsView::of($settings);
@@ -91,7 +91,12 @@ final class DocumentExamples
 
     public static function invoice(Order $order): InvoiceView
     {
-        return InvoiceView::of(Invoice::issue('2026-0007', $order, Seller::of(self::identity()), VatMentions::defaults(), new \DateTimeImmutable('2026-11-10 10:06:00')));
+        return InvoiceView::of(self::invoiceOf($order));
+    }
+
+    public static function invoiceOf(Order $order, string $number = '2026-0007'): Invoice
+    {
+        return Invoice::issue($number, $order, Seller::of(self::identity()), VatMentions::defaults(), new \DateTimeImmutable('2026-11-10 10:06:00'));
     }
 
     public static function orderView(Order $order): OrderView
