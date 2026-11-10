@@ -66,6 +66,7 @@ final readonly class SecurityHeaders
             "script-src 'self'",
             "style-src 'self' 'sha256-60LHlRjW/B3CtzIoE/Lf1/NEDvko9efWMFaGVhHu/cs='",
             "img-src 'self' data:",
+            "media-src 'self'",
             "font-src 'self'",
             "connect-src 'self'",
             'frame-src https://www.youtube-nocookie.com https://open.spotify.com',

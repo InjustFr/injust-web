@@ -2,6 +2,8 @@
 set -e
 
 if [ "$1" = "frankenphp" ] || [ "${1#-}" != "$1" ]; then
+    mkdir -p var/share/tmp
+    find var/share/tmp -mindepth 1 -delete
     attempts=0
     until php bin/console dbal:run-sql -q "SELECT 1" >/dev/null 2>&1; do
         attempts=$((attempts + 1))

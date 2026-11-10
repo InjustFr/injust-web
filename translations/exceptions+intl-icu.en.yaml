@@ -58,3 +58,15 @@ links:
     invalid_label: 'A link needs a label in at least one language, {max} characters at most in each.'
 seo:
     invalid_page_seo: 'Keep the title to {title} characters and the description to {description} characters in each language.'
+beats:
+    invalid_bpm: 'The tempo must be between {min} and {max} BPM.'
+    invalid_tags: 'Keep up to {max} tags, each 1 to {length} characters.'
+    slug_taken: 'Another beat already uses the address “{slug}”: choose another slug.'
+    unnamed_tier: 'A licence needs a name in at least one language.'
+    missing_tier_price: 'A licence needs a price above 0 €.'
+    missing_deliverables: 'A licence delivers at least one file: MP3, WAV or stems.'
+    invalid_cap: 'A limit is at least 1: leave it empty for no limit.'
+    one_exclusive_tier: 'Only one licence can be exclusive: switch the other one off first.'
+    unsupported_file: '{format, select, mp3 {This file is not an MP3 file: export the beat again and upload that file.} wav {This file is not a WAV file: export the beat again and upload that file.} other {This file is not a ZIP archive: put the stems in a .zip file and upload that.}}'
+    file_too_large: 'This file is too large: {megabytes} MB at most.'
+    upload_failed: 'The upload did not complete: check the file size and your connection, then try again.'

@@ -15,7 +15,7 @@ import LinkModal from '../components/links/LinkModal.vue';
 import PublicUrl from '../components/links/PublicUrl.vue';
 import OrderButtons from '../components/music/OrderButtons.vue';
 import { hostOf, linkPayload } from '../linksForm.js';
-import { moveId } from '../musicForm.js';
+import { moveId } from '../forms.js';
 
 const { t, locale } = useI18n();
 const api = useApi();

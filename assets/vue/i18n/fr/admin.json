@@ -12,7 +12,8 @@
         "production": "Production",
         "orders": "Commandes",
         "links": "Liens",
-        "seo": "SEO"
+        "seo": "SEO",
+        "beats": "Beats"
     },
     "dashboard": {
         "title": "Tableau de bord",
@@ -513,5 +514,93 @@
         "remove": "Retirer",
         "titleField": "Titre ({language})",
         "descriptionField": "Description ({language})"
+    },
+    "beats": {
+        "title": "Beats",
+        "subtitle": "Catalogue de beats, licences et textes de la boutique de beats.",
+        "saved": "Enregistré.",
+        "save": "Enregistrer",
+        "edit": "Modifier",
+        "delete": "Supprimer",
+        "remove": "Retirer",
+        "slots": {
+            "preview": "Extrait",
+            "mp3": "MP3",
+            "wav": "WAV",
+            "stems": "Stems"
+        },
+        "deliverables": {
+            "mp3": "MP3",
+            "wav": "WAV",
+            "stems": "Stems"
+        },
+        "beats": {
+            "title": "Beats",
+            "new": "Nouveau beat",
+            "edit": "Modifier le beat",
+            "empty": "Aucun beat pour l’instant.",
+            "titleField": "Titre",
+            "slug": "Identifiant dans l’adresse",
+            "slugHint": "Laissez vide pour le construire à partir du titre.",
+            "bpm": "BPM",
+            "key": "Tonalité",
+            "tags": "Étiquettes",
+            "tagsHint": "Séparées par des virgules, 8 au maximum, par exemple trap, dark, 808.",
+            "visible": "Visible sur le site",
+            "visibleHint": "Un beat n’apparaît qu’avec un extrait, et tant qu’il n’est pas vendu en exclusivité.",
+            "cover": "Pochette",
+            "sold": "Vendu en exclusivité",
+            "notListed": "Absent du site",
+            "showFiles": "Afficher les fichiers",
+            "hideFiles": "Masquer les fichiers",
+            "visibleSwitch": "Visible sur le site : {title}"
+        },
+        "files": {
+            "title": "Fichiers de {title}",
+            "empty": "Aucun fichier",
+            "drop": "ou déposez un fichier ici",
+            "choose": "choisissez-en un",
+            "replace": "Remplacer",
+            "cancel": "Annuler l’envoi",
+            "dismiss": "Fermer",
+            "limit": "Jusqu’à {size}.",
+            "tooLarge": "{name} dépasse la limite de {size}.",
+            "uploading": "Envoi {percent} %",
+            "processing": "Enregistrement du fichier",
+            "done": "Envoyé.",
+            "failed": "Échec de l’envoi : {error}",
+            "cancelled": "Envoi annulé.",
+            "removed": "Fichier retiré.",
+            "private": "Privé, remis uniquement aux acheteurs.",
+            "public": "Public, écouté sur le site."
+        },
+        "tiers": {
+            "title": "Licences",
+            "new": "Nouvelle licence",
+            "edit": "Modifier la licence",
+            "empty": "Aucune licence pour l’instant.",
+            "name": "Nom ({language})",
+            "summary": "Résumé des droits, Markdown ({language})",
+            "price": "Prix (EUR)",
+            "priceHint": "Par exemple 29 ou 29,50.",
+            "deliverables": "Fichiers livrés",
+            "exclusive": "Licence exclusive",
+            "exclusiveHint": "Le beat est retiré une fois vendu. Une seule licence peut être exclusive.",
+            "capsHint": "Laissez vide pour aucune limite.",
+            "streamCap": "Limite d’écoutes",
+            "copyCap": "Limite de copies",
+            "videoCap": "Limite de vidéos",
+            "exclusiveBadge": "Exclusive",
+            "caps": {
+                "streamCap": "{count} écoutes",
+                "copyCap": "{count} copies",
+                "videoCap": "{count} vidéos"
+            }
+        },
+        "texts": {
+            "title": "Textes de la page",
+            "intro": "Introduction, Markdown ({language})",
+            "faq": "FAQ, Markdown ({language})"
+        }
     }
 }

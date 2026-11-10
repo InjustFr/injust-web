@@ -2,7 +2,6 @@ import { describe, expect, it } from 'vitest';
 import {
     KINDS,
     PRICINGS,
-    optionalInt,
     pageForm,
     pagePayload,
     portfolioForm,
@@ -10,17 +9,6 @@ import {
     servicePayload,
     serviceForm,
 } from './productionForm.js';
-
-describe('optionalInt', () => {
-    it('turns blanks into null and keeps numbers', () => {
-        expect(optionalInt('')).toBeNull();
-        expect(optionalInt(null)).toBeNull();
-        expect(optionalInt(' ')).toBeNull();
-        expect(optionalInt('0')).toBe(0);
-        expect(optionalInt(7)).toBe(7);
-        expect(optionalInt('12')).toBe(12);
-    });
-});
 
 describe('service form', () => {
     const service = {

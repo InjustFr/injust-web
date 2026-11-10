@@ -1,0 +1,50 @@
+<section class="tiers" aria-labelledby="tiers-title">
+    {% include 'site/_section_head.html.twig' with {id: 'tiers-title', title: 'site.beats.tiers.title'|trans} only %}
+    <div class="tier-scroll" role="region" aria-labelledby="tiers-title" tabindex="0">
+        <table class="tier-table">
+            <caption class="visually-hidden">{{ 'site.beats.tiers.caption'|trans }}</caption>
+            <thead>
+                <tr>
+                    <td></td>
+                    {% for tier in tiers %}
+                        <th scope="col"{% if tier.exclusive %} class="tier-exclusive-head"{% endif %}>{{ tier.name }}</th>
+                    {% endfor %}
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <th scope="row">{{ 'site.beats.tiers.price'|trans }}</th>
+                    {% for tier in tiers %}<td class="tier-price">{{ tier.price }}</td>{% endfor %}
+                </tr>
+                <tr>
+                    <th scope="row">{{ 'site.beats.tiers.files'|trans }}</th>
+                    {% for tier in tiers %}
+                        <td class="tier-files">
+                            <ul>
+                                {%- for deliverable in tier.deliverables -%}
+                                    <li>{{ ('site.beats.tiers.deliverables.' ~ deliverable)|trans }}</li>
+                                {%- endfor -%}
+                            </ul>
+                        </td>
+                    {% endfor %}
+                </tr>
+                {% for cap, label in {streams: 'site.beats.tiers.streams', copies: 'site.beats.tiers.copies', videos: 'site.beats.tiers.videos'} %}
+                    <tr>
+                        <th scope="row">{{ label|trans }}</th>
+                        {% for tier in tiers %}
+                            <td class="tier-cap tier-{{ cap }}">{{ tier[cap] is null ? 'site.beats.tiers.unlimited'|trans : 'site.beats.tiers.cap'|trans({cap: tier[cap]}) }}</td>
+                        {% endfor %}
+                    </tr>
+                {% endfor %}
+                <tr>
+                    <th scope="row">{{ 'site.beats.tiers.exclusive'|trans }}</th>
+                    {% for tier in tiers %}<td class="tier-exclusive">{{ (tier.exclusive ? 'site.beats.tiers.yes' : 'site.beats.tiers.no')|trans }}</td>{% endfor %}
+                </tr>
+                <tr>
+                    <th scope="row">{{ 'site.beats.tiers.summary'|trans }}</th>
+                    {% for tier in tiers %}<td class="tier-summary">{{ tier.summary|raw }}</td>{% endfor %}
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</section>

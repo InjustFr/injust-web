@@ -84,13 +84,3 @@ export function textForm(text) {
 export function textPayload(form) {
     return { tagline: { ...form.tagline }, manifesto: { ...form.manifesto }, bio: { ...form.bio }, hooks: hooksPayload(form.hooks) };
 }
-
-export function moveId(ids, id, delta) {
-    const from = ids.indexOf(id);
-    const to = from + delta;
-    if (from === -1 || to < 0 || to >= ids.length) return [...ids];
-    const next = [...ids];
-    next.splice(from, 1);
-    next.splice(to, 0, id);
-    return next;
-}

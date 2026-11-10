@@ -10,7 +10,7 @@ import PageSection from '../../../components/ui/PageSection.vue';
 import { useApi } from '../../../composables/useApi.js';
 import { useToast } from '../../../composables/useToast.js';
 import { intlLocale } from '../../../i18n/locale.js';
-import { moveId } from '../../musicForm.js';
+import { moveId } from '../../forms.js';
 import OrderButtons from '../music/OrderButtons.vue';
 import ServiceModal from './ServiceModal.vue';
 

@@ -7,6 +7,7 @@ import SeoPage from './pages/SeoPage.vue';
 import MessagesPage from './pages/MessagesPage.vue';
 import OrdersPage from './pages/OrdersPage.vue';
 import MusicPage from './pages/MusicPage.vue';
+import BeatsPage from './pages/BeatsPage.vue';
 import ProductionPage from './pages/ProductionPage.vue';
 import NotFoundPage from './pages/NotFoundPage.vue';
 import SettingsPage from './pages/SettingsPage.vue';
@@ -18,6 +19,7 @@ export const router = createRouter({
         { path: '/music', name: 'music', component: MusicPage },
         { path: '/lessons', name: 'lessons', component: LessonsPage },
         { path: '/production', name: 'production', component: ProductionPage },
+        { path: '/beats', name: 'beats', component: BeatsPage },
         { path: '/links', name: 'links', component: LinksPage },
         { path: '/seo', name: 'seo', component: SeoPage },
         { path: '/messages', name: 'messages', component: MessagesPage },

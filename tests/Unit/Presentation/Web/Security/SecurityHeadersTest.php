@@ -22,7 +22,7 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
 
 final class SecurityHeadersTest extends TestCase
 {
-    private const string POLICY = "default-src 'self'; script-src 'self'; style-src 'self' 'sha256-60LHlRjW/B3CtzIoE/Lf1/NEDvko9efWMFaGVhHu/cs='; img-src 'self' data:; font-src 'self'; connect-src 'self'; frame-src https://www.youtube-nocookie.com https://open.spotify.com; object-src 'none'; base-uri 'none'; frame-ancestors 'none'; form-action 'self'";
+    private const string POLICY = "default-src 'self'; script-src 'self'; style-src 'self' 'sha256-60LHlRjW/B3CtzIoE/Lf1/NEDvko9efWMFaGVhHu/cs='; img-src 'self' data:; media-src 'self'; font-src 'self'; connect-src 'self'; frame-src https://www.youtube-nocookie.com https://open.spotify.com; object-src 'none'; base-uri 'none'; frame-ancestors 'none'; form-action 'self'";
 
     public function testEveryPageGetsTheStrictPolicyAndTheAccountsOriginMayReceiveForms(): void
     {

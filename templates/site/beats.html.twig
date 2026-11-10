@@ -1,0 +1,98 @@
+{% extends 'site.html.twig' %}
+
+{% set page_title = 'site.sections.beats'|trans %}
+
+{% block main %}
+    <section class="page-hero beats-hero" aria-labelledby="beats-title">
+        <p class="page-kicker">{{ 'site.beats.kicker'|trans }}</p>
+        <h1 class="page-title" id="beats-title">{{ page_title }}</h1>
+        {% if intro|trim %}
+            <div class="page-intro">{{ intro|raw }}</div>
+        {% else %}
+            <p class="page-lead">{{ 'site.leads.beats'|trans }}</p>
+        {% endif %}
+    </section>
+    <section class="beats" aria-labelledby="catalogue-title">
+        {% include 'site/_section_head.html.twig' with {id: 'catalogue-title', title: 'site.beats.catalogue'|trans} only %}
+        {% if rows %}
+            <div class="beat-catalogue" data-island="BeatTable" data-props="{{ {
+                rows: rows,
+                tags: tags,
+                keys: keys,
+                bounds: bounds,
+                filter: filter,
+                contact: path('contact', {topic: 'beats'}),
+                labels: {
+                    caption: 'site.beats.caption'|trans,
+                    columns: {
+                        play: 'site.beats.columns.play'|trans,
+                        cover: 'site.beats.columns.cover'|trans,
+                        title: 'site.beats.columns.title'|trans,
+                        bpm: 'site.beats.columns.bpm'|trans,
+                        key: 'site.beats.columns.key'|trans,
+                        tags: 'site.beats.columns.tags'|trans,
+                        price: 'site.beats.columns.price'|trans,
+                        action: 'site.beats.columns.action'|trans,
+                    },
+                    sort: 'site.beats.sort'|trans({column: '{column}'}),
+                    play: 'site.beats.play'|trans({title: '{title}'}),
+                    onRequest: 'site.beats.on_request'|trans,
+                    contact: 'site.beats.contact'|trans,
+                    filters: {
+                        label: 'site.beats.filters.label'|trans,
+                        tags: 'site.beats.filters.tags'|trans,
+                        key: 'site.beats.filters.key'|trans,
+                        anyKey: 'site.beats.filters.any_key'|trans,
+                        bpm: 'site.beats.filters.bpm'|trans,
+                        min: 'site.beats.filters.min'|trans,
+                        max: 'site.beats.filters.max'|trans,
+                        reset: 'site.beats.filters.reset'|trans,
+                    },
+                    counts: range(0, rows|length)|map(count => 'site.beats.count'|trans({count: count})),
+                    none: 'site.beats.none'|trans,
+                },
+            }|json_encode }}">
+                {% include 'site/_beat_filters.html.twig' %}
+                <p class="beat-count" role="status">{{ 'site.beats.count'|trans({count: shown|length}) }}</p>
+                {% if shown %}
+                    <table class="beat-table">
+                        <caption class="visually-hidden">{{ 'site.beats.caption'|trans }}</caption>
+                        <thead>
+                            <tr>
+                                <th scope="col" class="beat-col-play"><span class="visually-hidden">{{ 'site.beats.columns.play'|trans }}</span></th>
+                                <th scope="col" class="beat-col-cover"><span class="visually-hidden">{{ 'site.beats.columns.cover'|trans }}</span></th>
+                                <th scope="col" class="beat-col-title">{{ 'site.beats.columns.title'|trans }}</th>
+                                <th scope="col" class="beat-col-bpm">{{ 'site.beats.columns.bpm'|trans }}</th>
+                                <th scope="col" class="beat-col-key">{{ 'site.beats.columns.key'|trans }}</th>
+                                <th scope="col" class="beat-col-tags">{{ 'site.beats.columns.tags'|trans }}</th>
+                                <th scope="col" class="beat-col-price">{{ 'site.beats.columns.price'|trans }}</th>
+                                <th scope="col" class="beat-col-action"><span class="visually-hidden">{{ 'site.beats.columns.action'|trans }}</span></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for beat in shown %}
+                                {% include 'site/_beat_row.html.twig' with {beat: beat} only %}
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                {% else %}
+                    <p class="beat-none">{{ 'site.beats.none'|trans }}</p>
+                {% endif %}
+            </div>
+        {% else %}
+            <div class="offers-empty beats-empty">
+                <p>{{ 'site.beats.empty'|trans }}</p>
+                <a class="button" href="{{ path('contact', {topic: 'beats'}) }}">{{ 'site.beats.contact'|trans }}</a>
+            </div>
+        {% endif %}
+    </section>
+    {% if tiers %}
+        {% include 'site/_beat_tiers.html.twig' %}
+    {% endif %}
+    {% if faq|trim %}
+        <section class="faq" aria-labelledby="faq-title">
+            {% include 'site/_section_head.html.twig' with {id: 'faq-title', title: 'site.faq'|trans} only %}
+            {% include 'site/_faq.html.twig' with {faq: faq, questions: faq_questions} only %}
+        </section>
+    {% endif %}
+{% endblock %}

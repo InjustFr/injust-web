@@ -17,14 +17,14 @@ export function launchChecklist({ settings, music }) {
     ];
 }
 
-export function sectionRows({ settings, music, lessons, production }) {
+export function sectionRows({ settings, music, lessons, production, beats }) {
     const { sections } = settings;
 
     return [
         { key: 'music', enabled: true, count: music.releases.length + music.videos.length, to: { name: 'music' } },
         { key: 'lessons', enabled: sections.lessons, count: lessons.offers.length, to: { name: 'lessons' } },
         { key: 'production', enabled: sections.production, count: production.services.length + production.portfolio.length, to: { name: 'production' } },
-        { key: 'beats', enabled: sections.beats, count: null, to: null },
+        { key: 'beats', enabled: sections.beats, count: beats.beats.length, to: { name: 'beats' } },
         { key: 'checkout', enabled: settings.onlineCheckout, count: null, to: { name: 'settings' } },
     ];
 }

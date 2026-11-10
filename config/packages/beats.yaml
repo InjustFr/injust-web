@@ -1,0 +1,6 @@
+parameters:
+    beats.upload_limits:
+        preview: 20971520
+        mp3: 52428800
+        wav: 524288000
+        stems: 2147483648

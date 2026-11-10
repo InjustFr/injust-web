@@ -58,3 +58,15 @@ links:
     invalid_label: 'Un lien a besoin d’un libellé dans au moins une langue, {max} caractères au plus dans chacune.'
 seo:
     invalid_page_seo: 'Le titre tient en {title} caractères et la description en {description} caractères au plus, dans chaque langue.'
+beats:
+    invalid_bpm: 'Le tempo doit être compris entre {min} et {max} BPM.'
+    invalid_tags: 'Gardez au plus {max} tags, de 1 à {length} caractères chacun.'
+    slug_taken: 'Un autre beat utilise déjà l’adresse « {slug} » : choisissez un autre slug.'
+    unnamed_tier: 'Une licence a besoin d’un nom dans au moins une langue.'
+    missing_tier_price: 'Une licence a besoin d’un prix supérieur à 0 €.'
+    missing_deliverables: 'Une licence livre au moins un fichier : MP3, WAV ou stems.'
+    invalid_cap: 'Une limite vaut au moins 1 : laissez-la vide pour ne rien limiter.'
+    one_exclusive_tier: 'Une seule licence peut être exclusive : désactivez d’abord l’autre.'
+    unsupported_file: '{format, select, mp3 {Ce fichier n’est pas un MP3 : exportez à nouveau le beat et envoyez ce fichier.} wav {Ce fichier n’est pas un WAV : exportez à nouveau le beat et envoyez ce fichier.} other {Ce fichier n’est pas une archive ZIP : mettez les stems dans un fichier .zip et envoyez-le.}}'
+    file_too_large: 'Ce fichier est trop lourd : {megabytes} Mo au maximum.'
+    upload_failed: 'L’envoi n’a pas abouti : vérifiez la taille du fichier et votre connexion, puis réessayez.'

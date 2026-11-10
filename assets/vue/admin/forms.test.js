@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { centsToEuros, eurosToCents, pair, trimmed } from './forms.js';
+import { centsToEuros, eurosToCents, moveId, optionalInt, pair, trimmed } from './forms.js';
 
 describe('euros', () => {
     it('parses whole, comma and dot amounts into cents', () => {
@@ -39,5 +39,36 @@ describe('localized pairs', () => {
 
     it('trims both locales', () => {
         expect(trimmed({ fr: ' a ', en: ' b\n' })).toEqual({ fr: 'a', en: 'b' });
+    });
+});
+
+describe('optionalInt', () => {
+    it('turns blanks into null and keeps numbers', () => {
+        expect(optionalInt('')).toBeNull();
+        expect(optionalInt(null)).toBeNull();
+        expect(optionalInt(' ')).toBeNull();
+        expect(optionalInt('0')).toBe(0);
+        expect(optionalInt(7)).toBe(7);
+        expect(optionalInt('12')).toBe(12);
+    });
+});
+
+describe('moveId', () => {
+    const ids = ['a', 'b', 'c'];
+
+    it('moves an id up or down', () => {
+        expect(moveId(ids, 'b', -1)).toEqual(['b', 'a', 'c']);
+        expect(moveId(ids, 'b', 1)).toEqual(['a', 'c', 'b']);
+    });
+
+    it('stays put at the edges or for an unknown id', () => {
+        expect(moveId(ids, 'a', -1)).toEqual(ids);
+        expect(moveId(ids, 'c', 1)).toEqual(ids);
+        expect(moveId(ids, 'z', 1)).toEqual(ids);
+    });
+
+    it('does not mutate its input', () => {
+        moveId(ids, 'b', 1);
+        expect(ids).toEqual(['a', 'b', 'c']);
     });
 });

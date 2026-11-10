@@ -1,9 +1,7 @@
-import { centsToEuros, eurosToCents, pair, trimmed } from './forms.js';
+import { centsToEuros, eurosToCents, optionalInt, pair, trimmed } from './forms.js';
 
 export const KINDS = ['mix', 'master', 'mix-master', 'production', 'arrangement', 'recording', 'other'];
 export const PRICINGS = ['fixed', 'quote'];
-
-export const optionalInt = (value) => (String(value ?? '').trim() === '' ? null : Number(value));
 
 export function serviceForm(service) {
     if (!service) {

@@ -23,6 +23,7 @@ function data(overrides = {}) {
         },
         lessons: { offers: [], ...overrides.lessons },
         production: { services: [], portfolio: [], ...overrides.production },
+        beats: { beats: [], tiers: [], ...overrides.beats },
     };
 }
 
@@ -79,13 +80,14 @@ describe('sectionRows', () => {
             music: { releases: [{}, {}], videos: [{}] },
             lessons: { offers: [{}, {}, {}] },
             production: { services: [{}], portfolio: [{}, {}] },
+            beats: { beats: [{}, {}, {}, {}] },
         }));
 
         expect(rows).toEqual([
             { key: 'music', enabled: true, count: 3, to: { name: 'music' } },
             { key: 'lessons', enabled: true, count: 3, to: { name: 'lessons' } },
             { key: 'production', enabled: false, count: 3, to: { name: 'production' } },
-            { key: 'beats', enabled: false, count: null, to: null },
+            { key: 'beats', enabled: false, count: 4, to: { name: 'beats' } },
             { key: 'checkout', enabled: true, count: null, to: { name: 'settings' } },
         ]);
     });

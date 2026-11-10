@@ -5,6 +5,7 @@ import './styles/site/home.css';
 import './styles/site/services.css';
 import './styles/site/lessons.css';
 import './styles/site/production.css';
+import './styles/site/beats.css';
 import './styles/site/contact.css';
 import './styles/site/checkout.css';
 import './styles/site/withdrawal.css';

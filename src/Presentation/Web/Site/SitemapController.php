@@ -7,7 +7,6 @@ namespace App\Presentation\Web\Site;
 use App\Application\Music\MusicQueries;
 use App\Application\Music\ReleaseView;
 use App\Application\Settings\SettingsQueries;
-use App\Domain\Settings\Section;
 use Psr\Clock\ClockInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Attribute\AsController;
@@ -33,7 +32,7 @@ final readonly class SitemapController
         $covers = array_filter(array_map(static fn (ReleaseView $release): ?string => $release->cover, $this->music->releases($this->clock->now())));
         $pages = [new SitemapPage('home', images: $covers)];
         foreach ($settings->enabledSections() as $section) {
-            $pages[] = Section::Beats === $section ? new SitemapPage('section', ['section' => $section->value]) : new SitemapPage($section->value);
+            $pages[] = new SitemapPage($section->value);
         }
         $pages[] = new SitemapPage('contact');
         foreach ($this->legalPages->visible($settings) as $kind) {

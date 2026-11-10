@@ -4,6 +4,14 @@ declare(strict_types=1);
 
 namespace App\Fixtures;
 
+use App\Application\Beats\AddBeat\AddBeat;
+use App\Application\Beats\AddBeat\AddBeatHandler;
+use App\Application\Beats\AddLicenceTier\AddLicenceTier;
+use App\Application\Beats\AddLicenceTier\AddLicenceTierHandler;
+use App\Application\Beats\UploadBeatFile\UploadBeatFile;
+use App\Application\Beats\UploadBeatFile\UploadBeatFileHandler;
+use App\Application\Beats\UploadBeatPreview\UploadBeatPreview;
+use App\Application\Beats\UploadBeatPreview\UploadBeatPreviewHandler;
 use App\Application\Contact\SendContactMessage\SendContactMessage;
 use App\Application\Contact\SendContactMessage\SendContactMessageHandler;
 use App\Application\Lessons\AddLessonOffer\AddLessonOffer;
@@ -47,6 +55,10 @@ use App\Application\Settings\SwitchOnlineCheckout\SwitchOnlineCheckout;
 use App\Application\Settings\SwitchOnlineCheckout\SwitchOnlineCheckoutHandler;
 use App\Application\Settings\SwitchSections\SwitchSections;
 use App\Application\Settings\SwitchSections\SwitchSectionsHandler;
+use App\Domain\Beats\BeatDetails;
+use App\Domain\Beats\Deliverable;
+use App\Domain\Beats\LicenceTierDetails;
+use App\Domain\Beats\MusicalKey;
 use App\Domain\Contact\ContactTopic;
 use App\Domain\Lessons\LessonFormat;
 use App\Domain\Lessons\LessonOffer;
@@ -124,6 +136,10 @@ final class AppFixtures extends Fixture
         private readonly AddProductionServiceHandler $addProductionService,
         private readonly EditProductionPageHandler $editProductionPage,
         private readonly AddPortfolioItemHandler $addPortfolioItem,
+        private readonly AddBeatHandler $addBeat,
+        private readonly AddLicenceTierHandler $addLicenceTier,
+        private readonly UploadBeatPreviewHandler $uploadBeatPreview,
+        private readonly UploadBeatFileHandler $uploadBeatFile,
         private readonly SendContactMessageHandler $sendContactMessage,
         private readonly EditLegalIdentityHandler $editLegalIdentity,
         private readonly SwitchOnlineCheckoutHandler $switchOnlineCheckout,
@@ -167,6 +183,7 @@ final class AppFixtures extends Fixture
         $this->messages();
 
         if ('dev' === $this->environment) {
+            $this->beats();
             $this->shop($manager);
         }
     }
@@ -259,6 +276,59 @@ final class AppFixtures extends Fixture
         }
     }
 
+    private function beats(): void
+    {
+        $tiers = [
+            ['Basic', 'Basique', 2900, [Deliverable::Mp3], false, 50000, 2500, 1],
+            ['Premium', 'Premium', 5900, [Deliverable::Mp3, Deliverable::Wav], false, 500000, 10000, 3],
+            ['Exclusive', 'Exclusive', 49900, [Deliverable::Mp3, Deliverable::Wav, Deliverable::Stems], true, null, null, null],
+        ];
+        foreach ($tiers as [$en, $fr, $cents, $deliverables, $exclusive, $streams, $copies, $videos]) {
+            ($this->addLicenceTier)(new AddLicenceTier(new LicenceTierDetails(
+                new LocalizedText($fr, $en),
+                new Price($cents),
+                new LocalizedText('Usage commercial selon la licence.', 'Commercial use as the licence allows.'),
+                $deliverables,
+                $exclusive,
+                $streams,
+                $copies,
+                $videos,
+            )));
+        }
+
+        $beats = [
+            ['Riot Static', 148, MusicalKey::EMinor, ['punk', 'aggressive'], [Deliverable::Mp3, Deliverable::Wav]],
+            ['Concrete Hymn', 172, MusicalKey::DMinor, ['hard rock', 'anthem'], [Deliverable::Mp3]],
+            ['Ivory Tower', 128, MusicalKey::AMinor, ['protest', 'dark', 'punk'], [Deliverable::Mp3, Deliverable::Wav, Deliverable::Stems]],
+            ['Last Call', 95, MusicalKey::GMajor, ['slow', 'melodic'], []],
+        ];
+        foreach ($beats as [$title, $bpm, $key, $tags, $files]) {
+            $beat = ($this->addBeat)(new AddBeat(new BeatDetails($title, null, $bpm, $key, $tags, true)));
+            $id = Ulid::fromString($beat->id);
+            ($this->uploadBeatPreview)(new UploadBeatPreview($id, $this->audioFile($this->silentMp3()), $title.'.mp3'));
+            foreach ($files as $deliverable) {
+                ($this->uploadBeatFile)(new UploadBeatFile($id, $deliverable, $this->audioFile(match ($deliverable) {
+                    Deliverable::Mp3 => $this->silentMp3(),
+                    Deliverable::Wav => 'RIFF'."\x24\0\0\0".'WAVE',
+                    Deliverable::Stems => "PK\x03\x04",
+                }), $title.'.'.('stems' === $deliverable->value ? 'zip' : $deliverable->value)));
+            }
+        }
+    }
+
+    private function silentMp3(): string
+    {
+        return str_repeat("\xFF\xFB\x90\x00".str_repeat("\0", 413), 380);
+    }
+
+    private function audioFile(string $content): string
+    {
+        $path = tempnam(sys_get_temp_dir(), 'fixture');
+        file_put_contents($path, $content);
+
+        return $path;
+    }
+
     private function messages(): void
     {
         ($this->sendContactMessage)(new SendContactMessage('Alex Example', 'alex@example.com', ContactTopic::General, 'Hello, when is the album out? Looking forward to it.', 'en'));
@@ -282,7 +352,7 @@ final class AppFixtures extends Fixture
             '+33 1 98 76 54 32',
         ));
         ($this->installLegalDefaults)(new InstallLegalDefaults());
-        ($this->switchSections)(new SwitchSections(true, true, false));
+        ($this->switchSections)(new SwitchSections(true, true, true));
         ($this->switchOnlineCheckout)(new SwitchOnlineCheckout(true));
 
         $this->paidOrder(ProductType::Lesson, $this->first($manager, LessonOffer::class, [])->id()->toBase32(), 'buyer-one@example.com', 'fr');

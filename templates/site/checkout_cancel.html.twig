@@ -8,7 +8,7 @@
         <p class="checkout-state">{{ 'site.checkout.cancel.body'|trans }}</p>
         <p class="checkout-actions">
             <a class="button" href="{{ path('checkout', {productType: order.productType, productId: order.productId}) }}">{{ 'site.checkout.cancel.retry'|trans }}</a>
-            <a class="button-ghost" href="{{ back.value == 'beats' ? path('section', {section: back.value}) : path(back.value) }}">{{ ('site.checkout.cancel.back.' ~ back.value)|trans }}</a>
+            <a class="button-ghost" href="{{ path(back.value) }}">{{ ('site.checkout.cancel.back.' ~ back.value)|trans }}</a>
         </p>
     </section>
 {% endblock %}

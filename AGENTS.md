@@ -16,6 +16,8 @@ accounts OIDC authenticator. Don't ask about these.
 
 The M5 section of `CLAUDE.md` describes the withdrawal page, refunds and credit notes (the `charge.refunded` webhook is the only place credit notes are issued).
 
+The M6 section of `CLAUDE.md` describes the beats catalogue, its private and public file storage and the large-upload setup.
+
 ## Adding features: Flex, not hand-wiring
 
 Install new capabilities with `composer require <package>` (e.g. `symfony/lock`,

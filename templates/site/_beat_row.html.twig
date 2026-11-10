@@ -1,0 +1,28 @@
+<tr class="beat-row" id="beat-{{ beat.slug }}">
+    <td class="beat-cell-play">
+        {%- if beat.preview -%}
+            <a class="beat-play" href="{{ beat.preview }}" aria-label="{{ 'site.beats.play'|trans({title: beat.title}) }}"><span class="beat-play-icon" aria-hidden="true"></span></a>
+        {%- endif -%}
+    </td>
+    <td class="beat-cover">
+        {%- if beat.cover -%}
+            <img src="{{ beat.cover }}" alt="" width="56" height="56" loading="lazy" decoding="async">
+        {%- else -%}
+            <span class="cover-blank" aria-hidden="true">{{ beat.title|first }}</span>
+        {%- endif -%}
+    </td>
+    <th scope="row" class="beat-title" id="beat-title-{{ beat.id }}">{{ beat.title }}</th>
+    <td class="beat-bpm">{{ 'site.beats.bpm'|trans({bpm: beat.bpm}) }}</td>
+    <td class="beat-key">{{ beat.keyLabel }}</td>
+    <td class="beat-cell-tags">
+        {%- if beat.tags -%}
+            <ul class="beat-tags">
+                {%- for tag in beat.tags -%}
+                    <li>{{ tag }}</li>
+                {%- endfor -%}
+            </ul>
+        {%- endif -%}
+    </td>
+    <td class="beat-price{% if beat.price is null %} is-request{% endif %}">{{ beat.price ?? 'site.beats.on_request'|trans }}</td>
+    <td class="beat-action"><a class="button" href="{{ path('contact', {topic: 'beats', offer: beat.id}) }}" aria-describedby="beat-title-{{ beat.id }}">{{ 'site.beats.contact'|trans }}</a></td>
+</tr>

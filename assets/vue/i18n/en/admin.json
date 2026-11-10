@@ -12,7 +12,8 @@
         "production": "Production",
         "orders": "Orders",
         "links": "Links",
-        "seo": "SEO"
+        "seo": "SEO",
+        "beats": "Beats"
     },
     "dashboard": {
         "title": "Dashboard",
@@ -513,5 +514,93 @@
         "remove": "Remove",
         "titleField": "Title ({language})",
         "descriptionField": "Description ({language})"
+    },
+    "beats": {
+        "title": "Beats",
+        "subtitle": "Beat catalogue, licence tiers and page texts for the beats store.",
+        "saved": "Saved.",
+        "save": "Save",
+        "edit": "Edit",
+        "delete": "Delete",
+        "remove": "Remove",
+        "slots": {
+            "preview": "Preview",
+            "mp3": "MP3",
+            "wav": "WAV",
+            "stems": "Stems"
+        },
+        "deliverables": {
+            "mp3": "MP3",
+            "wav": "WAV",
+            "stems": "Stems"
+        },
+        "beats": {
+            "title": "Beats",
+            "new": "New beat",
+            "edit": "Edit beat",
+            "empty": "No beat yet.",
+            "titleField": "Title",
+            "slug": "Address slug",
+            "slugHint": "Leave empty to build it from the title.",
+            "bpm": "BPM",
+            "key": "Key",
+            "tags": "Tags",
+            "tagsHint": "Separated by commas, up to 8, for example trap, dark, 808.",
+            "visible": "Visible on the site",
+            "visibleHint": "A beat only shows with a preview, and while it is not sold exclusively.",
+            "cover": "Cover",
+            "sold": "Sold exclusively",
+            "notListed": "Not on the site",
+            "showFiles": "Show files",
+            "hideFiles": "Hide files",
+            "visibleSwitch": "Visible on the site: {title}"
+        },
+        "files": {
+            "title": "Files of {title}",
+            "empty": "No file yet",
+            "drop": "or drop a file here",
+            "choose": "choose one",
+            "replace": "Replace",
+            "cancel": "Cancel upload",
+            "dismiss": "Dismiss",
+            "limit": "Up to {size}.",
+            "tooLarge": "{name} is over the {size} limit.",
+            "uploading": "Uploading {percent}%",
+            "processing": "Saving the file",
+            "done": "Uploaded.",
+            "failed": "Upload failed: {error}",
+            "cancelled": "Upload cancelled.",
+            "removed": "File removed.",
+            "private": "Private, only given to buyers.",
+            "public": "Public, played on the site."
+        },
+        "tiers": {
+            "title": "Licence tiers",
+            "new": "New tier",
+            "edit": "Edit tier",
+            "empty": "No licence tier yet.",
+            "name": "Name ({language})",
+            "summary": "Rights summary, Markdown ({language})",
+            "price": "Price (EUR)",
+            "priceHint": "For example 29 or 29,50.",
+            "deliverables": "Files delivered",
+            "exclusive": "Exclusive licence",
+            "exclusiveHint": "The beat is withdrawn once sold. Only one tier can be exclusive.",
+            "capsHint": "Leave empty for no limit.",
+            "streamCap": "Stream limit",
+            "copyCap": "Copies limit",
+            "videoCap": "Video limit",
+            "exclusiveBadge": "Exclusive",
+            "caps": {
+                "streamCap": "{count} streams",
+                "copyCap": "{count} copies",
+                "videoCap": "{count} videos"
+            }
+        },
+        "texts": {
+            "title": "Page texts",
+            "intro": "Introduction, Markdown ({language})",
+            "faq": "FAQ, Markdown ({language})"
+        }
     }
 }

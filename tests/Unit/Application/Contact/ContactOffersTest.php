@@ -4,11 +4,16 @@ declare(strict_types=1);
 
 namespace App\Tests\Unit\Application\Contact;
 
+use App\Application\Beats\BeatsQueries;
+use App\Application\Beats\BeatView;
 use App\Application\Contact\ContactOffers;
 use App\Application\Lessons\LessonOfferView;
 use App\Application\Lessons\LessonsQueries;
 use App\Application\Production\ProductionQueries;
 use App\Application\Production\ProductionServiceView;
+use App\Domain\Beats\Beat;
+use App\Domain\Beats\BeatDetails;
+use App\Domain\Beats\MusicalKey;
 use App\Domain\Contact\ContactTopic;
 use App\Domain\Lessons\LessonFormat;
 use App\Domain\Lessons\LessonOffer;
@@ -28,6 +33,8 @@ final class ContactOffersTest extends TestCase
 
     private ProductionServiceView $service;
 
+    private BeatView $beat;
+
     private ContactOffers $offers;
 
     protected function setUp(): void
@@ -38,7 +45,10 @@ final class ContactOffersTest extends TestCase
         $lessons->method('offer')->willReturnCallback(fn (string $id): ?LessonOfferView => $id === $this->lesson->id ? $this->lesson : null);
         $production = self::createStub(ProductionQueries::class);
         $production->method('service')->willReturnCallback(fn (string $id): ?ProductionServiceView => $id === $this->service->id ? $this->service : null);
-        $this->offers = new ContactOffers($lessons, $production);
+        $this->beat = BeatView::of(Beat::add(new BeatDetails('Riot Gear', null, 140, MusicalKey::AMinor), 0));
+        $beats = self::createStub(BeatsQueries::class);
+        $beats->method('beat')->willReturnCallback(fn (string $id): ?BeatView => $id === $this->beat->id ? $this->beat : null);
+        $this->offers = new ContactOffers($lessons, $production, $beats);
     }
 
     public function testALessonsMessageResolvesALessonOfferInTheVisitorLocale(): void
@@ -57,17 +67,28 @@ final class ContactOffersTest extends TestCase
         self::assertSame('Mixing', $this->offers->find(ContactTopic::Production, $this->service->id, 'en')?->label);
     }
 
+    public function testABeatsMessageResolvesABeatByItsTitle(): void
+    {
+        $offer = $this->offers->find(ContactTopic::Beats, $this->beat->id, 'fr');
+
+        self::assertSame([$this->beat->id, 'Riot Gear'], [$offer?->id, $offer?->label]);
+        self::assertSame('Riot Gear', $this->offers->find(ContactTopic::Beats, $this->beat->id, 'en')?->label);
+    }
+
     public function testAnOfferOfAnotherTopicIsIgnored(): void
     {
         self::assertNull($this->offers->find(ContactTopic::Lessons, $this->service->id, 'en'));
         self::assertNull($this->offers->find(ContactTopic::Production, $this->lesson->id, 'en'));
         self::assertNull($this->offers->find(ContactTopic::General, $this->lesson->id, 'en'));
         self::assertNull($this->offers->find(ContactTopic::Beats, $this->service->id, 'en'));
+        self::assertNull($this->offers->find(ContactTopic::Lessons, $this->beat->id, 'en'));
+        self::assertNull($this->offers->find(ContactTopic::General, $this->beat->id, 'en'));
     }
 
     public function testAnUnknownRefResolvesNothing(): void
     {
         self::assertNull($this->offers->find(ContactTopic::Lessons, '', 'en'));
         self::assertNull($this->offers->find(ContactTopic::Production, 'nope', 'en'));
+        self::assertNull($this->offers->find(ContactTopic::Beats, 'nope', 'en'));
     }
 }

@@ -10,7 +10,8 @@ import FormField from '../../../components/ui/FormField.vue';
 import PageSection from '../../../components/ui/PageSection.vue';
 import { useApi } from '../../../composables/useApi.js';
 import { useToast } from '../../../composables/useToast.js';
-import { NETWORKS, moveId } from '../../musicForm.js';
+import { moveId } from '../../forms.js';
+import { NETWORKS } from '../../musicForm.js';
 import OrderButtons from './OrderButtons.vue';
 
 const props = defineProps({ links: { type: Array, required: true } });

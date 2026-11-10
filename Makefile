@@ -43,6 +43,7 @@ BUILD = docker buildx build --platform $(PLATFORM) --target prod -t $(IMAGE):$(T
 .PHONY: up down build install assets assets-e2e db db-test db-test-threads fixtures migration test test-unit test-functional test-js deptrac depcruise phpstan cs cs-fix audit audit-php audit-js gate gate-base coverage-php coverage-js crap mutation crap-js mutation-js e2e e2e-run qa ci ci-up ci-build ci-bundle ci-unbundle ci-warmup ci-checks ci-e2e image push deploy deploy-files
 
 up: ## Start the stack (site on http://localhost:8098, admin on /admin, Vite on :5178, mock mossyleaf accounts on :8099, Mailpit on :8028)
+	mkdir -p var/share/tmp
 	$(DC) up -d --wait php database node oidc mailpit
 	@git config core.hooksPath .githooks
 
@@ -118,6 +119,7 @@ audit-js:
 e2e: assets-e2e e2e-run ## Playwright against a dedicated APP_ENV=test container
 
 e2e-run: ## Playwright against already built assets (E2E_ASSETS_DIR, default build-e2e)
+	mkdir -p var/share/tmp
 	$(DC) --profile e2e up -d --wait php-e2e
 	$(EXEC) php-e2e php bin/console cache:clear --env=test
 	$(EXEC) php-e2e php bin/console doctrine:database:drop --force --if-exists --env=test
@@ -162,6 +164,7 @@ ci: ci-build ## Full suite from a fresh checkout (GitHub Actions runs ci-build o
 	$(MAKE) ci-e2e
 
 ci-up:
+	mkdir -p var/share/tmp
 	$(DC) up -d --wait php database oidc
 
 ci-build: ci-up ## Install PHP and JS dependencies and build the production assets

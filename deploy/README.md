@@ -75,6 +75,35 @@ Search Console: add the domain as a property, choose the HTML tag method, paste 
 - The site's server block of the nginx configuration proxies to `http://injust-web` and needs `client_max_body_size 25M` for image uploads, plus `X-Forwarded-Host`/`X-Forwarded-Port` like the other app blocks, and `proxy_set_header X-Forwarded-For $remote_addr;`. The app trusts `X-Forwarded-For` from private addresses, so without that line nginx passes on whatever the visitor sent and the contact rate limit can be dodged.
 - Uploaded images live in the `app_share` volume (`var/share/images`), the data in `database_data`.
 
+### Beat uploads
+
+Beat files are large (stems up to 2 GB), so only the admin route that receives them gets a bigger limit; every other location keeps `client_max_body_size 25M`. PHP writes a whole upload to disk before the app can check who sent it, so nginx turns away requests without a session cookie and allows three uploads at a time per address (one per file kind). Declare the zone once at `http` level (in `nginx.conf` or a `conf.d/*.conf` file):
+
+```nginx
+limit_conn_zone $binary_remote_addr zone=injust_uploads:1m;
+```
+
+Then add this block next to the site's main `location /`, with the same `proxy_set_header` lines:
+
+```nginx
+location ~ ^/api/admin/beats/.+/files/ {
+    if ($http_cookie !~ "(PHPSESSID|REMEMBERME)=") {
+        return 401;
+    }
+    limit_conn injust_uploads 3;
+    client_max_body_size 2g;
+    proxy_request_buffering off;
+    proxy_read_timeout 1800;
+    proxy_send_timeout 1800;
+    proxy_pass http://injust-web;
+}
+```
+
+`proxy_request_buffering off` streams the upload to the app instead of writing a second copy on the proxy's disk. The app accepts uploads up to 2 GB (`upload_max_filesize`, `post_max_size` 2100M, `max_input_time` 1800, so about 10 Mbit/s of upload is enough for the largest file) and writes them to `var/share/tmp` on the `app_share` volume, so a finished upload is moved into place, never copied. The container empties `var/share/tmp` when it starts, which removes what an interrupted upload left. Limits per file: preview MP3 20 MB, MP3 50 MB, WAV 500 MB, stems ZIP 2 GB (`config/packages/beats.yaml`). Keep at least 10 GB free on the disk that holds the `app_share` volume (`docker system df -v`, `df -h /var/lib/docker`): three uploads in progress plus the files already stored.
+
+- Public previews: `var/share/audio`, served on `/media/audio/<id>.mp3`.
+- Sold files (MP3, WAV, stems): `var/share/private`, never served by a public route. Keep it in the backups below.
+
 ## Updating
 
 From a dev machine, with `DEPLOY_HOST` (`user@server`), `DEPLOY_DIR` and optionally `REMOTE_DOCKER` (default `docker`) set in a gitignored `.deploy.env` at the repository root, push to `main`: GitHub Actions runs the full test suite, then publishes `docker.io/injust/injust-web` tagged with the short commit and `latest`. Once it is green, `make deploy` points the server `.env` at that tag, pulls it and restarts. `make push` builds and pushes by hand (after `make qa` and `docker login`).

@@ -13,6 +13,11 @@ export class ApiError extends Error {
     }
 }
 
+export function apiFailure(status, payload) {
+    if (status === 401) window.location.assign('/login');
+    return new ApiError(payload?.detail ?? payload?.title ?? t('common.error'), status, payload?.violations ?? []);
+}
+
 const REFRESH_HEADER = 'X-Refresh';
 const REFRESHED_HEADER = 'X-Refreshed';
 
@@ -66,15 +71,9 @@ async function send(method, url, body, refresh = []) {
             body: json ? JSON.stringify(body) : body,
         });
 
-        if (response.status === 401) {
-            window.location.assign('/login');
-        }
-
         const payload = response.status === 204 ? null : await response.json().catch(() => null);
 
-        if (!response.ok) {
-            throw new ApiError(payload?.detail ?? payload?.title ?? t('common.error'), response.status, payload?.violations ?? []);
-        }
+        if (!response.ok) throw apiFailure(response.status, payload);
 
         if (method === 'GET') return payload;
 

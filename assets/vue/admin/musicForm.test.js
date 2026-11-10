@@ -3,7 +3,6 @@ import {
     formatDuration,
     hooksPayload,
     hooksText,
-    moveId,
     parseDuration,
     parseTracks,
     releaseForm,
@@ -122,25 +121,5 @@ describe('texts', () => {
         const form = textForm(view);
         expect(form.hooks).toBe('x\ny');
         expect(textPayload(form)).toEqual({ tagline: { fr: 'f', en: 'e' }, manifesto: { fr: '', en: 'm' }, bio: { fr: 'b', en: '' }, hooks: ['x', 'y'] });
-    });
-});
-
-describe('moveId', () => {
-    const ids = ['a', 'b', 'c'];
-
-    it('moves an id up or down', () => {
-        expect(moveId(ids, 'b', -1)).toEqual(['b', 'a', 'c']);
-        expect(moveId(ids, 'b', 1)).toEqual(['a', 'c', 'b']);
-    });
-
-    it('stays put at the edges or for an unknown id', () => {
-        expect(moveId(ids, 'a', -1)).toEqual(ids);
-        expect(moveId(ids, 'c', 1)).toEqual(ids);
-        expect(moveId(ids, 'z', 1)).toEqual(ids);
-    });
-
-    it('does not mutate its input', () => {
-        moveId(ids, 'b', 1);
-        expect(ids).toEqual(['a', 'b', 'c']);
     });
 });

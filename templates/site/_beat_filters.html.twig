@@ -1,0 +1,33 @@
+<form class="beat-filters" method="get" action="{{ path('beats') }}" aria-label="{{ 'site.beats.filters.label'|trans }}">
+    {% if tags %}
+        <fieldset class="beat-filter beat-filter-tags">
+            <legend>{{ 'site.beats.filters.tags'|trans }}</legend>
+            <div class="chips">
+                {% for tag in tags %}
+                    <label class="chip"><input type="checkbox" name="tag[]" value="{{ tag }}"{% if tag in filter.tags %} checked{% endif %}><span>{{ tag }}</span></label>
+                {% endfor %}
+            </div>
+        </fieldset>
+    {% endif %}
+    <label class="beat-filter beat-filter-key">
+        <span class="beat-filter-label">{{ 'site.beats.filters.key'|trans }}</span>
+        <select name="key">
+            <option value="">{{ 'site.beats.filters.any_key'|trans }}</option>
+            {% for key in keys %}
+                <option value="{{ key.value }}"{% if key.value == filter.key %} selected{% endif %}>{{ key.label }}</option>
+            {% endfor %}
+        </select>
+    </label>
+    <fieldset class="beat-filter beat-filter-bpm">
+        <legend>{{ 'site.beats.filters.bpm'|trans }}</legend>
+        <div class="bpm-range">
+            <label><span class="visually-hidden">{{ 'site.beats.filters.min'|trans }}</span><input type="number" name="bpm_min" inputmode="numeric" min="{{ bounds.min }}" max="{{ bounds.max }}" placeholder="{{ bounds.min }}"{% if filter.min is not null %} value="{{ filter.min }}"{% endif %}></label>
+            <span class="bpm-dash" aria-hidden="true">–</span>
+            <label><span class="visually-hidden">{{ 'site.beats.filters.max'|trans }}</span><input type="number" name="bpm_max" inputmode="numeric" min="{{ bounds.min }}" max="{{ bounds.max }}" placeholder="{{ bounds.max }}"{% if filter.max is not null %} value="{{ filter.max }}"{% endif %}></label>
+        </div>
+    </fieldset>
+    <div class="beat-filter-actions">
+        <button class="button-ghost" type="submit">{{ 'site.beats.filters.apply'|trans }}</button>
+        <a class="beat-reset" href="{{ path('beats') }}">{{ 'site.beats.filters.reset'|trans }}</a>
+    </div>
+</form>

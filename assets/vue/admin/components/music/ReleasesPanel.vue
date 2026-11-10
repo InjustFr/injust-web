@@ -9,7 +9,7 @@ import IconButton from '../../../components/ui/IconButton.vue';
 import PageSection from '../../../components/ui/PageSection.vue';
 import { useApi } from '../../../composables/useApi.js';
 import { useToast } from '../../../composables/useToast.js';
-import { moveId } from '../../musicForm.js';
+import { moveId } from '../../forms.js';
 import { imageUrl } from '../../settingsForm.js';
 import OrderButtons from './OrderButtons.vue';
 import ReleaseModal from './ReleaseModal.vue';

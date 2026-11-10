@@ -233,7 +233,7 @@ final class ProductionPageTest extends WebTestCase
         self::assertCount(0, $crawler->filter('.placeholder'));
         self::assertSame(['/fr/production', '/fr/beats'], $crawler->filter('header nav a.nav-section')->each(static fn (Crawler $link): ?string => $link->attr('href')));
         self::assertSame('page', $crawler->filter('header nav a.nav-section')->attr('aria-current'));
-        self::assertCount(1, $client->request('GET', '/fr/beats')->filter('.placeholder'));
+        self::assertCount(0, $client->request('GET', '/fr/beats')->filter('.placeholder'));
     }
 
     public function testTheSitemapListsTheProductionPageWhenTheSectionIsOn(): void

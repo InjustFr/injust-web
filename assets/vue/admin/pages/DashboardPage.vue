@@ -15,16 +15,18 @@ const settings = ref(null);
 const music = ref(null);
 const lessons = ref(null);
 const production = ref(null);
+const beats = ref(null);
 const messages = ref(null);
 await Promise.all([
     api.load('/api/admin/settings', settings),
     api.load('/api/admin/music', music),
     api.load('/api/admin/lessons', lessons),
     api.load('/api/admin/production', production),
+    api.load('/api/admin/beats', beats),
     api.load('/api/admin/messages', messages),
 ]);
 
-const site = computed(() => ({ settings: settings.value, music: music.value, lessons: lessons.value, production: production.value }));
+const site = computed(() => ({ settings: settings.value, music: music.value, lessons: lessons.value, production: production.value, beats: beats.value }));
 const checklist = computed(() => launchChecklist(site.value));
 const doneCount = computed(() => checklist.value.filter((item) => item.done).length);
 const sections = computed(() => sectionRows(site.value));
