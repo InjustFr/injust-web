@@ -7,7 +7,7 @@
         <h1 class="checkout-title" id="checkout-return-title">{{ page_title }}</h1>
         <p class="checkout-state">{{ 'site.checkout.cancel.body'|trans }}</p>
         <p class="checkout-actions">
-            <a class="button" href="{{ path('checkout', {productType: order.productType, productId: order.productId}) }}">{{ 'site.checkout.cancel.retry'|trans }}</a>
+            <a class="button" href="{{ path('checkout', {productType: order.productType, productId: order.productId}|merge(order.licence ? {tier: order.licence.beat.tierId} : {})) }}">{{ 'site.checkout.cancel.retry'|trans }}</a>
             <a class="button-ghost" href="{{ path(back.value) }}">{{ ('site.checkout.cancel.back.' ~ back.value)|trans }}</a>
         </p>
     </section>

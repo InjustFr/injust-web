@@ -21,6 +21,8 @@ final readonly class CheckoutPayload
         public string $locale = '',
         public array $consents = [],
         public int $cgvVersion = 0,
+        public string $tierId = '',
+        public ?int $licenceVersion = null,
     ) {
     }
 }

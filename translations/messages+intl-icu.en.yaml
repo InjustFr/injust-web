@@ -161,6 +161,12 @@ site:
         from: 'from {price}'
         on_request: 'Price on request'
         contact: 'Contact me'
+        buy: 'Buy'
+        picker:
+            title: 'Choose a licence'
+            close: 'Close'
+            unavailable: 'File not available'
+            compare: 'Compare the licences'
         bpm: '{bpm} BPM'
         key: '{note} {mode, select, major {major} other {minor}}'
         notes:
@@ -240,6 +246,16 @@ site:
             body_too_short: 'Write at least 10 characters.'
             body_too_long: 'Use at most 5,000 characters.'
     checkout:
+        licences: 'Licence'
+        licence_link: 'Read the licence terms (opens in a new tab)'
+        line: '{label}: {value}'
+        downloads:
+            title: 'Your downloads'
+            mp3: 'Download MP3'
+            wav: 'Download WAV'
+            stems: 'Download the stems (ZIP)'
+            licence: 'Licence (PDF)'
+            valid: 'These links are valid for 7 days. They are also in your confirmation email.'
         book: 'Book & pay'
         title: 'Checkout'
         summary: 'Your order'
@@ -277,6 +293,11 @@ site:
                 lessons: 'See all lessons'
                 production: 'See all services'
                 beats: 'See all beats'
+    download:
+        expired:
+            title: 'This download link has expired'
+            body: 'Download links are valid for 7 days. Reply to your confirmation email, or write to me with your order reference, and I will send you a new one.'
+            contact: 'Contact me'
     withdrawal:
         title: 'Withdrawal'
         kicker: 'Right of withdrawal'
@@ -337,3 +358,5 @@ sales:
         terms: 'I have read and accept the terms of sale (version {version}).'
         early-start: 'I expressly request that the service starts before the end of the 14-day withdrawal period.'
         pro-rata: 'I acknowledge that if I withdraw after the service has started, I will pay an amount proportional to the service already provided.'
+        digital-waiver: 'I expressly ask for the files to be supplied as soon as my payment is confirmed, and I acknowledge that I thereby lose my right of withdrawal.'
+        licence: 'I accept the licence terms (version {version}) for the chosen tier, including its limits on streams, copies and music videos.'

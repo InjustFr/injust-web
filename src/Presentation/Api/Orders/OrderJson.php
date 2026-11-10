@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Presentation\Api\Orders;
 
+use App\Application\Sales\DownloadLink;
 use App\Application\Sales\OrderView;
 
 final class OrderJson
@@ -11,6 +12,8 @@ final class OrderJson
     /** @return array<string, mixed> */
     public static function of(OrderView $order): array
     {
+        $licence = $order->licence?->beat;
+
         return [
             'id' => $order->id,
             'reference' => $order->reference,
@@ -43,6 +46,23 @@ final class OrderJson
                 'issuedAt' => $note->issuedAt->format(\DATE_ATOM),
                 'reason' => $note->reason,
             ], $order->creditNotes),
+            'licence' => null === $licence ? null : [
+                'beatTitle' => $licence->title,
+                'tierName' => $licence->tierName->in($order->locale),
+                'exclusive' => $licence->exclusive,
+                'deliverables' => $licence->deliverables,
+            ],
+            'exclusiveConflictAt' => $order->exclusiveConflictAt?->format(\DATE_ATOM),
         ];
+    }
+
+    /**
+     * @param list<DownloadLink> $downloads
+     *
+     * @return array<string, mixed>
+     */
+    public static function detail(OrderView $order, array $downloads): array
+    {
+        return [...self::of($order), 'downloads' => $downloads];
     }
 }

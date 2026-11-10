@@ -7,6 +7,7 @@ namespace App\Infrastructure\Persistence\Doctrine\Beats;
 use App\Domain\Beats\Beat;
 use App\Domain\Beats\BeatRepository;
 use App\Domain\Shared\Exception\NotFound;
+use Doctrine\DBAL\LockMode;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Uid\Ulid;
 
@@ -29,6 +30,11 @@ final readonly class DoctrineBeatRepository implements BeatRepository
     public function find(Ulid $id): ?Beat
     {
         return $this->entityManager->find(Beat::class, $id);
+    }
+
+    public function lock(Ulid $id): ?Beat
+    {
+        return $this->entityManager->find(Beat::class, $id, LockMode::PESSIMISTIC_WRITE);
     }
 
     public function remove(Beat $beat): void

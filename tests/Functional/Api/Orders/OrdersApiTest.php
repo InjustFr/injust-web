@@ -6,6 +6,7 @@ namespace App\Tests\Functional\Api\Orders;
 
 use App\Application\Sales\CreditNoteView;
 use App\Application\Sales\InvoiceView;
+use App\Application\Sales\OrderView;
 use App\Application\Sales\PaymentGateway;
 use App\Application\Sales\SalesDocuments;
 use App\Application\Sales\SalesMails;
@@ -96,6 +97,11 @@ final class OrdersApiTest extends WebTestCase
             public function legalPdf(LegalDocumentView $document, string $locale): string
             {
                 return '';
+            }
+
+            public function licence(OrderView $order): string
+            {
+                return 'licence '.$order->reference;
             }
         });
 
@@ -329,6 +335,11 @@ final class OrdersApiTest extends WebTestCase
             public function legalPdf(LegalDocumentView $document, string $locale): string
             {
                 return '';
+            }
+
+            public function licence(OrderView $order): string
+            {
+                return 'licence '.$order->reference;
             }
         };
     }

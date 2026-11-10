@@ -7,6 +7,7 @@ namespace App\Application\Sales;
 use App\Domain\Sales\Consent;
 use App\Domain\Sales\CreditNote;
 use App\Domain\Sales\Customer;
+use App\Domain\Sales\LicenceSnapshot;
 use App\Domain\Sales\Order;
 use App\Domain\Sales\Terms;
 use App\Domain\Sales\WithdrawalRequest;
@@ -44,6 +45,8 @@ final readonly class OrderView
         public ?\DateTimeImmutable $withdrawalLastDay,
         public ?WithdrawalRequestView $withdrawal,
         public array $creditNotes,
+        public ?LicenceSnapshot $licence,
+        public ?\DateTimeImmutable $exclusiveConflictAt,
     ) {
     }
 
@@ -76,6 +79,8 @@ final readonly class OrderView
             $order->withdrawalLastDay(),
             null === $withdrawal ? null : WithdrawalRequestView::of($withdrawal),
             array_map(CreditNoteView::of(...), $creditNotes),
+            $order->licence(),
+            $order->exclusiveConflictAt(),
         );
     }
 }

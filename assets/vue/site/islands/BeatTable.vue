@@ -1,6 +1,8 @@
 <script setup>
-import { computed, onBeforeUnmount, ref } from 'vue';
+import { X } from '@lucide/vue';
+import { computed, nextTick, onBeforeUnmount, ref } from 'vue';
 import { filterBeats, formatBpm, formatDuration, idle, nextSort, player, progress, sortBeats } from '../beatTable.js';
+import { capLabel, licenceOptions } from '../licencePicker.js';
 
 const props = defineProps({
     rows: { type: Array, required: true },
@@ -9,6 +11,8 @@ const props = defineProps({
     bounds: { type: Object, required: true },
     filter: { type: Object, required: true },
     contact: { type: String, required: true },
+    checkout: { type: Boolean, required: true },
+    tiers: { type: Array, required: true },
     labels: { type: Object, required: true },
 });
 
@@ -21,6 +25,29 @@ const state = ref(idle);
 const time = ref(0);
 const duration = ref(0);
 const audio = ref(null);
+const picker = ref(null);
+const picked = ref(null);
+let opener = null;
+
+const options = computed(() => (picked.value ? licenceOptions(picked.value, props.tiers) : []));
+const caps = computed(() => [
+    { name: 'streams', label: props.labels.picker.streams },
+    { name: 'copies', label: props.labels.picker.copies },
+    { name: 'videos', label: props.labels.picker.videos },
+]);
+
+async function pick(beat, event) {
+    opener = event.currentTarget;
+    picked.value = beat;
+    await nextTick();
+    picker.value.showModal();
+}
+
+function closed() {
+    picked.value = null;
+    opener?.focus();
+    opener = null;
+}
 
 const shown = computed(() => sortBeats(filterBeats(props.rows, { tags: chosenTags.value, key: key.value, min: min.value, max: max.value }), sort.value));
 const count = computed(() => props.labels.counts[shown.value.length]);
@@ -151,10 +178,38 @@ onBeforeUnmount(() => audio.value?.pause());
                     </ul>
                 </td>
                 <td class="beat-price" :class="{ 'is-request': beat.price === null }">{{ beat.price ?? labels.onRequest }}</td>
-                <td class="beat-action"><a class="button" :href="`${contact}&offer=${encodeURIComponent(beat.id)}`" :aria-describedby="`beat-title-${beat.id}`">{{ labels.contact }}</a></td>
+                <td class="beat-action">
+                    <button v-if="checkout && beat.buy" type="button" class="button" aria-haspopup="dialog" :aria-describedby="`beat-title-${beat.id}`" @click="pick(beat, $event)">{{ labels.buy }}</button>
+                    <a v-else class="button" :href="`${contact}&offer=${encodeURIComponent(beat.id)}`" :aria-describedby="`beat-title-${beat.id}`">{{ labels.contact }}</a>
+                </td>
             </tr>
         </tbody>
     </table>
     <p v-else class="beat-none">{{ labels.none }}</p>
+    <dialog ref="picker" class="licence-picker" aria-labelledby="licence-picker-title" @close="closed" @click.self="picker.close()">
+        <div v-if="picked" class="licence-picker-body">
+            <header class="licence-picker-head">
+                <p class="licence-picker-beat">{{ picked.title }} <span>{{ formatBpm(picked.bpm) }} · {{ picked.keyLabel }}</span></p>
+                <h2 id="licence-picker-title" class="licence-picker-title">{{ labels.picker.title }}</h2>
+                <button type="button" class="licence-picker-close" :aria-label="labels.picker.close" @click="picker.close()"><X :size="20" aria-hidden="true" /></button>
+            </header>
+            <ul class="licence-options">
+                <li v-for="option in options" :key="option.id" class="licence-option" :class="{ 'is-exclusive': option.exclusive, 'is-off': !option.url }">
+                    <div class="licence-option-head">
+                        <h3 :id="`licence-${option.id}`" class="licence-option-name">{{ option.name }}</h3>
+                        <p v-if="option.exclusive" class="licence-option-flag">{{ labels.picker.exclusive }}</p>
+                        <p class="licence-option-price">{{ option.price }}</p>
+                    </div>
+                    <dl class="licence-option-facts">
+                        <div><dt>{{ labels.picker.files }}</dt><dd>{{ option.deliverables.map((deliverable) => labels.picker.deliverables[deliverable]).join(' · ') }}</dd></div>
+                        <div v-for="cap in caps" :key="cap.name"><dt>{{ cap.label }}</dt><dd>{{ capLabel(option[cap.name], labels.picker.locale, labels.picker.unlimited) }}</dd></div>
+                    </dl>
+                    <a v-if="option.url" class="button licence-option-buy" :href="option.url" :aria-describedby="`licence-${option.id}`">{{ labels.buy }}</a>
+                    <p v-else class="licence-option-reason">{{ labels.picker.unavailable }}</p>
+                </li>
+            </ul>
+            <p class="licence-picker-foot"><a href="#tiers-title" @click="picker.close()">{{ labels.picker.compare }}</a></p>
+        </div>
+    </dialog>
     <audio ref="audio" preload="none" @play="send({ type: 'play' })" @pause="send({ type: 'pause' })" @error="send({ type: 'pause' })" @ended="ended" @timeupdate="time = $event.target.currentTime" @durationchange="duration = $event.target.duration"></audio>
 </template>

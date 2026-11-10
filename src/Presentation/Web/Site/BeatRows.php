@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Presentation\Web\Site;
 
 use App\Application\Beats\BeatsQueries;
+use App\Application\Beats\BeatTierView;
 use App\Application\Beats\BeatView;
 use App\Domain\Beats\MusicalKey;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
@@ -17,13 +18,14 @@ final readonly class BeatRows
         private PriceFormat $prices,
         private TranslatorInterface $translator,
         private UrlGeneratorInterface $urls,
+        private CheckoutTierOptions $checkout,
     ) {
     }
 
     /**
      * @param list<BeatView> $beats
      *
-     * @return list<array{id: string, slug: string, title: string, bpm: int, key: string, keyLabel: string, tags: list<string>, cover: ?string, preview: ?string, price: ?string, cents: ?int}>
+     * @return list<array{id: string, slug: string, title: string, bpm: int, key: string, keyLabel: string, tags: list<string>, cover: ?string, preview: ?string, price: ?string, cents: ?int, licences: array<string, ?string>, buy: ?string}>
      */
     public function rows(array $beats): array
     {
@@ -58,10 +60,12 @@ final readonly class BeatRows
         return $tags;
     }
 
-    /** @return array{id: string, slug: string, title: string, bpm: int, key: string, keyLabel: string, tags: list<string>, cover: ?string, preview: ?string, price: ?string, cents: ?int} */
+    /** @return array{id: string, slug: string, title: string, bpm: int, key: string, keyLabel: string, tags: list<string>, cover: ?string, preview: ?string, price: ?string, cents: ?int, licences: array<string, ?string>, buy: ?string} */
     private function row(BeatView $beat): array
     {
-        $price = $this->beats->fromPrice($beat->id);
+        $options = $this->beats->tiersFor($beat->id);
+        $cheapest = self::cheapest($options);
+        $price = $cheapest?->tier->price;
 
         return [
             'id' => $beat->id,
@@ -75,7 +79,18 @@ final readonly class BeatRows
             'preview' => null === $beat->preview ? null : $this->urls->generate('media_audio', ['id' => $beat->preview->id]),
             'price' => null === $price ? null : $this->translator->trans('site.beats.from', ['price' => $this->prices->format($price->cents, $this->translator->getLocale())]),
             'cents' => $price?->cents,
+            'licences' => $this->checkout->links($beat->id, $options),
+            'buy' => null === $cheapest ? null : $this->checkout->url($beat->id, $cheapest->tier->id),
         ];
+    }
+
+    /** @param list<BeatTierView> $options */
+    private static function cheapest(array $options): ?BeatTierView
+    {
+        $purchasable = array_filter($options, static fn (BeatTierView $option): bool => $option->purchasable);
+        usort($purchasable, static fn (BeatTierView $a, BeatTierView $b): int => $a->tier->price->cents <=> $b->tier->price->cents);
+
+        return $purchasable[0] ?? null;
     }
 
     private function keyLabel(string $key): string

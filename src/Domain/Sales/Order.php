@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Domain\Sales;
 
+use App\Domain\Beats\Beat;
 use App\Domain\Sales\Exception\InvalidRefundAmount;
 use App\Domain\Sales\Exception\MissingConsent;
 use App\Domain\Sales\Exception\OrderNotPaid;
@@ -20,6 +21,7 @@ use Symfony\Component\Uid\Ulid;
 /**
  * @phpstan-import-type ConsentData from Consent
  * @phpstan-import-type CustomerData from Customer
+ * @phpstan-import-type LicenceData from LicenceSnapshot
  */
 #[ORM\Entity]
 #[ORM\Table(name: 'sales_order')]
@@ -104,8 +106,18 @@ class Order
     #[ORM\Column(type: 'datetimetz_immutable', nullable: true)]
     private ?\DateTimeImmutable $withdrawnAt = null;
 
+    /** @var LicenceData|null */
+    #[ORM\Column(type: 'json', nullable: true)]
+    private ?array $licence;
+
+    #[ORM\Column(type: 'datetimetz_immutable', nullable: true)]
+    private ?\DateTimeImmutable $exclusiveConflictAt = null;
+
+    #[ORM\Column(type: 'datetimetz_immutable', nullable: true)]
+    private ?\DateTimeImmutable $conflictNoticeSentAt = null;
+
     /** @param list<Consent> $consents */
-    private function __construct(Purchasable $product, string $locale, string $email, array $consents, Terms $terms, \DateTimeImmutable $now)
+    private function __construct(Purchasable $product, string $locale, string $email, array $consents, Terms $terms, \DateTimeImmutable $now, ?LicenceSnapshot $licence)
     {
         $this->id = new Ulid();
         $this->reference = self::REFERENCE_PREFIX.substr($this->id->toBase32(), -6);
@@ -119,12 +131,19 @@ class Order
         $this->consents = array_map(static fn (Consent $consent): array => $consent->toArray(), self::complete($product->type, $consents));
         $this->terms = $terms;
         $this->createdAt = $now;
+        $this->licence = $licence?->toArray();
     }
 
     /** @param list<Consent> $consents */
     public static function place(Purchasable $product, string $locale, string $email, array $consents, Terms $terms, \DateTimeImmutable $now): self
     {
-        return new self($product, $locale, $email, $consents, $terms, $now);
+        return new self($product, $locale, $email, $consents, $terms, $now, null);
+    }
+
+    /** @param list<Consent> $consents */
+    public static function placeBeat(Purchasable $product, LicenceSnapshot $licence, string $locale, string $email, array $consents, Terms $terms, \DateTimeImmutable $now): self
+    {
+        return new self($product, $locale, $email, $consents, $terms, $now, $licence);
     }
 
     public function attachSession(string $sessionId): void
@@ -209,6 +228,30 @@ class Order
         $email = mb_strtolower(trim($email));
 
         return '' !== $email && mb_strtolower($this->email) === $email;
+    }
+
+    public function sell(Beat $beat, \DateTimeImmutable $now): void
+    {
+        if (null !== $beat->soldExclusivelyAt()) {
+            $this->flagExclusiveConflict($now);
+        } elseif (true === $this->licence()?->beat->exclusive) {
+            $beat->markSoldExclusively($this->paidAt ?? $now);
+        }
+    }
+
+    public function flagExclusiveConflict(\DateTimeImmutable $now): void
+    {
+        $this->exclusiveConflictAt ??= $now;
+    }
+
+    public function needsConflictNotice(): bool
+    {
+        return null !== $this->exclusiveConflictAt && null === $this->conflictNoticeSentAt;
+    }
+
+    public function conflictNoticeSent(\DateTimeImmutable $now): void
+    {
+        $this->conflictNoticeSentAt = $now;
     }
 
     public function invoiced(string $number): void
@@ -338,6 +381,16 @@ class Order
     public function withdrawnAt(): ?\DateTimeImmutable
     {
         return $this->withdrawnAt;
+    }
+
+    public function licence(): ?LicenceSnapshot
+    {
+        return null === $this->licence ? null : LicenceSnapshot::fromArray($this->licence);
+    }
+
+    public function exclusiveConflictAt(): ?\DateTimeImmutable
+    {
+        return $this->exclusiveConflictAt;
     }
 
     /**

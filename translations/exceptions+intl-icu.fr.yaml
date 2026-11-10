@@ -44,6 +44,7 @@ sales:
     product_unavailable: 'Cette offre ne peut pas être payée en ligne : elle a peut-être changé ou se fait sur devis. Contactez-moi pour la réserver.'
     missing_consent: 'Cochez toutes les cases ci-dessus pour passer la commande.'
     terms_changed: 'Les conditions générales de vente ont changé pendant que cette page était ouverte : rechargez-la, relisez-les et commandez à nouveau.'
+    licence_changed: 'Les conditions de la licence ont changé pendant que cette page était ouverte : rechargez-la, relisez-les et commandez à nouveau.'
     payment_unavailable: 'La page de paiement n’a pas pu s’ouvrir : réessayez dans quelques minutes.'
     payment_mismatch: 'Le paiement reçu pour la commande {reference} ne correspond pas à son prix.'
     order_not_paid: 'La commande {reference} n’est pas payée.'

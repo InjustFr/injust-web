@@ -24,7 +24,7 @@ final class StartCheckoutController extends AbstractController
         if (null !== $refused) {
             return $refused;
         }
-        $started = $startCheckout(new StartCheckout($payload->productType, $payload->productId, $payload->locale, $payload->email, $payload->consents, $payload->cgvVersion));
+        $started = $startCheckout(new StartCheckout($payload->productType, $payload->productId, $payload->locale, $payload->email, $payload->consents, $payload->cgvVersion, $payload->tierId, $payload->licenceVersion));
 
         return new JsonResponse(['url' => $started->url], Response::HTTP_CREATED);
     }

@@ -24,6 +24,9 @@ final class RecordingSalesMails implements SalesMails
     /** @var list<array{OrderView, CreditNoteView}> */
     public array $creditNotes = [];
 
+    /** @var list<OrderView> */
+    public array $conflicts = [];
+
     public int $failures = 0;
 
     public ?string $broken = null;
@@ -54,6 +57,12 @@ final class RecordingSalesMails implements SalesMails
     {
         $this->send('mail credit note '.$creditNote->number);
         $this->creditNotes[] = [$order, $creditNote];
+    }
+
+    public function exclusiveConflict(OrderView $order): void
+    {
+        $this->send('mail conflict '.$order->reference);
+        $this->conflicts[] = $order;
     }
 
     private function send(string $entry): void

@@ -48,6 +48,11 @@ sales:
         delay: 'It will reach your account within 5 to 10 days, depending on your bank.'
         reason: 'Reason: {reason}'
         attachment: 'Attached is credit note {number}, which relates to invoice {invoice}.'
+    exclusive_conflict:
+        subject: 'Exclusive conflict: order {reference} ({product})'
+        intro: 'A beat was paid for while it was no longer available for this licence: it had already been sold exclusively, or it was deleted.'
+        refund: 'The order is paid and invoiced and the buyer received the download links. Refund it from the Orders page of the admin, then explain the situation to the buyer.'
+        reply: 'Reply to this email to write to the buyer.'
     confirmation:
         subject: 'Injust: your order {reference} is confirmed'
         greeting: 'Hi,'
@@ -69,4 +74,12 @@ sales:
         digital_waiver: 'You expressly agreed that the digital content is supplied right after the payment and acknowledged that you thereby waive your right of withdrawal (article L221-28 13° of the French Consumer Code).'
         mediator: 'In case of a dispute, you can turn to the consumer mediator free of charge: {name} – {url}'
         attachments: 'Your invoice and the terms of sale you accepted are attached.'
+        files_ready: 'Your files are ready to download:'
+        deliverables:
+            mp3: 'MP3'
+            wav: 'WAV'
+            stems: 'Separate tracks (ZIP)'
+        links_valid: 'These links are valid for 7 days, until {date} (Paris time).'
+        new_link: 'Reply to this email if you need a new link.'
+        attachments_licence: 'Your invoice, the terms of sale and your licence are attached.'
         signature: 'Injust'

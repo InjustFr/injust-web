@@ -1,5 +1,5 @@
 <script setup>
-import { FileText } from '@lucide/vue';
+import { Copy, FileText } from '@lucide/vue';
 import { computed, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import BaseButton from '../../../components/ui/BaseButton.vue';
@@ -7,7 +7,7 @@ import ConfirmButton from '../../../components/ui/ConfirmButton.vue';
 import { useApi } from '../../../composables/useApi.js';
 import { useToast } from '../../../composables/useToast.js';
 import { intlLocale } from '../../../i18n/locale.js';
-import { canRefund, formatMoney } from '../../ordersView.js';
+import { canRefund, formatMoney, hasConflict } from '../../ordersView.js';
 import RefundModal from './RefundModal.vue';
 
 const source = defineProps({ order: { type: Object, required: true } });
@@ -16,7 +16,7 @@ const api = useApi();
 const toast = useToast();
 const detail = ref(source.order);
 api.load(`/api/admin/orders/${source.order.id}`, detail).catch(() => {});
-const order = computed(() => ({ refundedCents: 0, withdrawal: null, creditNotes: [], ...source.order, ...detail.value }));
+const order = computed(() => ({ refundedCents: 0, withdrawal: null, creditNotes: [], licence: null, downloads: [], exclusiveConflictAt: null, ...source.order, ...detail.value }));
 const refunding = ref(false);
 const money = (cents) => formatMoney(cents, intlLocale());
 const day = (value) => new Intl.DateTimeFormat(intlLocale(), { dateStyle: 'medium' }).format(new Date(value));
@@ -24,11 +24,32 @@ const customer = computed(() => order.value.customer);
 const address = computed(() => customer.value && [customer.value.line1, customer.value.line2, `${customer.value.postalCode} ${customer.value.city}`.trim(), customer.value.state, customer.value.country].filter(Boolean).join(', '));
 const when = (value) => new Intl.DateTimeFormat(intlLocale(), { dateStyle: 'medium', timeStyle: 'short' }).format(new Date(value));
 const resendAcknowledgement = () => toast.attempt(() => api.post(`/api/admin/orders/${order.value.id}/withdrawal/resend`), t('admin.orders.detail.acknowledgementResent'));
-const resend = () => toast.attempt(() => api.post(`/api/admin/orders/${order.id}/resend`), t('admin.orders.detail.resent'));
+const resend = () => toast.attempt(() => api.post(`/api/admin/orders/${order.value.id}/resend`), t('admin.orders.detail.resent'));
+const copyLink = (url) => toast.attempt(() => navigator.clipboard.writeText(url), t('admin.orders.detail.linkCopied'));
 </script>
 
 <template>
     <div class="order-detail">
+        <section v-if="hasConflict(order)" class="order-detail__alert" role="alert">
+            <h3>{{ t('admin.orders.detail.conflictTitle') }}</h3>
+            <p>{{ t('admin.orders.detail.conflictText', { date: when(order.exclusiveConflictAt) }) }}</p>
+        </section>
+        <section v-if="order.licence">
+            <h3>{{ t('admin.orders.detail.licence') }}</h3>
+            <p>{{ t('admin.orders.detail.licenceBeat', { title: order.licence.beatTitle }) }}</p>
+            <p>{{ t('admin.orders.detail.licenceTier', { tier: order.licence.tierName }) }} · {{ order.licence.exclusive ? t('admin.orders.detail.licenceExclusive') : t('admin.orders.detail.licenceNonExclusive') }}</p>
+            <p>{{ t('admin.orders.detail.licenceFiles', { files: order.licence.deliverables.join(', ').toUpperCase() }) }}</p>
+            <BaseButton variant="ghost" :href="`/api/admin/orders/${order.id}/licence`"><FileText size="1rem" aria-hidden="true" />{{ t('admin.orders.detail.openLicence') }}</BaseButton>
+        </section>
+        <section v-if="order.downloads.length > 0">
+            <h3>{{ t('admin.orders.detail.downloads') }}</h3>
+            <ul class="order-detail__notes">
+                <li v-for="link in order.downloads" :key="link.deliverable">
+                    <BaseButton variant="ghost" :href="link.url"><FileText size="1rem" aria-hidden="true" />{{ t('admin.orders.detail.downloadLink', { file: link.deliverable.toUpperCase(), date: day(link.expiresAt) }) }}</BaseButton>
+                    <BaseButton variant="ghost" @click="copyLink(link.url)"><Copy size="1rem" aria-hidden="true" />{{ t('admin.orders.detail.copyLink') }}</BaseButton>
+                </li>
+            </ul>
+        </section>
         <section>
             <h3>{{ t('admin.orders.detail.customer') }}</h3>
             <dl v-if="customer">
@@ -96,6 +117,8 @@ const resend = () => toast.attempt(() => api.post(`/api/admin/orders/${order.id}
 .order-detail dl { display: grid; grid-template-columns: max-content 1fr; gap: var(--space-1) var(--space-3); margin: 0; }
 .order-detail dt { color: var(--color-muted); }
 .order-detail dd { margin: 0; overflow-wrap: anywhere; }
+.order-detail__alert { padding: var(--space-3); border: 0.0625rem solid var(--color-accent); border-radius: var(--radius); }
+.order-detail__alert h3 { color: var(--color-accent-strong); }
 .order-detail__muted { color: var(--color-muted); }
 .order-detail .order-detail__notes { padding-left: 0; list-style: none; }
 </style>

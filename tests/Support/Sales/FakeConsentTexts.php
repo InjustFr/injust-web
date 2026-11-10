@@ -9,8 +9,8 @@ use App\Domain\Sales\ConsentKind;
 
 final class FakeConsentTexts implements ConsentTexts
 {
-    public function text(ConsentKind $kind, string $locale, int $cgvVersion): string
+    public function text(ConsentKind $kind, string $locale, int $version): string
     {
-        return $locale.':'.$kind->value.':v'.$cgvVersion;
+        return $locale.':'.$kind->value.':v'.$version;
     }
 }

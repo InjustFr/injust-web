@@ -22,6 +22,8 @@
                 bounds: bounds,
                 filter: filter,
                 contact: path('contact', {topic: 'beats'}),
+                checkout: settings.onlineCheckout,
+                tiers: tiers|map(tier => tier|filter((value, key) => key != 'summary')),
                 labels: {
                     caption: 'site.beats.caption'|trans,
                     columns: {
@@ -38,6 +40,21 @@
                     play: 'site.beats.play'|trans({title: '{title}'}),
                     onRequest: 'site.beats.on_request'|trans,
                     contact: 'site.beats.contact'|trans,
+                    buy: 'site.beats.buy'|trans,
+                    picker: {
+                        locale: app.request.locale,
+                        title: 'site.beats.picker.title'|trans,
+                        close: 'site.beats.picker.close'|trans,
+                        unavailable: 'site.beats.picker.unavailable'|trans,
+                        files: 'site.beats.tiers.files'|trans,
+                        streams: 'site.beats.tiers.streams'|trans,
+                        copies: 'site.beats.tiers.copies'|trans,
+                        videos: 'site.beats.tiers.videos'|trans,
+                        exclusive: 'site.beats.tiers.exclusive'|trans,
+                        unlimited: 'site.beats.tiers.unlimited'|trans,
+                        deliverables: {mp3: 'site.beats.tiers.deliverables.mp3'|trans, wav: 'site.beats.tiers.deliverables.wav'|trans, stems: 'site.beats.tiers.deliverables.stems'|trans},
+                        compare: 'site.beats.picker.compare'|trans,
+                    },
                     filters: {
                         label: 'site.beats.filters.label'|trans,
                         tags: 'site.beats.filters.tags'|trans,
@@ -71,7 +88,7 @@
                         </thead>
                         <tbody>
                             {% for beat in shown %}
-                                {% include 'site/_beat_row.html.twig' with {beat: beat} only %}
+                                {% include 'site/_beat_row.html.twig' with {beat: beat, checkout: settings.onlineCheckout} only %}
                             {% endfor %}
                         </tbody>
                     </table>

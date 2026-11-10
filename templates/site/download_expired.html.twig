@@ -1,0 +1,19 @@
+{% extends 'site.html.twig' %}
+
+{% set page_title = 'site.download.expired.title'|trans %}
+
+{% block main %}
+    <section class="checkout-return" aria-labelledby="download-expired-title">
+        <h1 class="checkout-title" id="download-expired-title">{{ page_title }}</h1>
+        <p class="checkout-state">{{ 'site.download.expired.body'|trans }}</p>
+        {% if reference %}
+            <p class="checkout-reference-line">
+                <span class="checkout-label">{{ 'site.checkout.reference'|trans }}</span>
+                <span class="checkout-reference">{{ reference }}</span>
+            </p>
+        {% endif %}
+        <p class="checkout-actions">
+            <a class="button-ghost" href="{{ path('contact') }}">{{ 'site.download.expired.contact'|trans }}</a>
+        </p>
+    </section>
+{% endblock %}

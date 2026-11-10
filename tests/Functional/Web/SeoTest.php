@@ -32,7 +32,7 @@ final class SeoTest extends WebTestCase
 
         $client->request('GET', '/robots.txt');
 
-        self::assertSame("User-agent: *\nAllow: /\nDisallow: /admin\nDisallow: /api/\nDisallow: /go/\nDisallow: /checkout\nDisallow: /fr/checkout\nDisallow: /login\nDisallow: /logout\n\nSitemap: http://localhost/sitemap.xml\n", $client->getResponse()->getContent());
+        self::assertSame("User-agent: *\nAllow: /\nDisallow: /admin\nDisallow: /api/\nDisallow: /go/\nDisallow: /download/\nDisallow: /checkout\nDisallow: /fr/checkout\nDisallow: /login\nDisallow: /logout\n\nSitemap: http://localhost/sitemap.xml\n", $client->getResponse()->getContent());
     }
 
     public function testWhileIndexingIsOffEveryPageIsNoindex(): void

@@ -11,6 +11,7 @@ use App\Domain\Sales\InvoiceSequence;
 use App\Domain\Sales\Order;
 use App\Domain\Sales\OrderStatus;
 use App\Domain\Settings\SettingsRepository;
+use App\Infrastructure\Persistence\Doctrine\Beats\DoctrineBeatRepository;
 use App\Infrastructure\Persistence\Doctrine\DoctrineTransaction;
 use App\Infrastructure\Persistence\Doctrine\Sales\DoctrineInvoiceRepository;
 use App\Infrastructure\Persistence\Doctrine\Sales\DoctrineInvoiceSequenceRepository;
@@ -39,7 +40,7 @@ final class ConfirmPaymentPersistenceTest extends KernelTestCase
         $mails->failures = 1;
         $confirm = static function (EntityManagerInterface $entityManager) use ($gateway, $mails): void {
             $transaction = new DoctrineTransaction($entityManager);
-            new ConfirmPaymentHandler(new DoctrineOrderRepository($entityManager), new DoctrineInvoiceRepository($entityManager), new DoctrineInvoiceSequenceRepository($entityManager), self::getContainer()->get(SettingsRepository::class), $gateway, $mails, new MockClock('2026-11-10 10:06:00'), $transaction, $transaction)(new ConfirmPayment('cs_db'));
+            new ConfirmPaymentHandler(new DoctrineOrderRepository($entityManager), new DoctrineInvoiceRepository($entityManager), new DoctrineInvoiceSequenceRepository($entityManager), self::getContainer()->get(SettingsRepository::class), $gateway, $mails, new MockClock('2026-11-10 10:06:00'), $transaction, $transaction, new DoctrineBeatRepository($entityManager))(new ConfirmPayment('cs_db'));
         };
 
         try {

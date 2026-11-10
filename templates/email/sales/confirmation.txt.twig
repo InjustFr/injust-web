@@ -15,7 +15,14 @@
 {% endfor %}
 
 {{ 'sales.confirmation.next'|trans({}, 'emails') }}
-{% if bookingUrl %}
+{% if downloads is not empty %}
+{{ 'sales.confirmation.files_ready'|trans({}, 'emails') }}
+{% for download in downloads %}
+- {{ ('sales.confirmation.deliverables.' ~ download.deliverable)|trans({}, 'emails') }}: {{ download.url }}
+{% endfor %}
+{{ 'sales.confirmation.links_valid'|trans({date: downloads|first.expiresAt|date(dateFormat ~ ' H:i', 'Europe/Paris')}, 'emails') }}
+{{ 'sales.confirmation.new_link'|trans({}, 'emails') }}
+{% elseif bookingUrl %}
 {{ 'sales.confirmation.booking'|trans({}, 'emails') }} {{ bookingUrl }}
 {% else %}
 {{ 'sales.confirmation.contact_soon'|trans({}, 'emails') }}
@@ -33,7 +40,7 @@
 
 {{ 'sales.confirmation.mediator'|trans({name: mediatorName, url: mediatorUrl}, 'emails') }}
 
-{{ 'sales.confirmation.attachments'|trans({}, 'emails') }}
+{{ (order.licence ? 'sales.confirmation.attachments_licence' : 'sales.confirmation.attachments')|trans({}, 'emails') }}
 
 --
 {{ 'sales.confirmation.signature'|trans({}, 'emails') }}

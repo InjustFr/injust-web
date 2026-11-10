@@ -14,8 +14,8 @@ final readonly class TranslatedConsentTexts implements ConsentTexts
     {
     }
 
-    public function text(ConsentKind $kind, string $locale, int $cgvVersion): string
+    public function text(ConsentKind $kind, string $locale, int $version): string
     {
-        return $this->translator->trans('sales.consents.'.$kind->value, ['version' => $cgvVersion], 'messages', $locale);
+        return $this->translator->trans('sales.consents.'.$kind->value, ['version' => $version], 'messages', $locale);
     }
 }

@@ -11,13 +11,26 @@
             <span class="checkout-reference">{{ order.reference }}</span>
         </p>
         <p class="checkout-state is-{{ state }}" role="status">{{ ('site.checkout.success.' ~ state)|trans }}</p>
+        {% if downloads is not empty %}
+            <section class="checkout-downloads" aria-labelledby="checkout-downloads-title">
+                <h2 class="checkout-label" id="checkout-downloads-title">{{ 'site.checkout.downloads.title'|trans }}</h2>
+                <ul>
+                    {% for download in downloads %}
+                        <li><a class="{{ download.deliverable == 'licence' ? 'button-ghost' : 'button' }}" href="{{ download.url }}" download>{{ ('site.checkout.downloads.' ~ download.deliverable)|trans }}</a></li>
+                    {% endfor %}
+                </ul>
+                <p class="checkout-downloads-note">{{ 'site.checkout.downloads.valid'|trans }}</p>
+            </section>
+        {% elseif downloads_expired %}
+            <p class="checkout-downloads-note">{{ 'site.download.expired.body'|trans }}</p>
+        {% endif %}
         {% if state == 'processing' %}
             <p class="checkout-actions">
                 <a class="button-ghost checkout-refresh" href="{{ path('checkout_success', {order: order.id}) }}">{{ 'site.checkout.success.refresh'|trans }}</a>
             </p>
         {% elseif state == 'closed' %}
             <p class="checkout-actions">
-                <a class="button" href="{{ path('checkout', {productType: order.productType, productId: order.productId}) }}">{{ 'site.checkout.cancel.retry'|trans }}</a>
+                <a class="button" href="{{ path('checkout', {productType: order.productType, productId: order.productId}|merge(order.licence ? {tier: order.licence.beat.tierId} : {})) }}">{{ 'site.checkout.cancel.retry'|trans }}</a>
             </p>
         {% endif %}
     </section>

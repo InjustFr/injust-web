@@ -114,3 +114,15 @@ From a dev machine, with `DEPLOY_HOST` (`user@server`), `DEPLOY_DIR` and optiona
 docker compose exec -T database pg_dump -U app app | gzip > backup-$(date +%F).sql.gz
 docker run --rm -v injust-web_app_share:/share -v "$PWD":/backup alpine tar czf /backup/share-$(date +%F).tgz -C /share .
 ```
+
+## Beat downloads
+
+`GET /download/...` links are signed with the app secret (`APP_SECRET`) and checked against the scheme and host of the request: the proxy must pass `X-Forwarded-Host` and `X-Forwarded-Proto` so the host the buyer clicks equals the host used to sign (webhook, admin). Rotating `APP_SECRET` invalidates links already sent. Large downloads are streamed by PHP from the `app_share` volume: the controller lifts PHP's `max_execution_time` (30 s in production) for the download, and nginx needs a `location /download/` with `proxy_read_timeout 1800;` and `proxy_buffering off;` (with the same `proxy_set_header` lines as `location /`) so a 2 GB stems ZIP on a slow connection is neither cut off nor buffered to the proxy’s disk:
+
+```nginx
+location /download/ {
+    proxy_pass http://injust-web;
+    proxy_read_timeout 1800;
+    proxy_buffering off;
+}
+```

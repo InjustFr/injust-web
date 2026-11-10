@@ -19,6 +19,7 @@ use App\Domain\Settings\VatMentions;
 use App\Domain\Shared\Exception\NotFound;
 use App\Domain\Shared\LocalizedText;
 use App\Tests\Support\Sales\FakePaymentGateway;
+use App\Tests\Support\Sales\InMemoryBeats;
 use App\Tests\Support\Sales\InMemoryInvoices;
 use App\Tests\Support\Sales\InMemoryInvoiceSequences;
 use App\Tests\Support\Sales\InMemoryOrders;
@@ -174,6 +175,7 @@ final class ConfirmPaymentTest extends TestCase
             new MockClock($now),
             $transaction,
             $transaction,
+            new InMemoryBeats(),
         )(new ConfirmPayment($sessionId));
     }
 

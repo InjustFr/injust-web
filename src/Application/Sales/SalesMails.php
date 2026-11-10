@@ -13,4 +13,6 @@ interface SalesMails
     public function withdrawalNotice(OrderView $order, WithdrawalRequestView $withdrawal): void;
 
     public function creditNote(OrderView $order, CreditNoteView $creditNote): void;
+
+    public function exclusiveConflict(OrderView $order): void;
 }

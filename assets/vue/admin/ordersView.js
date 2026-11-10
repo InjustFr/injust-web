@@ -58,3 +58,5 @@ export function refundPayload(euros, reason, remaining) {
     const amountCents = eurosToCents(euros);
     return amountCents === null || amountCents <= 0 || amountCents > remaining ? null : { amountCents, reason: reason.trim() };
 }
+
+export const hasConflict = (order) => Boolean(order.exclusiveConflictAt);

@@ -55,8 +55,10 @@ use App\Application\Settings\SwitchOnlineCheckout\SwitchOnlineCheckout;
 use App\Application\Settings\SwitchOnlineCheckout\SwitchOnlineCheckoutHandler;
 use App\Application\Settings\SwitchSections\SwitchSections;
 use App\Application\Settings\SwitchSections\SwitchSectionsHandler;
+use App\Domain\Beats\Beat;
 use App\Domain\Beats\BeatDetails;
 use App\Domain\Beats\Deliverable;
+use App\Domain\Beats\LicenceTier;
 use App\Domain\Beats\LicenceTierDetails;
 use App\Domain\Beats\MusicalKey;
 use App\Domain\Contact\ContactTopic;
@@ -76,6 +78,7 @@ use App\Domain\Production\ServiceKind;
 use App\Domain\Sales\ConsentKind;
 use App\Domain\Sales\ProductType;
 use App\Domain\Seo\PageKey;
+use App\Domain\Settings\LegalKind;
 use App\Domain\Shared\LocalizedText;
 use App\Domain\Shared\Price;
 use Doctrine\Bundle\FixturesBundle\Fixture;
@@ -358,6 +361,9 @@ final class AppFixtures extends Fixture
         $this->paidOrder(ProductType::Lesson, $this->first($manager, LessonOffer::class, [])->id()->toBase32(), 'buyer-one@example.com', 'fr');
         $this->paidOrder(ProductType::Production, $this->first($manager, ProductionService::class, ['pricing' => Pricing::Fixed])->id()->toBase32(), 'buyer-two@example.com', 'en');
 
+        $premium = $manager->getRepository(LicenceTier::class)->findBy([], ['position' => 'ASC'])[1] ?? throw new \LogicException(LicenceTier::class);
+        $this->paidOrder(ProductType::Beat, $manager->getRepository(Beat::class)->findOneBy(['title' => 'Riot Static'])?->id()->toBase32() ?? throw new \LogicException(Beat::class), 'buyer-five@example.com', 'en', $premium->id()->toBase32());
+
         $withdrawn = $this->paidOrder(ProductType::Lesson, $this->first($manager, LessonOffer::class, [])->id()->toBase32(), 'buyer-three@example.com', 'en');
         ($this->requestWithdrawal)(new RequestWithdrawal($withdrawn->reference, 'buyer-three@example.com', 'Buyer Three', 'I changed my mind.', 'en'));
 
@@ -378,9 +384,9 @@ final class AppFixtures extends Fixture
         return $manager->getRepository($class)->findOneBy($criteria, ['position' => 'ASC']) ?? throw new \LogicException($class);
     }
 
-    private function paidOrder(ProductType $type, string $productId, string $email, string $locale): OrderView
+    private function paidOrder(ProductType $type, string $productId, string $email, string $locale, ?string $tierId = null): OrderView
     {
-        $started = ($this->startCheckout)(new StartCheckout($type, $productId, $locale, $email, array_map(static fn (ConsentKind $kind) => $kind->value, $type->requiredConsents()), $this->settings->legalDocument($type->cgvKind())->version));
+        $started = ($this->startCheckout)(new StartCheckout($type, $productId, $locale, $email, array_map(static fn (ConsentKind $kind) => $kind->value, $type->requiredConsents()), $this->settings->legalDocument($type->cgvKind())->version, $tierId, null === $tierId ? null : $this->settings->legalDocument(LegalKind::Licence)->version));
         $session = basename((string) parse_url($started->url, \PHP_URL_PATH));
         $this->httpClient->request('POST', 'https://api.stripe.com/v1/test_helpers/checkout/sessions/'.$session.'/pay')->getContent();
         ($this->confirmPayment)(new ConfirmPayment($session));

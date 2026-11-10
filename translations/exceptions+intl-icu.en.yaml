@@ -44,6 +44,7 @@ sales:
     product_unavailable: 'This offer cannot be paid online: it may have changed or need a quote. Contact me to book it.'
     missing_consent: 'Tick every box above to place the order.'
     terms_changed: 'The terms of sale changed while this page was open: reload it, read them and order again.'
+    licence_changed: 'The licence terms changed while this page was open: reload it, read them and order again.'
     payment_unavailable: 'The payment page could not be opened: try again in a few minutes.'
     payment_mismatch: 'The payment received for order {reference} does not match its price.'
     order_not_paid: 'Order {reference} is not paid.'

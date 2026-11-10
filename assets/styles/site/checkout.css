@@ -65,6 +65,27 @@
 
 .checkout-details:empty { display: none; }
 
+.checkout-licences ul { display: grid; gap: 0.5rem; margin: 0; padding: 0; list-style: none; }
+
+.checkout-licences a, .checkout-licence-off {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0.25rem 1rem;
+    padding: 0.75rem 1rem;
+    border: 2px solid var(--steel);
+    color: var(--bone);
+    text-decoration: none;
+}
+
+.checkout-licences a:hover { border-color: var(--bone); }
+.checkout-licences a[aria-current='page'] { border-color: var(--signal-bright); background: var(--ink); }
+.checkout-licence-name { flex: 1; font-weight: 750; text-transform: uppercase; }
+.checkout-licence-price { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
+.checkout-licences a .checkout-licence-price { color: var(--signal-bright); }
+.checkout-licence-off { border-style: dashed; color: var(--fog); }
+.checkout-licence-reason { flex-basis: 100%; font-family: var(--font-mono); font-size: 0.75rem; text-transform: uppercase; }
+
 .checkout-total {
     display: flex;
     align-items: baseline;
@@ -263,6 +284,11 @@
 .checkout-state.is-closed { padding-left: 1rem; border-left: 3px solid var(--fog); }
 
 .checkout-state.is-paid { padding-left: 1rem; border-left: 3px solid var(--signal-bright); }
+
+.checkout-downloads { display: grid; gap: 0.75rem; width: 100%; max-width: 46rem; padding-top: 1.5rem; border-top: var(--rule); }
+.checkout-downloads ul { display: flex; flex-wrap: wrap; gap: 0.75rem; margin: 0; padding: 0; list-style: none; }
+.checkout-downloads .button, .checkout-downloads .button-ghost { text-transform: uppercase; }
+.checkout-downloads-note { margin: 0; color: var(--fog); font-size: 0.875rem; }
 
 .checkout-return .checkout-actions { display: flex; flex-wrap: wrap; gap: 0.75rem; margin: 0; }
 

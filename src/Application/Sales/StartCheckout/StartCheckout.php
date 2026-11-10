@@ -16,6 +16,8 @@ final readonly class StartCheckout
         public string $email,
         public array $acceptedConsents,
         public int $cgvVersion,
+        public ?string $tierId = null,
+        public ?int $licenceVersion = null,
     ) {
     }
 }

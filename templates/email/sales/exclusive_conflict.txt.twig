@@ -1,0 +1,13 @@
+{% set dateFormat = 'sales.date_format'|trans({}, 'emails') %}
+{{ 'sales.exclusive_conflict.intro'|trans({}, 'emails') }}
+
+{{ 'sales.confirmation.reference'|trans({reference: order.reference}, 'emails') }}
+{{ 'sales.confirmation.product'|trans({product: order.productLabel}, 'emails') }}
+{{ 'sales.confirmation.price'|trans({amount: order.price.cents / 100}, 'emails') }}
+{% if order.paidAt %}
+{{ 'sales.withdrawal_acknowledgement.paid_on'|trans({date: order.paidAt|date(dateFormat ~ ' H:i', 'Europe/Paris')}, 'emails') }}
+{% endif %}
+
+{{ 'sales.exclusive_conflict.refund'|trans({}, 'emails') }}
+
+{{ 'sales.exclusive_conflict.reply'|trans({}, 'emails') }}

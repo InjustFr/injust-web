@@ -20,8 +20,31 @@
                     <li>{{ ('site.production.kinds.' ~ service.kind)|trans }}</li>
                     {% if service.deliveryDays is not null %}<li>{{ 'site.production.delivery'|trans({days: service.deliveryDays}) }}</li>{% endif %}
                     {% if service.revisions is not null %}<li>{{ 'site.production.revisions'|trans({revisions: service.revisions}) }}</li>{% endif %}
+                {% elseif tier %}
+                    {% if beat %}<li>{{ 'site.beats.bpm'|trans({bpm: beat.bpm}) }} · {{ beat.keyLabel }}</li>{% endif %}
+                    <li>{{ 'site.checkout.line'|trans({label: 'site.beats.tiers.files'|trans, value: tier.deliverables|map(deliverable => ('site.beats.tiers.deliverables.' ~ deliverable.value)|trans)|join(', ')}) }}</li>
+                    {% for cap, value in {streams: tier.streamCap, copies: tier.copyCap, videos: tier.videoCap} %}
+                        <li>{{ 'site.checkout.line'|trans({label: ('site.beats.tiers.' ~ cap)|trans, value: value is null ? 'site.beats.tiers.unlimited'|trans : 'site.beats.tiers.cap'|trans({cap: value})}) }}</li>
+                    {% endfor %}
+                    <li>{{ 'site.checkout.line'|trans({label: 'site.beats.tiers.exclusive'|trans, value: (tier.exclusive ? 'site.beats.tiers.yes' : 'site.beats.tiers.no')|trans}) }}</li>
                 {% endif %}
             </ul>
+            {% if tier_options %}
+                <nav class="checkout-licences" aria-label="{{ 'site.checkout.licences'|trans }}">
+                    <ul>
+                        {% for option in tier_options %}
+                            {% set link = tier_links[option.id] ?? null %}
+                            <li>
+                                {%- if link -%}
+                                    <a href="{{ link }}"{% if option.id == tier.tierId %} aria-current="page"{% endif %}><span class="checkout-licence-name">{{ option.name }}</span> <span class="checkout-licence-price">{{ option.price }}</span></a>
+                                {%- else -%}
+                                    <span class="checkout-licence-off"><span class="checkout-licence-name">{{ option.name }}</span> <span class="checkout-licence-price">{{ option.price }}</span> <span class="checkout-licence-reason">{{ 'site.beats.picker.unavailable'|trans }}</span></span>
+                                {%- endif -%}
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </nav>
+            {% endif %}
             <p class="checkout-total">
                 <span class="checkout-label">{{ 'site.checkout.total'|trans }}</span>
                 <span class="checkout-price">{{ price }}</span>
@@ -38,9 +61,10 @@
         </section>
         <div class="checkout-form" data-island="CheckoutForm" data-props="{{ {
             endpoint: path('api_checkout_start'),
-            product: {productType: product.type.value, productId: product.id, locale: locale, cgvVersion: cgv.version},
-            consents: product.type.requiredConsents()|map(kind => {kind: kind.value, text: ('sales.consents.' ~ kind.value)|trans({version: cgv.version})}),
+            product: {productType: product.type.value, productId: product.id, locale: locale, cgvVersion: cgv.version}|merge(tier ? {tierId: tier.tierId, licenceVersion: licence.version} : {}),
+            consents: product.type.requiredConsents()|map(kind => {kind: kind.value, text: ('sales.consents.' ~ kind.value)|trans({version: kind.value == 'licence' ? licence.version : cgv.version})}),
             terms: {href: path('legal', {kind: cgv.kind.value}), label: 'site.checkout.terms_link'|trans({version: cgv.version})},
+            licence: tier ? {href: path('legal', {kind: 'licence'}), label: 'site.checkout.licence_link'|trans} : null,
             labels: {
                 email: 'site.checkout.email'|trans,
                 emailHint: 'site.checkout.email_hint'|trans,

@@ -16,7 +16,7 @@ accounts OIDC authenticator. Don't ask about these.
 
 The M5 section of `CLAUDE.md` describes the withdrawal page, refunds and credit notes (the `charge.refunded` webhook is the only place credit notes are issued).
 
-The M6 section of `CLAUDE.md` describes the beats catalogue, its private and public file storage and the large-upload setup.
+The M6 section of `CLAUDE.md` describes the beats catalogue, its private and public file storage and the large-upload setup; the M7 section describes beat checkout, licences and signed downloads.
 
 ## Adding features: Flex, not hand-wiring
 

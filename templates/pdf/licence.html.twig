@@ -1,0 +1,68 @@
+{% extends 'pdf/_layout.html.twig' %}
+
+{% block lang %}{{ locale }}{% endblock %}
+
+{% block title %}{{ 'licence_document.title'|trans({}, 'documents', locale) }} {{ order.reference }}{% endblock %}
+
+{% block body %}
+    {% set unlimited = 'licence_document.unlimited'|trans({}, 'documents', locale) %}
+    <h1>{{ 'licence_document.title'|trans({}, 'documents', locale) }}</h1>
+    <p class="meta">
+        {{ 'licence_document.order'|trans({reference: order.reference}, 'documents', locale) }}<br>
+        {{ 'licence_document.date'|trans({date: (order.paidAt ?? order.createdAt)|date('d/m/Y', 'Europe/Paris')}, 'documents', locale) }}
+    </p>
+
+    <table class="parties">
+        <tr>
+            <td>
+                <h2>{{ 'licence_document.producer'|trans({}, 'documents', locale) }}</h2>
+                <p>{{ seller.name }} {{ seller.businessForm }}<br>
+                {{ seller.address|nl2br }}<br>
+                {{ 'licence_document.siren'|trans({siren: seller.siren}, 'documents', locale) }}<br>
+                {% if seller.vatNumber %}{{ 'licence_document.vat_id'|trans({vatId: seller.vatNumber}, 'documents', locale) }}<br>{% endif %}
+                {{ seller.email }}</p>
+            </td>
+            <td>
+                <h2>{{ 'licence_document.licensee'|trans({}, 'documents', locale) }}</h2>
+                {% if buyer %}
+                    <p>{% if buyer.company %}{{ buyer.company }}<br>{% endif %}
+                    {{ buyer.name }}<br>
+                    {{ buyer.line1 }}<br>
+                    {% if buyer.line2 %}{{ buyer.line2 }}<br>{% endif %}
+                    {{ buyer.postalCode }} {{ buyer.city }}{% if buyer.state %} {{ buyer.state }}{% endif %}<br>
+                    {{ country }}<br>
+                    {{ buyer.email }}</p>
+                {% else %}
+                    <p>{{ order.email }}</p>
+                {% endif %}
+            </td>
+        </tr>
+    </table>
+
+    <h2>{{ 'licence_document.licence'|trans({}, 'documents', locale) }}</h2>
+    <p>{{ 'licence_document.beat'|trans({title: beat.title}, 'documents', locale) }}<br>
+    {{ 'licence_document.tier'|trans({tier: beat.tierName.in(locale)}, 'documents', locale) }}<br>
+    {{ (beat.exclusive ? 'licence_document.exclusive' : 'licence_document.non_exclusive')|trans({}, 'documents', locale) }}<br>
+    {{ 'licence_document.files'|trans({files: beat.deliverables|map(deliverable => ('licence_document.deliverables.' ~ deliverable.value)|trans({}, 'documents', locale))|join(', ')}, 'documents', locale) }}</p>
+
+    <h2>{{ 'licence_document.scope'|trans({}, 'documents', locale) }}</h2>
+    <p>
+        {% for line in ['term', 'territory', 'sync', 'share'] %}
+            {{ ('licence_document.' ~ line)|trans({exclusive: beat.exclusive ? 'yes' : 'no'}, 'documents', locale) }}<br>
+        {% endfor %}
+    </p>
+
+    <h2>{{ 'licence_document.caps'|trans({}, 'documents', locale) }}</h2>
+    <p>
+        {% for cap, value in {stream_cap: beat.streamCap, copy_cap: beat.copyCap, video_cap: beat.videoCap} %}
+            {{ ('licence_document.' ~ cap)|trans({cap: value is null ? unlimited : 'licence_document.count'|trans({count: value}, 'documents', locale)}, 'documents', locale) }}<br>
+        {% endfor %}
+    </p>
+
+    <h2>{{ 'licence_document.not_transferred'|trans({}, 'documents', locale) }}</h2>
+    <p>{{ 'licence_document.sacem'|trans({}, 'documents', locale) }}</p>
+    <p>{{ 'licence_document.credit'|trans({}, 'documents', locale) }}</p>
+
+    <h2>{{ 'licence_document.terms'|trans({version: version}, 'documents', locale) }}</h2>
+    {{ body|raw }}
+{% endblock %}

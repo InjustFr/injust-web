@@ -8,5 +8,5 @@ use App\Domain\Sales\ConsentKind;
 
 interface ConsentTexts
 {
-    public function text(ConsentKind $kind, string $locale, int $cgvVersion): string;
+    public function text(ConsentKind $kind, string $locale, int $version): string;
 }

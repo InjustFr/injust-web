@@ -14,6 +14,7 @@ final readonly class Purchasable
         public string $label,
         public Price $price,
         public ?string $format = null,
+        public ?LicensedBeat $beat = null,
     ) {
     }
 }

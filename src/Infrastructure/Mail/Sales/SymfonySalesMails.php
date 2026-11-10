@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Infrastructure\Mail\Sales;
 
 use App\Application\Sales\CreditNoteView;
+use App\Application\Sales\DownloadLinks;
 use App\Application\Sales\InvoiceView;
 use App\Application\Sales\OrderView;
 use App\Application\Sales\SalesDocuments;
@@ -26,6 +27,7 @@ final readonly class SymfonySalesMails implements SalesMails
         private TranslatorInterface $translator,
         private SettingsQueries $settings,
         private SalesDocuments $documents,
+        private DownloadLinks $links,
         #[Autowire(env: 'MAILER_SENDER')]
         private string $sender,
         #[Autowire(param: 'kernel.default_locale')]
@@ -39,7 +41,7 @@ final readonly class SymfonySalesMails implements SalesMails
         $terms = new LegalDocumentView(ProductType::from($order->productType)->cgvKind(), $order->terms->body, $order->terms->version, $order->terms->publishedAt);
         $contactEmail = $this->contactEmail();
 
-        $this->mailer->send(new TemplatedEmail()
+        $email = new TemplatedEmail()
             ->from(Address::create($this->sender))
             ->to($order->email)
             ->replyTo($contactEmail)
@@ -53,10 +55,28 @@ final readonly class SymfonySalesMails implements SalesMails
                 'contactEmail' => $contactEmail,
                 'mediatorName' => $settings->legal->mediatorName,
                 'mediatorUrl' => $settings->legal->mediatorUrl,
+                'downloads' => $this->links->forOrder($order),
             ])
             ->locale($order->locale)
             ->attach($this->documents->invoicePdf($invoice), 'Facture-'.$invoice->number.'.pdf', 'application/pdf')
-            ->attach($this->documents->legalPdf($terms, $order->locale), 'CGV-'.$terms->version.'.pdf', 'application/pdf'));
+            ->attach($this->documents->legalPdf($terms, $order->locale), 'CGV-'.$terms->version.'.pdf', 'application/pdf');
+        if (null !== $order->licence) {
+            $email->attach($this->documents->licence($order), 'Licence-'.$order->reference.'.pdf', 'application/pdf');
+        }
+
+        $this->mailer->send($email);
+    }
+
+    public function exclusiveConflict(OrderView $order): void
+    {
+        $this->mailer->send(new TemplatedEmail()
+            ->from(Address::create($this->sender))
+            ->to($this->contactEmail())
+            ->replyTo($order->email)
+            ->subject($this->translator->trans('sales.exclusive_conflict.subject', ['reference' => $order->reference, 'product' => $order->productLabel], 'emails', $this->ownerLocale))
+            ->textTemplate('email/sales/exclusive_conflict.txt.twig')
+            ->context(['order' => $order])
+            ->locale($this->ownerLocale));
     }
 
     public function withdrawalAcknowledgement(OrderView $order, WithdrawalRequestView $withdrawal): void

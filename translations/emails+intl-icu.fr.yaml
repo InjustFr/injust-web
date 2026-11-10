@@ -48,6 +48,11 @@ sales:
         delay: 'Il apparaîtra sur votre compte sous 5 à 10 jours selon votre banque.'
         reason: 'Motif : {reason}'
         attachment: 'Vous trouverez en pièce jointe l’avoir {number}, qui se rapporte à la facture {invoice}.'
+    exclusive_conflict:
+        subject: 'Conflit d’exclusivité : commande {reference} ({product})'
+        intro: 'Un beat a été payé alors qu’il n’était plus disponible pour cette licence : il avait déjà été vendu en exclusivité, ou il a été supprimé.'
+        refund: 'La commande est payée et facturée et l’acheteur a reçu les liens de téléchargement. Remboursez-la depuis la page Commandes de l’administration, puis expliquez la situation à l’acheteur.'
+        reply: 'Répondez à cet e-mail pour écrire à l’acheteur.'
     confirmation:
         subject: 'Injust : confirmation de votre commande {reference}'
         greeting: 'Bonjour,'
@@ -69,4 +74,12 @@ sales:
         digital_waiver: 'Vous avez expressément accepté que le contenu numérique soit fourni dès le paiement et reconnu renoncer ainsi à votre droit de rétractation (article L221-28 13° du Code de la consommation).'
         mediator: 'En cas de litige, vous pouvez recourir gratuitement au médiateur de la consommation : {name} – {url}'
         attachments: 'Vous trouverez en pièces jointes votre facture et les conditions générales de vente que vous avez acceptées.'
+        files_ready: 'Vos fichiers sont prêts à télécharger :'
+        deliverables:
+            mp3: 'MP3'
+            wav: 'WAV'
+            stems: 'Pistes séparées (ZIP)'
+        links_valid: 'Ces liens sont valables 7 jours, jusqu’au {date} (heure de Paris).'
+        new_link: 'Répondez à cet e-mail si vous avez besoin d’un nouveau lien.'
+        attachments_licence: 'Votre facture, les conditions générales de vente et votre licence sont jointes.'
         signature: 'Injust'

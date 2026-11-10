@@ -427,7 +427,22 @@
             "creditNote": "Credit note {number}",
             "creditNoteDetail": "{amount} on {date}",
             "noCreditNotes": "No credit note.",
-            "withdrawalDeadline": "Withdrawal possible until {date}"
+            "withdrawalDeadline": "Withdrawal possible until {date}",
+            "licence": "Licence",
+            "licenceBeat": "Beat: {title}",
+            "licenceTier": "Tier: {tier}",
+            "licenceExclusive": "Exclusive rights",
+            "licenceNonExclusive": "Non-exclusive",
+            "licenceFiles": "Files: {files}",
+            "openLicence": "Licence PDF",
+            "downloads": "Download links",
+            "downloadLink": "{file} (valid until {date})",
+            "copyLink": "Copy link",
+            "linkCopied": "Link copied.",
+            "linkCopyFailed": "Could not copy the link.",
+            "conflictTitle": "Exclusive conflict",
+            "conflictText": "This sale was paid on {date} but the beat was already sold exclusively. Refund this order.",
+            "conflictBadge": "Conflict"
         },
         "totals": {
             "title": "Revenue {year}",

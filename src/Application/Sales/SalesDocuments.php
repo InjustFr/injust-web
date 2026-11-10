@@ -13,4 +13,6 @@ interface SalesDocuments
     public function creditNotePdf(CreditNoteView $creditNote): string;
 
     public function legalPdf(LegalDocumentView $document, string $locale): string;
+
+    public function licence(OrderView $order): string;
 }

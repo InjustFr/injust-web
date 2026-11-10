@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { REASON_MAX, STATUSES, canRefund, displayStatus, exportUrl, formatMoney, ordersUrl, proRataCents, refundPayload, remainingCents, thresholdProgress, totalsTable, yearOptions } from './ordersView.js';
+import { REASON_MAX, STATUSES, canRefund, hasConflict, displayStatus, exportUrl, formatMoney, ordersUrl, proRataCents, refundPayload, remainingCents, thresholdProgress, totalsTable, yearOptions } from './ordersView.js';
 
 describe('yearOptions', () => {
     it('lists the current year first then the previous ones', () => {
@@ -139,5 +139,13 @@ describe('refundPayload', () => {
         expect(refundPayload('abc', '', 3000)).toBeNull();
         expect(refundPayload('30.01', '', 3000)).toBeNull();
         expect(refundPayload('', '', 3000)).toBeNull();
+    });
+});
+
+describe('beat orders', () => {
+    it('flags an exclusive conflict', () => {
+        expect(hasConflict({ exclusiveConflictAt: '2026-11-10T10:00:00+01:00' })).toBe(true);
+        expect(hasConflict({ exclusiveConflictAt: null })).toBe(false);
+        expect(hasConflict({})).toBe(false);
     });
 });

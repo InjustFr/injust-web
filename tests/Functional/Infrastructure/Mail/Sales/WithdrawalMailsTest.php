@@ -14,6 +14,7 @@ use App\Application\Settings\SettingsView;
 use App\Domain\Sales\WithdrawalRequest;
 use App\Infrastructure\Mail\Sales\SymfonySalesMails;
 use App\Tests\Support\Sales\DocumentExamples;
+use App\Tests\Support\Sales\FakeDownloadLinks;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mime\Email;
@@ -141,9 +142,14 @@ final class WithdrawalMailsTest extends KernelTestCase
             {
                 return '';
             }
+
+            public function licence(OrderView $order): string
+            {
+                return 'licence '.$order->reference;
+            }
         };
 
-        return new SymfonySalesMails(self::getContainer()->get(MailerInterface::class), self::getContainer()->get('translator'), DocumentExamples::queries($settings), $documents, 'Injust <noreply@injust.test>', 'en');
+        return new SymfonySalesMails(self::getContainer()->get(MailerInterface::class), self::getContainer()->get('translator'), DocumentExamples::queries($settings), $documents, new FakeDownloadLinks(), 'Injust <noreply@injust.test>', 'en');
     }
 
     private static function sent(): Email

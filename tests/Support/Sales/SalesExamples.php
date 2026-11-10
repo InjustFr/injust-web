@@ -4,8 +4,11 @@ declare(strict_types=1);
 
 namespace App\Tests\Support\Sales;
 
+use App\Domain\Beats\Deliverable;
 use App\Domain\Sales\Consent;
 use App\Domain\Sales\Customer;
+use App\Domain\Sales\LicenceSnapshot;
+use App\Domain\Sales\LicensedBeat;
 use App\Domain\Sales\Order;
 use App\Domain\Sales\PaymentDetails;
 use App\Domain\Sales\ProductType;
@@ -26,9 +29,23 @@ final class SalesExamples
         return new Purchasable(ProductType::Production, $id, 'Mixage', new Price($cents));
     }
 
-    public static function beat(int $cents = 3000): Purchasable
+    public const string BEAT_ID = '01JCBEAT000000000000000000';
+    public const string TIER_ID = '01JCT1ER000000000000000000';
+
+    public static function beat(int $cents = 3000, bool $exclusive = false, string $id = self::BEAT_ID): Purchasable
     {
-        return new Purchasable(ProductType::Beat, '01JCBEAT000000000000000000', 'Riot beat', new Price($cents));
+        return new Purchasable(ProductType::Beat, $id, 'Riot beat', new Price($cents), null, self::licensedBeat($exclusive, $id));
+    }
+
+    /** @param list<Deliverable> $deliverables */
+    public static function licensedBeat(bool $exclusive = false, string $id = self::BEAT_ID, array $deliverables = [Deliverable::Mp3, Deliverable::Wav]): LicensedBeat
+    {
+        return new LicensedBeat($id, 'Riot', 'riot', self::TIER_ID, new LocalizedText('Premium FR', 'Premium'), $exclusive, $deliverables, 10000, null, 1);
+    }
+
+    public static function licence(int $version = 2): Terms
+    {
+        return new Terms($version, new LocalizedText('Licence v'.$version, 'Licence EN v'.$version), new \DateTimeImmutable('2026-11-02 09:00:00 UTC'));
     }
 
     /** @return list<Consent> */
@@ -41,7 +58,15 @@ final class SalesExamples
     {
         $product ??= self::lesson();
 
-        return Order::place($product, $locale, $email, self::consents($product->type, $at), self::terms(), new \DateTimeImmutable($at));
+        return self::place($product, $locale, $email, self::consents($product->type, $at), new \DateTimeImmutable($at));
+    }
+
+    /** @param list<Consent> $consents */
+    public static function place(Purchasable $product, string $locale, string $email, array $consents, \DateTimeImmutable $at): Order
+    {
+        return null === $product->beat
+            ? Order::place($product, $locale, $email, $consents, self::terms(), $at)
+            : Order::placeBeat($product, new LicenceSnapshot($product->beat, self::licence()), $locale, $email, $consents, self::terms(), $at);
     }
 
     public static function terms(int $version = 3): Terms

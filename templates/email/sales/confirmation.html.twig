@@ -19,7 +19,16 @@
     {% endfor %}
 </ul>
 <p><strong>{{ 'sales.confirmation.next'|trans({}, 'emails') }}</strong><br>
-{% if bookingUrl %}
+{% if downloads is not empty %}
+    {{ 'sales.confirmation.files_ready'|trans({}, 'emails') }}</p>
+<ul>
+    {% for download in downloads %}
+        <li>{{ ('sales.confirmation.deliverables.' ~ download.deliverable)|trans({}, 'emails') }}: <a href="{{ download.url }}">{{ download.url }}</a></li>
+    {% endfor %}
+</ul>
+<p>{{ 'sales.confirmation.links_valid'|trans({date: downloads|first.expiresAt|date(dateFormat ~ ' H:i', 'Europe/Paris')}, 'emails') }}
+{{ 'sales.confirmation.new_link'|trans({}, 'emails') }}
+{% elseif bookingUrl %}
     {{ 'sales.confirmation.booking'|trans({}, 'emails') }} <a href="{{ bookingUrl }}">{{ bookingUrl }}</a>
 {% else %}
     {{ 'sales.confirmation.contact_soon'|trans({}, 'emails') }}
@@ -34,7 +43,7 @@
 {{ 'sales.confirmation.digital_waiver'|trans({}, 'emails') }}
 {% endif %}</p>
 <p>{{ 'sales.confirmation.mediator'|trans({name: mediatorName, url: mediatorUrl}, 'emails') }}</p>
-<p>{{ 'sales.confirmation.attachments'|trans({}, 'emails') }}</p>
+<p>{{ (order.licence ? 'sales.confirmation.attachments_licence' : 'sales.confirmation.attachments')|trans({}, 'emails') }}</p>
 <p>-- <br>{{ 'sales.confirmation.signature'|trans({}, 'emails') }}</p>
 </body>
 </html>

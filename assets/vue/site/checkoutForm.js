@@ -32,6 +32,7 @@ export function checkoutPayload(form, product) {
         email: form.email.trim(),
         consents: requiredConsents(product.productType).filter((kind) => form.consents.includes(kind)),
         cgvVersion: product.cgvVersion,
+        ...(product.tierId ? { tierId: product.tierId, licenceVersion: product.licenceVersion } : {}),
     };
 }
 

@@ -24,5 +24,11 @@
         {%- endif -%}
     </td>
     <td class="beat-price{% if beat.price is null %} is-request{% endif %}">{{ beat.price ?? 'site.beats.on_request'|trans }}</td>
-    <td class="beat-action"><a class="button" href="{{ path('contact', {topic: 'beats', offer: beat.id}) }}" aria-describedby="beat-title-{{ beat.id }}">{{ 'site.beats.contact'|trans }}</a></td>
+    <td class="beat-action">
+        {%- if checkout and beat.buy -%}
+            <a class="button" href="{{ beat.buy }}" aria-describedby="beat-title-{{ beat.id }}">{{ 'site.beats.buy'|trans }}</a>
+        {%- else -%}
+            <a class="button" href="{{ path('contact', {topic: 'beats', offer: beat.id}) }}" aria-describedby="beat-title-{{ beat.id }}">{{ 'site.beats.contact'|trans }}</a>
+        {%- endif -%}
+    </td>
 </tr>

@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace App\Presentation\Web\Site;
 
+use App\Application\Sales\DownloadLinks;
 use App\Application\Sales\SalesQueries;
-use App\Presentation\Web\Security\SecurityHeaders;
+use App\Domain\Sales\OrderStatus;
+use Psr\Clock\ClockInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Attribute\AsController;
@@ -18,7 +20,9 @@ final readonly class CheckoutSuccessController
 {
     public function __construct(
         private SalesQueries $sales,
+        private DownloadLinks $links,
         private SitePage $page,
+        private ClockInterface $clock,
     ) {
     }
 
@@ -26,9 +30,13 @@ final readonly class CheckoutSuccessController
     {
         $order = $this->sales->order($request->query->getString('order')) ?? throw new NotFoundHttpException();
 
-        $response = $this->page->render('site/checkout_success.html.twig', ['order' => $order]);
-        $response->headers->set('X-Robots-Tag', SecurityHeaders::NOINDEX);
+        $paid = null !== $order->licence && OrderStatus::Paid->value === $order->status;
+        $fresh = $paid && $order->paidAt > $this->clock->now()->sub(new \DateInterval(DownloadLinks::VALIDITY));
 
-        return $response;
+        return $this->page->render('site/checkout_success.html.twig', [
+            'order' => $order,
+            'downloads' => $fresh ? [...$this->links->forOrder($order), $this->links->licence($order)] : [],
+            'downloads_expired' => $paid && !$fresh,
+        ]);
     }
 }

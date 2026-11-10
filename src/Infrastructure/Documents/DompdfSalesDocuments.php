@@ -6,6 +6,7 @@ namespace App\Infrastructure\Documents;
 
 use App\Application\Sales\CreditNoteView;
 use App\Application\Sales\InvoiceView;
+use App\Application\Sales\OrderView;
 use App\Application\Sales\SalesDocuments;
 use App\Application\Settings\LegalDocumentView;
 use Dompdf\Dompdf;
@@ -29,6 +30,11 @@ final readonly class DompdfSalesDocuments implements SalesDocuments
     public function legalPdf(LegalDocumentView $document, string $locale): string
     {
         return self::pdf($this->html->legal($document, $locale));
+    }
+
+    public function licence(OrderView $order): string
+    {
+        return self::pdf($this->html->licence($order));
     }
 
     private static function pdf(string $html): string

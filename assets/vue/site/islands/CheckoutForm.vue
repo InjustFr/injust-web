@@ -8,6 +8,7 @@ const props = defineProps({
     product: { type: Object, required: true },
     consents: { type: Array, required: true },
     terms: { type: Object, required: true },
+    licence: { type: Object, default: null },
     labels: { type: Object, required: true },
 });
 
@@ -69,6 +70,7 @@ async function submit() {
                 <input :id="`consent-${consent.kind}`" v-model="form.consents" type="checkbox" name="consents[]" :value="consent.kind" required>
                 <label :for="`consent-${consent.kind}`">{{ consent.text }}</label>
                 <a v-if="consent.kind === 'terms'" class="checkout-terms" :href="terms.href" target="_blank" rel="noopener">{{ terms.label }}<ExternalLink :size="14" aria-hidden="true" /></a>
+                <a v-if="consent.kind === 'licence' && licence" class="checkout-terms" :href="licence.href" target="_blank" rel="noopener">{{ licence.label }}<ExternalLink :size="14" aria-hidden="true" /></a>
             </div>
         </fieldset>
         <div class="checkout-actions">

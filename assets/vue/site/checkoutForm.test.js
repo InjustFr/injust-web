@@ -64,6 +64,21 @@ describe('checkoutPayload', () => {
         });
     });
 
+    it('sends the licence tier of a beat', () => {
+        const beat = { productType: 'beat', productId: '01JBN5Z7Q3X0000000000000BB', locale: 'en', cgvVersion: 2, tierId: '01JBN5Z7Q3X0000000000000CC', licenceVersion: 3 };
+
+        expect(checkoutPayload({ email: 'joe@punk.test', consents: ['terms', 'digital-waiver', 'licence'] }, beat)).toEqual({
+            productType: 'beat',
+            productId: '01JBN5Z7Q3X0000000000000BB',
+            locale: 'en',
+            email: 'joe@punk.test',
+            consents: ['terms', 'digital-waiver', 'licence'],
+            cgvVersion: 2,
+            tierId: '01JBN5Z7Q3X0000000000000CC',
+            licenceVersion: 3,
+        });
+    });
+
     it('drops a ticked kind that the product does not ask for', () => {
         expect(checkoutPayload({ email: 'joe@punk.test', consents: ['terms', 'licence'] }, product).consents).toEqual(['terms']);
     });

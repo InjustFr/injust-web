@@ -161,6 +161,12 @@ site:
         from: 'à partir de {price}'
         on_request: 'Prix sur demande'
         contact: 'Me contacter'
+        buy: 'Acheter'
+        picker:
+            title: 'Choisir une licence'
+            close: 'Fermer'
+            unavailable: 'Fichier indisponible'
+            compare: 'Comparer les licences'
         bpm: '{bpm} BPM'
         key: '{note} {mode, select, major {majeur} other {mineur}}'
         notes:
@@ -240,6 +246,16 @@ site:
             body_too_short: 'Écrivez au moins 10 caractères.'
             body_too_long: '5 000 caractères maximum.'
     checkout:
+        licences: 'Licence'
+        licence_link: 'Lire les conditions de la licence (nouvel onglet)'
+        line: '{label} : {value}'
+        downloads:
+            title: 'Vos téléchargements'
+            mp3: 'Télécharger le MP3'
+            wav: 'Télécharger le WAV'
+            stems: 'Télécharger les pistes séparées (ZIP)'
+            licence: 'Licence (PDF)'
+            valid: 'Ces liens sont valables 7 jours. Vous les retrouvez aussi dans l’e-mail de confirmation.'
         book: 'Réserver et payer'
         title: 'Commande'
         summary: 'Votre commande'
@@ -277,6 +293,11 @@ site:
                 lessons: 'Voir tous les cours'
                 production: 'Voir toutes les prestations'
                 beats: 'Voir tous les beats'
+    download:
+        expired:
+            title: 'Ce lien de téléchargement a expiré'
+            body: 'Les liens de téléchargement sont valables 7 jours. Répondez à l’e-mail de confirmation, ou écrivez-moi avec la référence de votre commande, et je vous en enverrai un nouveau.'
+            contact: 'Me contacter'
     withdrawal:
         title: 'Rétractation'
         kicker: 'Droit de rétractation'
@@ -337,3 +358,5 @@ sales:
         terms: 'J’ai lu et j’accepte les conditions générales de vente (version {version}).'
         early-start: 'Je demande expressément que la prestation commence avant la fin du délai de rétractation de 14 jours.'
         pro-rata: 'Je reconnais que si j’exerce mon droit de rétractation après le début de la prestation, je paierai un montant proportionnel au service déjà fourni.'
+        digital-waiver: 'Je demande expressément la fourniture immédiate des fichiers dès la confirmation de mon paiement et je reconnais perdre ainsi mon droit de rétractation.'
+        licence: 'J’accepte les conditions de la licence (version {version}) pour la formule choisie, y compris ses limites de streams, de copies et de clips.'

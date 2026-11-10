@@ -12,6 +12,15 @@ enum FileFormat: string
     case Wav = 'wav';
     case Zip = 'zip';
 
+    public function mimeType(): string
+    {
+        return match ($this) {
+            self::Mp3 => 'audio/mpeg',
+            self::Wav => 'audio/wav',
+            self::Zip => 'application/zip',
+        };
+    }
+
     public function matches(string $head): bool
     {
         return match ($this) {

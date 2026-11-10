@@ -6,6 +6,7 @@ namespace App\Tests\Functional\Infrastructure\Mail\Sales;
 
 use App\Application\Sales\CreditNoteView;
 use App\Application\Sales\InvoiceView;
+use App\Application\Sales\OrderView;
 use App\Application\Sales\SalesDocuments;
 use App\Application\Settings\LegalDocumentView;
 use App\Application\Settings\SettingsQueries;
@@ -94,6 +95,11 @@ final class CreditNoteMailTest extends KernelTestCase
             public function legalPdf(LegalDocumentView $document, string $locale): string
             {
                 return 'legal';
+            }
+
+            public function licence(OrderView $order): string
+            {
+                return 'licence '.$order->reference;
             }
         };
 

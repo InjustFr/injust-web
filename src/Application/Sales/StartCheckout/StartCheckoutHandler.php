@@ -11,18 +11,24 @@ use App\Application\Sales\CheckoutUrls;
 use App\Application\Sales\ConsentTexts;
 use App\Application\Sales\PaymentGateway;
 use App\Application\Settings\LegalDocumentHtml;
+use App\Application\Settings\LegalDocumentView;
 use App\Application\Settings\SettingsQueries;
 use App\Application\Transaction;
 use App\Domain\Sales\Consent;
+use App\Domain\Sales\ConsentKind;
 use App\Domain\Sales\Exception\CheckoutClosed;
+use App\Domain\Sales\Exception\LicenceChanged;
 use App\Domain\Sales\Exception\PaymentUnavailable;
 use App\Domain\Sales\Exception\ProductUnavailable;
 use App\Domain\Sales\Exception\SectionClosed;
 use App\Domain\Sales\Exception\TermsChanged;
+use App\Domain\Sales\LicenceSnapshot;
+use App\Domain\Sales\LicensedBeat;
 use App\Domain\Sales\Order;
 use App\Domain\Sales\OrderRepository;
 use App\Domain\Sales\Purchasable;
 use App\Domain\Sales\Terms;
+use App\Domain\Settings\LegalKind;
 use App\Domain\Shared\LocalizedText;
 use Psr\Clock\ClockInterface;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
@@ -49,7 +55,9 @@ final readonly class StartCheckoutHandler
         $product = $this->product($command);
         $terms = $this->terms($command);
         $now = $this->clock->now();
-        $order = Order::place($product, $command->locale, $command->email, $this->consents($command, $terms->version, $now), $terms, $now);
+        $order = null === $product->beat
+            ? Order::place($product, $command->locale, $command->email, $this->consents($command, $terms->version, $terms->version, $now), $terms, $now)
+            : $this->placeBeat($command, $product, $product->beat, $terms, $now);
         $this->orders->add($order);
         $this->transaction->commit();
 
@@ -70,7 +78,7 @@ final readonly class StartCheckoutHandler
             throw new SectionClosed();
         }
 
-        return $this->products->find($command->productType, $command->productId, $command->locale) ?? throw new ProductUnavailable();
+        return $this->products->find($command->productType, $command->productId, $command->locale, $command->tierId) ?? throw new ProductUnavailable();
     }
 
     private function terms(StartCheckout $command): Terms
@@ -80,18 +88,33 @@ final readonly class StartCheckoutHandler
             throw new TermsChanged();
         }
 
+        return $this->snapshot($cgv);
+    }
+
+    private function placeBeat(StartCheckout $command, Purchasable $product, LicensedBeat $beat, Terms $terms, \DateTimeImmutable $now): Order
+    {
+        $licence = $this->settings->legalDocument(LegalKind::Licence);
+        if ($licence->version !== $command->licenceVersion) {
+            throw new LicenceChanged();
+        }
+
+        return Order::placeBeat($product, new LicenceSnapshot($beat, $this->snapshot($licence)), $command->locale, $command->email, $this->consents($command, $terms->version, $licence->version, $now), $terms, $now);
+    }
+
+    private function snapshot(LegalDocumentView $document): Terms
+    {
         $settings = $this->settings->current();
 
-        return new Terms($cgv->version, new LocalizedText($this->legal->fill($cgv, $settings, 'fr', $this->siteUrl), $this->legal->fill($cgv, $settings, 'en', $this->siteUrl)), $cgv->updatedAt);
+        return new Terms($document->version, new LocalizedText($this->legal->fill($document, $settings, 'fr', $this->siteUrl), $this->legal->fill($document, $settings, 'en', $this->siteUrl)), $document->updatedAt);
     }
 
     /** @return list<Consent> */
-    private function consents(StartCheckout $command, int $cgvVersion, \DateTimeImmutable $now): array
+    private function consents(StartCheckout $command, int $cgvVersion, int $licenceVersion, \DateTimeImmutable $now): array
     {
         $consents = [];
         foreach ($command->productType->requiredConsents() as $kind) {
             if (\in_array($kind->value, $command->acceptedConsents, true)) {
-                $consents[] = new Consent($kind, $this->consentTexts->text($kind, $command->locale, $cgvVersion), $now);
+                $consents[] = new Consent($kind, $this->consentTexts->text($kind, $command->locale, ConsentKind::Licence === $kind ? $licenceVersion : $cgvVersion), $now);
             }
         }
 
