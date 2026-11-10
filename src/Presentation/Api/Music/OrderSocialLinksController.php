@@ -6,6 +6,7 @@ namespace App\Presentation\Api\Music;
 
 use App\Application\Music\OrderSocialLinks\OrderSocialLinks;
 use App\Application\Music\OrderSocialLinks\OrderSocialLinksHandler;
+use App\Presentation\Api\Shared\OrderPayload;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpKernel\Attribute\MapRequestPayload;

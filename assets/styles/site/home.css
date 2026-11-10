@@ -232,6 +232,8 @@ main { counter-reset: section; }
 }
 
 .section-index {
+    flex: none;
+    white-space: nowrap;
     padding-top: 0.35rem;
     color: var(--fog);
     font-family: var(--font-mono);

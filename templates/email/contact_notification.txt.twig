@@ -1,0 +1,12 @@
+{{ 'contact.notification.intro'|trans({name: contact.name, email: contact.email}, 'emails') }}
+
+{{ 'contact.notification.topic'|trans({topic: topic}, 'emails') }}
+{% if contact.offerLabel %}
+{{ 'contact.notification.offer'|trans({offer: contact.offerLabel}, 'emails') }}
+{% endif %}
+{{ 'contact.notification.language'|trans({locale: contact.locale}, 'emails') }}
+
+{{ contact.body }}
+
+--
+{{ 'contact.notification.reply'|trans({}, 'emails') }}

@@ -1,0 +1,10 @@
+{{ 'contact.acknowledgement.greeting'|trans({}, 'emails') }}
+
+{{ 'contact.acknowledgement.body'|trans({}, 'emails') }}
+{% if offer %}
+
+{{ 'contact.acknowledgement.offer'|trans({offer: offer}, 'emails') }}
+{% endif %}
+
+--
+{{ 'contact.acknowledgement.signature'|trans({}, 'emails') }}

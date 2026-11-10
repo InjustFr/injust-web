@@ -1,0 +1,64 @@
+{% extends 'site.html.twig' %}
+
+{% set page_title = 'site.sections.lessons'|trans %}
+
+{% block main %}
+    <section class="lessons-hero" aria-labelledby="lessons-title">
+        <p class="lessons-kicker">{{ 'site.lessons.service'|trans }}</p>
+        <h1 class="lessons-title" id="lessons-title">{{ page_title }}</h1>
+        {% if intro|trim %}
+            <div class="lessons-intro">{{ intro|raw }}</div>
+        {% else %}
+            <p class="lessons-lead">{{ 'site.leads.lessons'|trans }}</p>
+        {% endif %}
+    </section>
+    <section class="offers" aria-labelledby="offers-title">
+        {% include 'site/_section_head.html.twig' with {id: 'offers-title', title: 'site.lessons.offers'|trans} only %}
+        {% for group in groups %}
+            <section class="offer-group" aria-labelledby="format-{{ group.format }}">
+                <h3 class="offer-group-title" id="format-{{ group.format }}">{{ ('site.lessons.formats.' ~ group.format)|trans }}</h3>
+                <ul class="offer-list">
+                    {% for offer in group.offers %}
+                        <li class="offer">
+                            <p class="offer-kind">{{ ('site.lessons.kinds.' ~ offer.kind)|trans({sessions: offer.sessions}) }}</p>
+                            <h4 class="offer-title" id="offer-{{ offer.id }}">{{ offer.title }}</h4>
+                            {% if offer.description %}
+                                <p class="offer-description">{{ offer.description }}</p>
+                            {% endif %}
+                            <p class="offer-meta">{{ 'site.lessons.meta'|trans({sessions: offer.sessions, minutes: offer.minutes}) }}</p>
+                            <p class="offer-pricing">
+                                <span class="offer-price">{{ offer.price }}</span>
+                                {% if offer.per_lesson %}
+                                    <span class="offer-per-lesson">{{ 'site.lessons.per_lesson'|trans({price: offer.per_lesson}) }}</span>
+                                {% endif %}
+                            </p>
+                            <a class="button" href="{{ path('contact', {topic: 'lessons', offer: offer.id}) }}" aria-describedby="offer-{{ offer.id }}">{{ 'site.lessons.contact'|trans }}</a>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </section>
+        {% else %}
+            <div class="offers-empty">
+                <p>{{ 'site.lessons.empty'|trans }}</p>
+                <a class="button" href="{{ path('contact', {topic: 'lessons'}) }}">{{ 'site.write'|trans }}</a>
+            </div>
+        {% endfor %}
+    </section>
+    {% if faq|trim %}
+        <section class="faq" aria-labelledby="faq-title">
+            {% include 'site/_section_head.html.twig' with {id: 'faq-title', title: 'site.lessons.faq'|trans} only %}
+            {% if faq_questions %}
+                <div class="faq-list">
+                    {% for item in faq_questions %}
+                        <details class="faq-item">
+                            <summary>{{ item.question }}</summary>
+                            <div class="faq-answer">{{ item.answer|raw }}</div>
+                        </details>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="faq-body">{{ faq|raw }}</div>
+            {% endif %}
+        </section>
+    {% endif %}
+{% endblock %}

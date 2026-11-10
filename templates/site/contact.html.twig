@@ -1,0 +1,47 @@
+{% extends 'site.html.twig' %}
+
+{% set page_title = 'site.contact.title'|trans %}
+
+{% block main %}
+    <section class="contact" aria-labelledby="contact-title">
+        <header class="contact-head">
+            <h1 class="contact-title" id="contact-title">{{ page_title }}</h1>
+            <p class="contact-lead">{{ 'site.contact.lead'|trans }}</p>
+        </header>
+        {% set errors = {
+            name: {required: 'site.contact.errors.name_required'|trans, tooLong: 'site.contact.errors.name_too_long'|trans},
+            email: {required: 'site.contact.errors.email_required'|trans, invalid: 'site.contact.errors.email_invalid'|trans, tooLong: 'site.contact.errors.email_too_long'|trans},
+            body: {tooShort: 'site.contact.errors.body_too_short'|trans, tooLong: 'site.contact.errors.body_too_long'|trans},
+        } %}
+        <div class="contact-form" data-island="ContactForm" data-props="{{ {
+            endpoint: path('api_contact_send'),
+            locale: locale,
+            topic: topic,
+            offer: offer,
+            topics: topics|map(value => {value: value, label: ('site.contact.topics.' ~ value)|trans}),
+            labels: {
+                name: 'site.contact.name'|trans,
+                email: 'site.contact.email'|trans,
+                topic: 'site.contact.topic'|trans,
+                offer: 'site.contact.offer'|trans,
+                removeOffer: 'site.contact.remove_offer'|trans,
+                body: 'site.contact.body'|trans,
+                website: 'site.contact.website'|trans,
+                required: 'site.contact.required'|trans,
+                send: 'site.contact.send'|trans,
+                sending: 'site.contact.sending'|trans,
+                sentTitle: 'site.contact.sent_title'|trans,
+                sentBody: 'site.contact.sent_body'|trans,
+                invalid: 'site.contact.invalid'|trans,
+                tooMany: 'site.contact.too_many'|trans,
+                error: 'site.contact.error'|trans,
+                errors: errors,
+            },
+        }|json_encode }}">
+            <p class="contact-fallback">
+                {{ 'site.contact.fallback'|trans }}
+                {%- if settings.contactEmail %} <a href="mailto:{{ settings.contactEmail }}">{{ settings.contactEmail }}</a>{% endif %}
+            </p>
+        </div>
+    </section>
+{% endblock %}

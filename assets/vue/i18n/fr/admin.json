@@ -6,7 +6,9 @@
         "signOut": "Se déconnecter",
         "settings": "Réglages",
         "legal": "Textes légaux",
-        "music": "Musique"
+        "music": "Musique",
+        "lessons": "Cours",
+        "messages": "Messages"
     },
     "dashboard": {
         "title": "Tableau de bord",
@@ -188,6 +190,62 @@
         "portrait": {
             "title": "Portrait",
             "none": "Aucun portrait."
+        }
+    },
+    "lessons": {
+        "title": "Cours de guitare",
+        "subtitle": "Offres et textes de la page des cours.",
+        "saved": "Enregistré.",
+        "save": "Enregistrer",
+        "edit": "Modifier",
+        "delete": "Supprimer",
+        "kinds": {
+            "single": "Cours à l'unité",
+            "pack": "Forfait"
+        },
+        "formats": {
+            "at-home": "À domicile",
+            "at-teacher": "Chez le professeur",
+            "online": "En ligne"
+        },
+        "texts": {
+            "title": "Textes de la page",
+            "intro": "Introduction, Markdown ({language})",
+            "faq": "FAQ, Markdown ({language})"
+        },
+        "offers": {
+            "title": "Offres",
+            "new": "Nouvelle offre",
+            "edit": "Modifier l'offre",
+            "empty": "Aucune offre pour le moment.",
+            "titleField": "Titre ({language})",
+            "description": "Description courte ({language})",
+            "kind": "Type",
+            "sessions": "Nombre de cours",
+            "sessionsHint": "Un forfait compte au moins 2 cours.",
+            "format": "Format",
+            "minutes": "Minutes par cours",
+            "minutesHint": "Entre 15 et 240, par pas de 15.",
+            "price": "Prix (EUR)",
+            "priceHint": "Par exemple 45 ou 45,50.",
+            "duration": "{minutes} min",
+            "packSessions": "× {count}"
+        }
+    },
+    "messages": {
+        "title": "Messages",
+        "subtitle": "Messages envoyés par le formulaire de contact, les plus récents d'abord.",
+        "showHandled": "Afficher les messages traités",
+        "empty": "Aucun message.",
+        "handle": "Marquer comme traité",
+        "reopen": "Rouvrir",
+        "delete": "Supprimer",
+        "deleted": "Message supprimé.",
+        "topics": {
+            "general": "Général",
+            "lessons": "Cours",
+            "production": "Production",
+            "beats": "Beats"
         }
     }
 }

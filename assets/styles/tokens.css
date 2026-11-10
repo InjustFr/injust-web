@@ -28,7 +28,6 @@
     --color-warning-soft: color-mix(in oklch, var(--color-warning) 12%, var(--color-surface-hueless));
     --color-backdrop: rgb(0 0 0 / 70%);
 
-    --color-dew: oklch(from var(--theme-background) calc(0.7 - 0.12 * clamp(0, (l - 0.62) * 100, 1)) 0.09 220);
 
     --quadrant-do-first: var(--color-danger);
     --quadrant-schedule: var(--color-accent);

@@ -1,5 +1,5 @@
 <script setup>
-import { Trash2 } from '@lucide/vue';
+import { Link, Trash2 } from '@lucide/vue';
 import { ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import BaseButton from '../../../components/ui/BaseButton.vue';
@@ -56,7 +56,7 @@ const remove = (id) => toast.attempt(() => api.del(`/api/admin/music/links/${id}
             </FormField>
             <BaseButton type="submit" :loading="saving">{{ t('admin.music.add') }}</BaseButton>
         </form>
-        <EmptyState v-if="links.length === 0" :title="t('admin.music.links.empty')" />
+        <EmptyState :icon="Link" v-if="links.length === 0" :title="t('admin.music.links.empty')" />
         <ul v-else class="rows">
             <li v-for="(link, index) in links" :key="link.id" class="rows__item">
                 <span class="rows__label">{{ link.label ?? t(`admin.music.networks.${link.network}`) }} <span class="rows__sub">{{ link.url }}</span></span>

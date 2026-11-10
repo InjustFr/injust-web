@@ -1,4 +1,5 @@
 shared:
+    order_mismatch: 'Le nouvel ordre doit lister chaque élément une seule fois : rechargez la page et réessayez.'
     invalid_url: '« {url} » n’est pas une adresse web sécurisée : elle doit commencer par https://.'
     not_found: '{subject, select, user {Ce compte n’existe} other {Cet élément n’existe}} plus.'
     unsupported_image: 'Ce fichier n’est pas une image que le site peut afficher : utilisez du JPEG, PNG, WebP ou AVIF.'
@@ -19,4 +20,10 @@ music:
     invalid_slug: '« {slug} » ne peut pas devenir une adresse web : utilisez au moins une lettre ou un chiffre.'
     slug_taken: 'Une autre sortie utilise déjà l’adresse « {slug} » : choisissez un autre slug.'
     invalid_hooks: 'Gardez au plus {max} phrases, de {length} caractères au maximum chacune.'
-    order_mismatch: 'Le nouvel ordre doit lister chaque élément une seule fois : rechargez la page et réessayez.'
+lessons:
+    untitled_offer: 'Une offre a besoin d’un titre dans au moins une langue.'
+    invalid_sessions: '{kind, select, single {Un cours à l’unité compte exactement 1 séance.} other {Un pack compte au moins 2 séances.}}'
+    invalid_duration: 'Un cours dure entre {min} et {max} minutes, par paliers de {step} minutes.'
+contact:
+    too_many_messages: 'Vous avez envoyé plusieurs messages en peu de temps : attendez 10 minutes et réessayez.'
+    unsupported_locale: 'Les messages s’écrivent en français ou en anglais, pas en « {locale} ».'

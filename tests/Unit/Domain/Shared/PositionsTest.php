@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace App\Tests\Unit\Domain\Music;
+namespace App\Tests\Unit\Domain\Shared;
 
-use App\Domain\Music\Exception\OrderMismatch;
-use App\Domain\Music\Positions;
 use App\Domain\Music\SocialLink;
 use App\Domain\Music\SocialNetwork;
+use App\Domain\Shared\Exception\OrderMismatch;
+use App\Domain\Shared\Positions;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
@@ -43,7 +43,7 @@ final class PositionsTest extends TestCase
             Positions::apply($ids, $links);
             self::fail('The order was accepted.');
         } catch (OrderMismatch $refused) {
-            self::assertSame('music.order_mismatch', $refused->getMessage());
+            self::assertSame('shared.order_mismatch', $refused->getMessage());
             self::assertSame([0, 1, 2], array_map(static fn (SocialLink $link): int => $link->position(), $links));
         }
     }

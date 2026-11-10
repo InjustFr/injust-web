@@ -2,6 +2,8 @@ import './styles/site/fonts.css';
 import './styles/site/tokens.css';
 import './styles/site/base.css';
 import './styles/site/home.css';
+import './styles/site/lessons.css';
+import './styles/site/contact.css';
 
 const islands = import.meta.glob('./vue/site/islands/*.vue');
 

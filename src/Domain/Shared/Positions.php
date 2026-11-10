@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace App\Domain\Music;
+namespace App\Domain\Shared;
 
-use App\Domain\Music\Exception\OrderMismatch;
+use App\Domain\Shared\Exception\OrderMismatch;
 
 final class Positions
 {

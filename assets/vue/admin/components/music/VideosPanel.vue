@@ -1,5 +1,5 @@
 <script setup>
-import { Trash2 } from '@lucide/vue';
+import { Clapperboard, Trash2 } from '@lucide/vue';
 import { ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import BaseButton from '../../../components/ui/BaseButton.vue';
@@ -51,7 +51,7 @@ const remove = (id) => toast.attempt(() => api.del(`/api/admin/music/videos/${id
             </FormField>
             <BaseButton type="submit" :loading="saving">{{ t('admin.music.add') }}</BaseButton>
         </form>
-        <EmptyState v-if="videos.length === 0" :title="t('admin.music.videos.empty')" />
+        <EmptyState :icon="Clapperboard" v-if="videos.length === 0" :title="t('admin.music.videos.empty')" />
         <ul v-else class="rows">
             <li v-for="(video, index) in videos" :key="video.id" class="rows__item">
                 <img v-if="video.thumbnail" class="rows__thumb" :src="imageUrl(video.thumbnail)" alt="" />

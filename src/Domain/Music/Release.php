@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Domain\Music;
 
 use App\Domain\Shared\LocalizedText;
+use App\Domain\Shared\Positioned;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Types\UlidType;
 use Symfony\Component\Uid\Ulid;

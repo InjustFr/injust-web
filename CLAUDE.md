@@ -65,6 +65,16 @@ Layer-first: `src/{Domain,Application,Infrastructure,Presentation}/<Context>/`, 
 - Public home: `HomeController` renders `templates/site/home.html.twig` partials; JSON-LD through `Site\MusicStructuredData`. Islands `Countdown`, `SpotifyPlayer`, `VideoFacade`: embeds load only after a click (CSP `frame-src` youtube-nocookie + open.spotify.com, no third-party request on load).
 - Tests: `Tests\Support\FakeYoutube` decorates `http_client`; e2e `e2e/tests/music.spec.js`.
 
+## M2 Lessons and Contact
+
+- `Domain/Lessons`: `LessonOffer` (localized title and description, `OfferKind` single|pack, `sessions` 1 for a single and >= 2 for a pack, `LessonFormat` at-home|at-teacher|online, `minutes` 15..240 by 15, `Price`, position; the `LessonOfferDetails` VO validates), single-row `LessonsPage` (Markdown intro and FAQ). Ordered lists (releases, videos, links, offers) share `Domain\Shared\Positions` (`Positioned`, `OrderMismatch`) and `Presentation\Api\Shared\OrderPayload`.
+- `Domain/Contact`: `ContactMessage` (name, email, `ContactTopic` general|lessons|production|beats, `offerRef` + `offerLabel` snapshot, body 10..5000 without control characters, locale en|fr, `receivedAt`, `handledAt`); kept three years (`app:contact:purge`, run by the entrypoint and a daily cron).
+- `SendContactMessageHandler` stores and commits first, then the `ContactMails` port (`Infrastructure\Mail\SymfonyContactMails`, `templates/email/*`, sender `MAILER_SENDER`) notifies `Settings.contactEmail` (reply-to the visitor, skipped when empty) and acknowledges the visitor in their locale with a fixed text (no name or body echoed; limiters `contact_recipient` 3 a day per address and `contact_acknowledgement` 100 a day). A mail failure is logged with the message id and exception class only, never loses the message.
+- Public `POST /api/contact` (no session, `SameOriginGuard`): `website` honeypot (201, nothing stored), rate limit 5 per 10 minutes per IP, an IPv6 /64 as one (`cache.contact_limiter`, a filesystem pool with `lock.factory`; `make e2e` clears it) -> 429 problem+json.
+- Admin API `/api/admin/lessons[/page|/offers[/order]]` and `/api/admin/messages[/{id}/handled]`; pages `/admin/lessons` (`lessonsForm.js`) and `/admin/messages` (`messagesList.js`, unread badge).
+- Public pages `/lessons` (`LessonsController`, gated by `SectionGate`, offers grouped by format, FAQ, JSON-LD `Service`) and `/contact` (always on, `ContactForm` island prefilled from `?topic=lessons&offer=<id>`). Every buy button is a "Contact me" link until checkout exists (M4).
+- Dev fixtures add demo offers, lessons texts and two messages; e2e `e2e/tests/contact.spec.js` (the test mailer is `null://`, so mail is not asserted there).
+
 ## Accounts & security
 
 - Sign-in = mossyleaf accounts (Authentik at `accounts.mossyleaf.studio`, project `~/Sites/mossyleaf-studio/accounts`), OIDC code flow + PKCE, client id `injust`. Only accounts whose `groups` claim contains `OIDC_REQUIRED_GROUP` (`injust`) get in; dev leaves it empty.

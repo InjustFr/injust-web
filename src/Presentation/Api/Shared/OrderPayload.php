@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Presentation\Api\Music;
+namespace App\Presentation\Api\Shared;
 
 final readonly class OrderPayload
 {

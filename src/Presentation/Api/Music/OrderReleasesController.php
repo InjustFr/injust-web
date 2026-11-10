@@ -6,6 +6,7 @@ namespace App\Presentation\Api\Music;
 
 use App\Application\Music\OrderReleases\OrderReleases;
 use App\Application\Music\OrderReleases\OrderReleasesHandler;
+use App\Presentation\Api\Shared\OrderPayload;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpKernel\Attribute\MapRequestPayload;

@@ -33,7 +33,7 @@ final readonly class HomeController
             'music' => $home,
             'manifesto' => $this->markdown->toHtml($home->text->manifesto->in($locale), []),
             'bio' => $this->markdown->toHtml($home->text->bio->in($locale), []),
-            'music_graph' => $this->structuredData->releases($home->releases),
+            'page_graph' => $this->structuredData->releases($home->releases),
         ]);
     }
 }

@@ -6,8 +6,8 @@ namespace App\Application\Music\OrderSocialLinks;
 
 use App\Application\Music\SocialLinkView;
 use App\Application\Transaction;
-use App\Domain\Music\Positions;
 use App\Domain\Music\SocialLinkRepository;
+use App\Domain\Shared\Positions;
 
 final readonly class OrderSocialLinksHandler
 {

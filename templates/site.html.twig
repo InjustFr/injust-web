@@ -55,7 +55,7 @@
         '@graph': [
             band,
             {'@type': 'WebSite', '@id': home ~ '#website', url: home, name: brand, inLanguage: locale, publisher: {'@id': home ~ '#band'}},
-        ]|merge(music_graph ?? []),
+        ]|merge(page_graph ?? []),
     }|json_encode(constant('JSON_HEX_TAG') b-or constant('JSON_HEX_AMP') b-or constant('JSON_UNESCAPED_SLASHES') b-or constant('JSON_UNESCAPED_UNICODE'))|raw }}</script>
     {% block preload %}{% endblock %}
 {% endblock %}
@@ -81,8 +81,9 @@
         </a>
         <nav class="site-nav" aria-label="{{ 'site.nav'|trans }}">
             {% for item in settings.enabledSections() %}
-                <a class="nav-section" href="{{ path('section', {section: item.value}) }}"{% if item == current_section %} aria-current="page"{% endif %}>{{ ('site.sections.' ~ item.value)|trans }}</a>
+                <a class="nav-section" href="{{ item.value == 'lessons' ? path('lessons') : path('section', {section: item.value}) }}"{% if item == current_section %} aria-current="page"{% endif %}>{{ ('site.sections.' ~ item.value)|trans }}</a>
             {% endfor %}
+            <a class="nav-contact" href="{{ path('contact') }}"{% if route == 'contact' %} aria-current="page"{% endif %}>{{ 'site.contact.title'|trans }}</a>
             <a class="lang-switch" href="{{ path(route, params|merge({_locale: other})) }}" hreflang="{{ other }}" lang="{{ other }}" title="{{ 'site.switch'|trans({}, 'messages', other) }}">{{ other|upper }}</a>
         </nav>
     </header>
@@ -97,9 +98,10 @@
                 {% endfor %}
             </nav>
         {% endif %}
-        {% if settings.contactEmail %}
-            <p class="footer-contact">{{ 'site.footer.contact'|trans }} <a href="mailto:{{ settings.contactEmail }}">{{ settings.contactEmail }}</a></p>
-        {% endif %}
+        <p class="footer-contact">
+            <a class="footer-contact-link" href="{{ path('contact') }}">{{ 'site.footer.contact'|trans }}</a>
+            {%- if settings.contactEmail %} · <a href="mailto:{{ settings.contactEmail }}">{{ settings.contactEmail }}</a>{% endif %}
+        </p>
         <p class="footer-copy">© {{ 'now'|date('Y') }} {{ brand }}</p>
     </footer>
 {% endblock %}

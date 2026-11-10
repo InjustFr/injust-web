@@ -4,6 +4,12 @@ declare(strict_types=1);
 
 namespace App\Fixtures;
 
+use App\Application\Contact\SendContactMessage\SendContactMessage;
+use App\Application\Contact\SendContactMessage\SendContactMessageHandler;
+use App\Application\Lessons\AddLessonOffer\AddLessonOffer;
+use App\Application\Lessons\AddLessonOffer\AddLessonOfferHandler;
+use App\Application\Lessons\EditLessonsPage\EditLessonsPage;
+use App\Application\Lessons\EditLessonsPage\EditLessonsPageHandler;
 use App\Application\Music\AddRelease\AddRelease;
 use App\Application\Music\AddRelease\AddReleaseHandler;
 use App\Application\Music\AddSocialLink\AddSocialLink;
@@ -12,11 +18,16 @@ use App\Application\Music\EditMusicText\EditMusicText;
 use App\Application\Music\EditMusicText\EditMusicTextHandler;
 use App\Application\Music\FeatureRelease\FeatureRelease;
 use App\Application\Music\FeatureRelease\FeatureReleaseHandler;
+use App\Domain\Contact\ContactTopic;
+use App\Domain\Lessons\LessonFormat;
+use App\Domain\Lessons\LessonOfferDetails;
+use App\Domain\Lessons\OfferKind;
 use App\Domain\Music\ReleaseDetails;
 use App\Domain\Music\ReleaseType;
 use App\Domain\Music\SocialNetwork;
 use App\Domain\Music\Track;
 use App\Domain\Shared\LocalizedText;
+use App\Domain\Shared\Price;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Persistence\ObjectManager;
 use Symfony\Component\Uid\Ulid;
@@ -59,6 +70,9 @@ final class AppFixtures extends Fixture
         private readonly FeatureReleaseHandler $featureRelease,
         private readonly EditMusicTextHandler $editMusicText,
         private readonly AddSocialLinkHandler $addSocialLink,
+        private readonly AddLessonOfferHandler $addLessonOffer,
+        private readonly EditLessonsPageHandler $editLessonsPage,
+        private readonly SendContactMessageHandler $sendContactMessage,
     ) {
     }
 
@@ -75,6 +89,9 @@ final class AppFixtures extends Fixture
         foreach (self::SOCIAL as [$network, $url]) {
             ($this->addSocialLink)(new AddSocialLink($network, $url, null));
         }
+
+        $this->lessons();
+        $this->messages();
     }
 
     /** @param list<array{string, int}> $tracks */
@@ -93,5 +110,39 @@ final class AppFixtures extends Fixture
         )));
 
         return $view->id;
+    }
+
+    private function lessons(): void
+    {
+        $offers = [
+            ['Single lesson at my place', 'Leçon à domicile chez le professeur', OfferKind::Single, 1, LessonFormat::AtTeacher, 60, 4000],
+            ['Single online lesson', 'Leçon en ligne', OfferKind::Single, 1, LessonFormat::Online, 60, 3500],
+            ['Pack of 5 lessons at your home', 'Forfait 5 leçons à votre domicile', OfferKind::Pack, 5, LessonFormat::AtHome, 60, 22500],
+        ];
+        foreach ($offers as [$en, $fr, $kind, $sessions, $format, $minutes, $cents]) {
+            ($this->addLessonOffer)(new AddLessonOffer(new LessonOfferDetails(
+                new LocalizedText($fr, $en),
+                new LocalizedText('Guitare rock, punk et hard rock, tous niveaux.', 'Rock, punk and hard rock guitar, all levels.'),
+                $kind,
+                $sessions,
+                $format,
+                $minutes,
+                new Price($cents),
+            )));
+        }
+
+        ($this->editLessonsPage)(new EditLessonsPage(
+            new LocalizedText('Apprenez la guitare par les morceaux que vous aimez : riffs, accords de puissance, rythmique et solos.', 'Learn guitar through the songs you love: riffs, power chords, rhythm and solos.'),
+            new LocalizedText(
+                "### Faut-il avoir sa propre guitare ?\n\nOui, une guitare électrique ou acoustique pour commencer.\n\n### Quel niveau faut-il avoir ?\n\nAucun : on part de là où vous en êtes.",
+                "### Do I need my own guitar?\n\nYes, an electric or acoustic guitar to begin with.\n\n### What level do I need?\n\nNone: we start from where you are.",
+            ),
+        ));
+    }
+
+    private function messages(): void
+    {
+        ($this->sendContactMessage)(new SendContactMessage('Alex Example', 'alex@example.com', ContactTopic::General, 'Hello, when is the album out? Looking forward to it.', 'en'));
+        ($this->sendContactMessage)(new SendContactMessage('Camille Exemple', 'camille@example.com', ContactTopic::Lessons, 'Bonjour, je cherche des cours de guitare le samedi matin.', 'fr'));
     }
 }

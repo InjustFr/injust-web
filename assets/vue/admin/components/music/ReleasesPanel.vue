@@ -1,5 +1,5 @@
 <script setup>
-import { Pencil, Plus, Star, Trash2 } from '@lucide/vue';
+import { Disc3, Pencil, Plus, Star, Trash2 } from '@lucide/vue';
 import { ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import BaseButton from '../../../components/ui/BaseButton.vue';
@@ -36,7 +36,7 @@ const remove = (id) => toast.attempt(() => api.del(`/api/admin/music/releases/${
         <template #actions>
             <BaseButton @click="edit(null)"><Plus size="1rem" aria-hidden="true" />{{ t('admin.music.releases.new') }}</BaseButton>
         </template>
-        <EmptyState v-if="releases.length === 0" :title="t('admin.music.releases.empty')" />
+        <EmptyState :icon="Disc3" v-if="releases.length === 0" :title="t('admin.music.releases.empty')" />
         <ul v-else class="rows">
             <li v-for="(release, index) in releases" :key="release.id" class="rows__item">
                 <img v-if="release.cover" class="rows__thumb" :src="imageUrl(release.cover)" alt="" />

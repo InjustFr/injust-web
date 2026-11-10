@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Domain\Music;
+namespace App\Domain\Shared;
 
 use Symfony\Component\Uid\Ulid;
 

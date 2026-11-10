@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Presentation\Web\Site;
 
 use App\Application\Settings\SettingsQueries;
+use App\Domain\Settings\Section;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Attribute\AsController;
 use Symfony\Component\Routing\Attribute\Route;
@@ -26,8 +27,9 @@ final readonly class SitemapController
         $settings = $this->queries->current();
         $pages = [['home', []]];
         foreach ($settings->enabledSections() as $section) {
-            $pages[] = ['section', ['section' => $section->value]];
+            $pages[] = Section::Lessons === $section ? ['lessons', []] : ['section', ['section' => $section->value]];
         }
+        $pages[] = ['contact', []];
         foreach ($this->legalPages->visible($settings) as $kind) {
             $pages[] = ['legal', ['kind' => $kind->value]];
         }

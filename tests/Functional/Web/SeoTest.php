@@ -81,6 +81,7 @@ final class SeoTest extends WebTestCase
         self::assertSame([
             'http://localhost/', 'http://localhost/fr',
             'http://localhost/beats', 'http://localhost/fr/beats',
+            'http://localhost/contact', 'http://localhost/fr/contact',
             'http://localhost/legal/mentions', 'http://localhost/fr/legal/mentions',
             'http://localhost/legal/licence', 'http://localhost/fr/legal/licence',
         ], $locs);

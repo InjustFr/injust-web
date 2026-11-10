@@ -6,7 +6,9 @@
         "signOut": "Sign out",
         "settings": "Settings",
         "legal": "Legal texts",
-        "music": "Music"
+        "music": "Music",
+        "lessons": "Lessons",
+        "messages": "Messages"
     },
     "dashboard": {
         "title": "Dashboard",
@@ -188,6 +190,62 @@
         "portrait": {
             "title": "Portrait",
             "none": "No portrait."
+        }
+    },
+    "lessons": {
+        "title": "Guitar lessons",
+        "subtitle": "Offers and page texts for the lessons page.",
+        "saved": "Saved.",
+        "save": "Save",
+        "edit": "Edit",
+        "delete": "Delete",
+        "kinds": {
+            "single": "Single lesson",
+            "pack": "Pack"
+        },
+        "formats": {
+            "at-home": "At your home",
+            "at-teacher": "At the teacher's",
+            "online": "Online"
+        },
+        "texts": {
+            "title": "Page texts",
+            "intro": "Introduction, Markdown ({language})",
+            "faq": "FAQ, Markdown ({language})"
+        },
+        "offers": {
+            "title": "Offers",
+            "new": "New offer",
+            "edit": "Edit offer",
+            "empty": "No offer yet.",
+            "titleField": "Title ({language})",
+            "description": "Short description ({language})",
+            "kind": "Type",
+            "sessions": "Number of lessons",
+            "sessionsHint": "A pack has at least 2 lessons.",
+            "format": "Format",
+            "minutes": "Minutes per lesson",
+            "minutesHint": "Between 15 and 240, in steps of 15.",
+            "price": "Price (EUR)",
+            "priceHint": "For example 45 or 45,50.",
+            "duration": "{minutes} min",
+            "packSessions": "× {count}"
+        }
+    },
+    "messages": {
+        "title": "Messages",
+        "subtitle": "Messages sent through the contact form, newest first.",
+        "showHandled": "Show handled messages",
+        "empty": "No message.",
+        "handle": "Mark as handled",
+        "reopen": "Reopen",
+        "delete": "Delete",
+        "deleted": "Message deleted.",
+        "topics": {
+            "general": "General",
+            "lessons": "Lessons",
+            "production": "Production",
+            "beats": "Beats"
         }
     }
 }

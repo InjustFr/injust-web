@@ -1,0 +1,19 @@
+contact:
+    topic:
+        general: 'General'
+        lessons: 'Lessons'
+        production: 'Production'
+        beats: 'Beats'
+    notification:
+        subject: 'New message from {name} ({topic})'
+        intro: '{name} <{email}> wrote through the contact form.'
+        topic: 'Topic: {topic}'
+        offer: 'Offer: {offer}'
+        language: 'Language: {locale, select, fr {French} other {English}}'
+        reply: 'Reply to this email to answer them directly.'
+    acknowledgement:
+        subject: 'Injust: your message was received'
+        greeting: 'Hi,'
+        body: 'Thanks for your message. I read every one and will answer you by email as soon as I can.'
+        offer: 'About: {offer}'
+        signature: 'Injust'

@@ -25,5 +25,6 @@ security:
 
     access_control:
         - { path: ^/admin, roles: ROLE_USER }
+        - { path: ^/api/contact$, roles: PUBLIC_ACCESS }
         - { path: ^/api/, roles: ROLE_USER }
         - { path: ^/, roles: PUBLIC_ACCESS }

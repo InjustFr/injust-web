@@ -1,8 +1,10 @@
 <script setup>
-import { ExternalLink, FileText, LayoutDashboard, LogOut, Music, Settings } from '@lucide/vue';
+import { ExternalLink, FileText, GraduationCap, Inbox, LayoutDashboard, LogOut, Music, Settings } from '@lucide/vue';
 import { ConfigProvider, TooltipProvider } from 'reka-ui';
+import { computed, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import ToastHost from '../components/ui/ToastHost.vue';
+import { useApi } from '../composables/useApi.js';
 import { useSession } from '../composables/useSession.js';
 import { intlLocale } from '../i18n/locale.js';
 
@@ -12,9 +14,15 @@ const session = useSession();
 const SECTIONS = [
     { name: 'dashboard', icon: LayoutDashboard },
     { name: 'music', icon: Music },
+    { name: 'lessons', icon: GraduationCap },
+    { name: 'messages', icon: Inbox },
     { name: 'settings', icon: Settings },
     { name: 'legal', icon: FileText },
 ];
+
+const open = ref([]);
+useApi().load('/api/admin/messages', open).catch(() => {});
+const unread = computed(() => open.value.filter((message) => !message.handled).length);
 </script>
 
 <template>
@@ -27,6 +35,7 @@ const SECTIONS = [
                     <RouterLink v-for="section in SECTIONS" :key="section.name" :to="{ name: section.name }" class="admin__tab">
                         <component :is="section.icon" size="1rem" aria-hidden="true" />
                         {{ t(`admin.nav.${section.name}`) }}
+                        <span v-if="section.name === 'messages' && unread > 0" class="admin__badge tabular">{{ unread }}</span>
                     </RouterLink>
                 </nav>
                 <div class="admin__account">
@@ -92,6 +101,8 @@ const SECTIONS = [
 
 .admin__tab:hover { color: var(--color-ink); background: var(--color-hover); }
 .admin__tab.router-link-active { color: var(--color-accent-strong); background: var(--color-accent-soft); }
+
+.admin__badge { min-width: 1.25rem; padding: 0 var(--space-1); border-radius: var(--radius); background: var(--color-accent); color: var(--color-surface); font-size: var(--font-size-xs); text-align: center; }
 
 .admin__account { display: flex; align-items: center; gap: var(--space-4); margin-left: auto; }
 

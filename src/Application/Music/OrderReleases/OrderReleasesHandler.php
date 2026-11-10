@@ -6,9 +6,9 @@ namespace App\Application\Music\OrderReleases;
 
 use App\Application\Music\ReleaseView;
 use App\Application\Transaction;
-use App\Domain\Music\Positions;
 use App\Domain\Music\Release;
 use App\Domain\Music\ReleaseRepository;
+use App\Domain\Shared\Positions;
 use Psr\Clock\ClockInterface;
 
 final readonly class OrderReleasesHandler

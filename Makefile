@@ -126,6 +126,7 @@ e2e-run: ## Playwright against already built assets (E2E_ASSETS_DIR, default bui
 	$(EXEC) php-e2e php bin/console doctrine:fixtures:load --no-interaction --env=test
 	$(EXEC) php-e2e php bin/console app:legal:install-defaults --env=test
 	$(EXEC) php-e2e rm -rf var/share/e2e
+	$(EXEC) php-e2e php bin/console cache:pool:clear cache.contact_limiter --env=test
 	$(DC) --profile e2e run $(NO_TTY) --rm playwright sh -c "npm ci --no-audit --no-fund && ./node_modules/.bin/playwright test $(PLAYWRIGHT_ARGS)"
 
 gate: cs phpstan deptrac depcruise coverage-php coverage-js crap mutation crap-js mutation-js ## Everything a commit must pass: style, layers, tests with coverage, CRAP and mutation on the changed code (GATE_BASE=<ref> to compare against)

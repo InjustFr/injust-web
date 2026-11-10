@@ -1,4 +1,5 @@
 shared:
+    order_mismatch: 'The new order must list every item exactly once: reload the page and try again.'
     invalid_url: '“{url}” is not a secure web address: it must start with https://.'
     not_found: 'This {subject, select, user {account} other {item}} no longer exists.'
     unsupported_image: 'This file is not an image the site can show: use JPEG, PNG, WebP or AVIF.'
@@ -19,4 +20,10 @@ music:
     invalid_slug: '“{slug}” cannot become a web address: use at least one letter or digit.'
     slug_taken: 'Another release already uses the address “{slug}”: choose another slug.'
     invalid_hooks: 'Keep up to {max} hooks, each {length} characters at most.'
-    order_mismatch: 'The new order must list every item exactly once: reload the page and try again.'
+lessons:
+    untitled_offer: 'An offer needs a title in at least one language.'
+    invalid_sessions: '{kind, select, single {A single lesson has exactly 1 session.} other {A pack has at least 2 sessions.}}'
+    invalid_duration: 'A lesson lasts between {min} and {max} minutes, in steps of {step} minutes.'
+contact:
+    too_many_messages: 'You have sent several messages in a short time: wait 10 minutes and try again.'
+    unsupported_locale: 'Messages are written in English or French, not “{locale}”.'

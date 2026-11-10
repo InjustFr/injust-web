@@ -6,8 +6,8 @@ namespace App\Application\Music\OrderVideos;
 
 use App\Application\Music\VideoView;
 use App\Application\Transaction;
-use App\Domain\Music\Positions;
 use App\Domain\Music\VideoRepository;
+use App\Domain\Shared\Positions;
 
 final readonly class OrderVideosHandler
 {

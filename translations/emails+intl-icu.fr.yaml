@@ -1,0 +1,19 @@
+contact:
+    topic:
+        general: 'Général'
+        lessons: 'Cours'
+        production: 'Production'
+        beats: 'Beats'
+    notification:
+        subject: 'Nouveau message de {name} ({topic})'
+        intro: '{name} <{email}> a écrit via le formulaire de contact.'
+        topic: 'Sujet : {topic}'
+        offer: 'Offre : {offer}'
+        language: 'Langue : {locale, select, fr {français} other {anglais}}'
+        reply: 'Réponds à cet e-mail pour lui écrire directement.'
+    acknowledgement:
+        subject: 'Injust : votre message est bien arrivé'
+        greeting: 'Bonjour,'
+        body: 'Merci pour votre message. Je les lis tous et vous répondrai par e-mail dès que possible.'
+        offer: 'Objet : {offer}'
+        signature: 'Injust'
