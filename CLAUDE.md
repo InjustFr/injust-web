@@ -130,6 +130,14 @@ Layer-first: `src/{Domain,Application,Infrastructure,Presentation}/<Context>/`, 
 - Admin: `/admin/links` (`LinksPage.vue`, `linksForm.js`) and `/admin/seo` (`SeoPage.vue`, `seoForm.js`); API `/api/admin/links[/order|/{id}]`, `/api/admin/seo[/{key}[/image]]`.
 - e2e `e2e/tests/links.spec.js` (the visitor clicks from the home page). ErrorPageTest boots a non-debug kernel: clear `var/cache/test<TOKEN>` after changing a service constructor.
 
+## M8 Smart links
+
+- `Release` gains `upc` (`Domain\Music\Upc`: 12 or 13 digits, GTIN check digit, `InvalidUpc`, unique `UpcTaken`), `linksCheckedAt`, `hiddenPlatforms`; `PlatformLink.source` (`LinkSource` manual|auto). `Release::applyFoundLinks` keeps manual links over auto ones, replaces only the auto links of platforms whose finder answered, never re-adds a hidden platform. Changing the UPC drops the auto links.
+- Port `Application\Music\PlatformFinder` (`find($upc)` -> `FinderResult` found|notFound|failed), adapters `Infrastructure\Platforms\{Deezer,AppleMusic,Spotify,Tidal}Finder` (HttpClient, 5 s timeout, token cached per platform and client id). Links are rebuilt from the platform's album id on its own host, never copied from the answer; an answer without the expected shape is a failure (keeps the previous link), not a miss. A release keeps one manual link per platform (`DuplicatePlatform` 422); home and listen page buttons go through the counted `/listen/{slug}/{platform}`. Deezer and Apple need no key; Spotify and Tidal need `SPOTIFY_CLIENT_ID/SECRET` and `TIDAL_CLIENT_ID/SECRET` (empty = not configured, skipped). Odesli is not used. Other platforms stay manual.
+- `RefreshReleaseLinks` (admin button `POST /api/admin/music/releases/{id}/links/refresh`, `PUT .../hidden-platforms`) and `app:music:refresh-links` (host cron, not run at start-up): due when never checked, recent (120 days) or upcoming, or older with a missing platform and unchecked for 7 days.
+- Public `/listen/{slug}` and `/fr/listen/{slug}` (`ListenController`, `listen.html.twig`, indexable, in the sitemap, JSON-LD MusicAlbum/MusicRecording); buttons go through `GET /listen/{slug}/{platform}` (`ListenClickController`, 302, one atomic upsert into `release_link_click`, no session, no IP, HEAD not counted, noindex, disallowed in robots). The home "Listen" and "All platforms" buttons point to it when a release has a link or a UPC.
+- Tests: `Tests\Support\FakePlatforms` decorates `http_client` (UPC 701518909440 on all four, 012345678905 Apple and Deezer, 036000291452 failures); dev fixtures use them; e2e `e2e/tests/listen.spec.js`.
+
 ## Accounts & security
 
 - Sign-in = mossyleaf accounts (Authentik at `accounts.mossyleaf.studio`, project `~/Sites/mossyleaf-studio/accounts`), OIDC code flow + PKCE, client id `injust`. Only accounts whose `groups` claim contains `OIDC_REQUIRED_GROUP` (`injust`) get in; dev leaves it empty.

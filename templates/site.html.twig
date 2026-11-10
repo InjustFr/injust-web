@@ -41,7 +41,7 @@
         <meta property="og:url" content="{{ canonical }}">
     {% endif %}
     <link rel="preload" as="font" type="font/woff2" href="{{ asset('node_modules/@fontsource/anton/files/anton-latin-400-normal.woff2', 'vite') }}" crossorigin>
-    <meta property="og:type" content="website">
+    <meta property="og:type" content="{{ og_type ?? 'website' }}">
     <meta property="og:site_name" content="{{ brand }}">
     <meta property="og:locale" content="{{ locale == 'fr' ? 'fr_FR' : 'en_GB' }}">
     <meta property="og:locale:alternate" content="{{ other == 'fr' ? 'fr_FR' : 'en_GB' }}">

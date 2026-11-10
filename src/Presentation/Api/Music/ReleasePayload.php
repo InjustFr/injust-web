@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Presentation\Api\Music;
 
+use App\Domain\Music\LinkSource;
 use App\Domain\Music\PlatformLink;
 use App\Domain\Music\Release;
 use App\Domain\Music\ReleaseDetails;
@@ -37,6 +38,8 @@ final readonly class ReleasePayload
         #[Assert\Length(max: Release::MAX_URL)]
         public ?string $smartLinkUrl = null,
         public ?string $spotifyUrl = null,
+        #[Assert\Length(max: 20)]
+        public ?string $upc = null,
     ) {
     }
 
@@ -51,9 +54,10 @@ final readonly class ReleasePayload
             new \DateTimeImmutable($this->releaseDate),
             $this->description,
             array_map(static fn (TrackPayload $track, int $index): Track => new Track($index + 1, $track->title, $track->durationSeconds), $this->tracks, array_keys($this->tracks)),
-            array_map(static fn (PlatformLinkPayload $link): PlatformLink => new PlatformLink($link->platform, $link->url), $this->links),
+            array_values(array_map(static fn (PlatformLinkPayload $link): PlatformLink => new PlatformLink($link->platform, $link->url), array_filter($this->links, static fn (PlatformLinkPayload $link): bool => LinkSource::Manual === $link->source))),
             $this->smartLinkUrl,
             '' === $spotifyUrl ? null : SpotifyEmbed::parse($spotifyUrl),
+            $this->upc,
         );
     }
 }

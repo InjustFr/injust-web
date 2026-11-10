@@ -49,9 +49,16 @@ main { counter-reset: section; }
     letter-spacing: -0.005em;
 }
 
+.hero-mark::first-letter { color: var(--signal); }
+
 .hero-tagline {
+    justify-self: start;
     margin: 0;
+    padding: 0.12em 0.3em 0.04em;
     align-self: start;
+    background: var(--signal);
+    color: var(--bone);
+    transform: rotate(-1.5deg);
     font-family: var(--font-display);
     font-size: clamp(1.5rem, 4vw, 3rem);
     line-height: 1;
@@ -65,6 +72,7 @@ main { counter-reset: section; }
     gap: 1rem 1.25rem;
     align-items: end;
     border: 2px solid var(--fog);
+    border-top: 6px solid var(--signal);
     padding: 1rem;
     background: rgb(11 13 16 / 0.72);
 }
@@ -211,8 +219,8 @@ main { counter-reset: section; }
 
 .hook-2 {
     padding: 0.08em 0.18em 0.02em;
-    background: var(--bone);
-    color: var(--ink);
+    background: var(--signal);
+    color: var(--bone);
     transform: rotate(-1deg) translateX(clamp(0rem, 6vw, 6rem));
 }
 
@@ -229,14 +237,15 @@ main { counter-reset: section; }
     gap: 1rem;
     margin-bottom: clamp(1.5rem, 4vw, 3rem);
     padding-top: 0.75rem;
-    border-top: 2px solid var(--bone);
+    border-top: 3px solid var(--bone);
+    border-image: linear-gradient(90deg, var(--signal) 0 clamp(4rem, 12vw, 9rem), var(--bone) 0) 1;
 }
 
 .section-index {
     flex: none;
     white-space: nowrap;
     padding-top: 0.35rem;
-    color: var(--fog);
+    color: var(--signal-bright);
     font-family: var(--font-mono);
     font-size: 0.875rem;
 }
@@ -303,7 +312,7 @@ main { counter-reset: section; }
     place-items: center;
     width: 2.25rem;
     height: 2.25rem;
-    background: var(--ink);
+    background: var(--signal);
     color: var(--bone);
     font-family: var(--font-mono);
     font-size: 1.25rem;
@@ -403,7 +412,7 @@ main { counter-reset: section; }
     text-decoration: none;
 }
 
-.release-links a:hover { background: var(--bone); color: var(--ink); border-color: var(--bone); }
+.release-links a:hover { background: var(--signal); color: var(--bone); border-color: var(--signal); }
 
 .spotify-load {
     display: grid;
@@ -560,7 +569,7 @@ main { counter-reset: section; }
 
 .manifesto-body > :first-child { margin-top: 0; }
 .manifesto-body p { margin: 0 0 1em; }
-.manifesto-body strong { background: var(--bone); color: var(--ink); padding: 0 0.15em; }
+.manifesto-body strong { background: var(--signal); color: var(--bone); padding: 0 0.15em; }
 
 .bio { display: grid; align-content: start; gap: 1.25rem; }
 
@@ -577,7 +586,8 @@ main { counter-reset: section; }
 .bio-title {
     margin: 0;
     padding-top: 0.75rem;
-    border-top: 2px solid var(--bone);
+    border-top: 3px solid var(--bone);
+    border-image: linear-gradient(90deg, var(--signal) 0 4rem, var(--bone) 0) 1;
     font-family: var(--font-display);
     font-weight: 400;
     font-size: clamp(2rem, 4vw, 3rem);

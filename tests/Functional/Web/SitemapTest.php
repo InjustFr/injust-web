@@ -73,6 +73,20 @@ final class SitemapTest extends WebTestCase
         self::assertCount(0, $urls['http://localhost/contact']->children(self::IMAGE)->image);
     }
 
+    public function testEachReleaseHasItsListenPageWithItsCover(): void
+    {
+        $client = self::createClient();
+        self::release('With cover', true);
+        self::release('Without cover', false);
+
+        $client->request('GET', '/sitemap.xml');
+
+        $urls = self::urls($client->getResponse()->getContent());
+        self::assertSame(['http://localhost/', 'http://localhost/fr', 'http://localhost/listen/with-cover', 'http://localhost/fr/listen/with-cover', 'http://localhost/listen/without-cover', 'http://localhost/fr/listen/without-cover', 'http://localhost/contact', 'http://localhost/fr/contact'], array_keys($urls));
+        self::assertCount(1, $urls['http://localhost/fr/listen/with-cover']->children(self::IMAGE)->image);
+        self::assertCount(0, $urls['http://localhost/listen/without-cover']->children(self::IMAGE)->image);
+    }
+
     /** @return array<string, \SimpleXMLElement> */
     private static function urls(string|false $xml): array
     {

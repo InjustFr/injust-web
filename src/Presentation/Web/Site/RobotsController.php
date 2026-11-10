@@ -14,7 +14,7 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 #[Route('/robots.txt', name: 'robots', methods: ['GET'], format: 'txt')]
 final readonly class RobotsController
 {
-    private const array PRIVATE_PATHS = ['/admin', '/api/', '/go/', '/download/', '/checkout', '/fr/checkout', '/login', '/logout'];
+    private const array PRIVATE_PATHS = ['/admin', '/api/', '/go/', '/listen/*/*', '/download/', '/checkout', '/fr/checkout', '/login', '/logout'];
 
     public function __construct(
         private SettingsQueries $settings,

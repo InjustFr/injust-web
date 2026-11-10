@@ -14,7 +14,7 @@ import { imageUrl } from '../../settingsForm.js';
 import OrderButtons from './OrderButtons.vue';
 import ReleaseModal from './ReleaseModal.vue';
 
-const props = defineProps({ releases: { type: Array, required: true } });
+const props = defineProps({ releases: { type: Array, required: true }, finders: { type: Array, required: true } });
 const { t } = useI18n();
 const api = useApi();
 const toast = useToast();
@@ -51,6 +51,6 @@ const remove = (id) => toast.attempt(() => api.del(`/api/admin/music/releases/${
                 <ConfirmButton :icon="Trash2" :label="t('admin.music.delete')" @confirm="remove(release.id)" />
             </li>
         </ul>
-        <ReleaseModal v-model:open="open" :release="releases.find((release) => release.id === editing) ?? null" @saved="editing = $event" />
+        <ReleaseModal v-model:open="open" :finders="finders" :release="releases.find((release) => release.id === editing) ?? null" @saved="editing = $event" />
     </PageSection>
 </template>

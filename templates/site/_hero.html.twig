@@ -29,9 +29,12 @@
                         },
                     }|json_encode }}">{{ 'site.hero.out'|trans({date: featured.releaseDate|date('d.m.Y')}) }}</div>
                 {% endif %}
-                {% if featured.smartLinkUrl or music.videos is not empty or has_links %}
+                {% set listen_page = featured.links is not empty or featured.upc %}
+                {% if listen_page or featured.smartLinkUrl or music.videos is not empty or has_links %}
                     <div class="hero-actions">
-                        {% if featured.smartLinkUrl %}
+                        {% if listen_page %}
+                            <a class="button" href="{{ path('listen', {slug: featured.slug}) }}">{{ (featured.upcoming and featured.smartLinkUrl ? 'site.hero.presave' : 'site.hero.listen')|trans }}</a>
+                        {% elseif featured.smartLinkUrl %}
                             <a class="button" href="{{ featured.smartLinkUrl }}" rel="noopener">{{ (featured.upcoming ? 'site.hero.presave' : 'site.hero.listen')|trans }}</a>
                         {% endif %}
                         {% if music.videos is not empty %}

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tests\Unit\Presentation\Web\Site;
 
+use App\Application\Music\ListenView;
 use App\Application\Music\ReleaseView;
 use App\Domain\Music\Platform;
 use App\Domain\Music\PlatformLink;
@@ -91,6 +92,44 @@ final class MusicStructuredDataTest extends TestCase
         self::assertSame(['One', 'Two'], array_column($nodes, 'name'));
     }
 
+    public function testAListenedAlbumIsAMusicAlbumWhoseSameAsAreItsPlatforms(): void
+    {
+        $release = Release::draft(new ReleaseDetails('No Gods', null, ReleaseType::Ep, new \DateTimeImmutable('2026-12-01'), new LocalizedText(), [new Track(1, 'Intro', 61)], [new PlatformLink(Platform::Bandcamp, 'https://injust.bandcamp.com'), new PlatformLink(Platform::Spotify, 'https://open.spotify.com/album/1')], null, null), 0);
+        $release->useCover('01JCOVER');
+
+        $nodes = self::structuredData()->listen(ListenView::of($release, new \DateTimeImmutable('2026-06-01')));
+
+        self::assertSame([[
+            '@type' => 'MusicAlbum',
+            '@id' => 'https://injust.test/listen/no-gods#release',
+            'name' => 'No Gods',
+            'url' => 'https://injust.test/listen/no-gods',
+            'byArtist' => ['@id' => 'https://injust.test/#band'],
+            'datePublished' => '2026-12-01',
+            'sameAs' => ['https://open.spotify.com/album/1', 'https://injust.bandcamp.com'],
+            'albumReleaseType' => 'https://schema.org/EPRelease',
+            'numTracks' => 1,
+            'track' => [['@type' => 'MusicRecording', 'name' => 'Intro', 'position' => 1, 'duration' => 'PT1M1S']],
+            'image' => 'https://injust.test/media/images/01JCOVER.webp',
+        ]], $nodes);
+        self::assertJson((string) json_encode(['@context' => 'https://schema.org', '@graph' => $nodes]));
+    }
+
+    public function testAListenedSingleIsAMusicRecording(): void
+    {
+        $nodes = self::structuredData()->listen(ListenView::of(self::release(ReleaseType::Single), new \DateTimeImmutable('2026-06-01')));
+
+        self::assertSame([[
+            '@type' => 'MusicRecording',
+            '@id' => 'https://injust.test/listen/riot#release',
+            'name' => 'Riot',
+            'url' => 'https://injust.test/listen/riot',
+            'byArtist' => ['@id' => 'https://injust.test/#band'],
+            'datePublished' => '2026-01-01',
+            'sameAs' => [],
+        ]], $nodes);
+    }
+
     private static function release(ReleaseType $type, string $title = 'Riot'): Release
     {
         return Release::draft(new ReleaseDetails($title, null, $type, new \DateTimeImmutable('2026-01-01'), new LocalizedText(), [], [], null, null), 0);
@@ -106,6 +145,7 @@ final class MusicStructuredDataTest extends TestCase
         $routes = new RouteCollection();
         $routes->add('home', new Route('/'));
         $routes->add('media_image', new Route('/media/images/{file}'));
+        $routes->add('listen', new Route('/listen/{slug}'));
 
         return new MusicStructuredData(new UrlGenerator($routes, new RequestContext('', 'GET', 'injust.test', 'https')));
     }

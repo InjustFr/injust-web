@@ -107,6 +107,12 @@ site:
     links:
         title: 'Écouter & suivre'
         socials: 'Réseaux sociaux'
+    listen:
+        on: 'Écouter sur'
+        play: 'Écouter'
+        watch: 'Regarder'
+        soon: 'Bientôt sur toutes les plateformes'
+        more: 'Plus d’Injust'
     lessons:
         service: 'Cours de guitare'
         offers: 'Formules'

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Application\Music;
 
+use App\Domain\Music\Platform;
 use App\Domain\Music\PlatformLink;
 use App\Domain\Music\Release;
 use App\Domain\Music\SpotifyEmbed;
@@ -15,6 +16,8 @@ final readonly class ReleaseView
     /**
      * @param list<Track>        $tracks
      * @param list<PlatformLink> $links
+     * @param list<Platform>     $hiddenPlatforms
+     * @param array<string, int> $clicks
      */
     private function __construct(
         public string $id,
@@ -32,6 +35,10 @@ final readonly class ReleaseView
         public ?SpotifyEmbed $spotifyEmbed,
         public bool $featured,
         public int $position,
+        public ?string $upc,
+        public ?string $linksCheckedAt,
+        public array $hiddenPlatforms,
+        public array $clicks,
     ) {
     }
 
@@ -53,6 +60,10 @@ final readonly class ReleaseView
             $release->spotifyEmbed(),
             $release->featured(),
             $release->position(),
+            $release->upc(),
+            $release->linksCheckedAt()?->format(\DATE_ATOM),
+            $release->hiddenPlatforms(),
+            $release->clicks(),
         );
     }
 }

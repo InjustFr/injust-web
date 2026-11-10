@@ -187,7 +187,10 @@
             "addLink": "Add a link",
             "smartLink": "Smart link",
             "spotify": "Spotify URL or URI",
-            "cover": "Cover"
+            "cover": "Cover",
+            "upc": "UPC / barcode",
+            "upcHint": "12 or 13 digits. The platform links are found from it.",
+            "upcInvalid": "Invalid UPC (12 or 13 digits, wrong check digit)."
         },
         "platforms": {
             "spotify": "Spotify",
@@ -235,6 +238,32 @@
         "portrait": {
             "title": "Portrait",
             "none": "No portrait."
+        },
+        "listen": {
+            "title": "Listen page",
+            "url": "Public listen page address",
+            "copy": "Copy the link",
+            "copied": "Link copied.",
+            "source": {
+                "auto": "Auto",
+                "manual": "Manual"
+            },
+            "none": "No link yet",
+            "hidden": "Hidden",
+            "hide": "Hide this link",
+            "restore": "Show again",
+            "clicks": "{count} click | {count} clicks",
+            "fetch": "Fetch links now",
+            "checked": "Last checked {date}",
+            "neverChecked": "Never checked",
+            "needsUpc": "Save a UPC first: the links are found from it.",
+            "notConfigured": "These platforms need API keys in the server environment (empty means skipped):",
+            "report": {
+                "found": "found",
+                "notFound": "not found yet",
+                "failed": "failed",
+                "notConfigured": "needs an API key"
+            }
         }
     },
     "lessons": {

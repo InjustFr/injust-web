@@ -107,6 +107,12 @@ site:
     links:
         title: 'Listen & follow'
         socials: 'Social networks'
+    listen:
+        on: 'Listen on'
+        play: 'Play'
+        watch: 'Watch'
+        soon: 'Coming soon to every platform'
+        more: 'More from Injust'
     lessons:
         service: 'Guitar lessons'
         offers: 'Offers'

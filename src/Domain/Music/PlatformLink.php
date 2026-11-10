@@ -11,7 +11,7 @@ final readonly class PlatformLink
     public Platform $platform;
     public string $url;
 
-    public function __construct(Platform $platform, string $url)
+    public function __construct(Platform $platform, string $url, public LinkSource $source = LinkSource::Manual)
     {
         $this->platform = $platform;
         $this->url = HttpsUrl::of($url);

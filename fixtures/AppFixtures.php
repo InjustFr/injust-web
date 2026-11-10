@@ -28,6 +28,8 @@ use App\Application\Music\EditMusicText\EditMusicText;
 use App\Application\Music\EditMusicText\EditMusicTextHandler;
 use App\Application\Music\FeatureRelease\FeatureRelease;
 use App\Application\Music\FeatureRelease\FeatureReleaseHandler;
+use App\Application\Music\RefreshReleaseLinks\RefreshReleaseLinks;
+use App\Application\Music\RefreshReleaseLinks\RefreshReleaseLinksHandler;
 use App\Application\Production\AddPortfolioItem\AddPortfolioItem;
 use App\Application\Production\AddPortfolioItem\AddPortfolioItemHandler;
 use App\Application\Production\AddProductionService\AddProductionService;
@@ -130,6 +132,7 @@ final class AppFixtures extends Fixture
     public function __construct(
         private readonly AddReleaseHandler $addRelease,
         private readonly FeatureReleaseHandler $featureRelease,
+        private readonly RefreshReleaseLinksHandler $refreshReleaseLinks,
         private readonly EditMusicTextHandler $editMusicText,
         private readonly AddSocialLinkHandler $addSocialLink,
         private readonly AddBioLinkHandler $addBioLink,
@@ -162,10 +165,10 @@ final class AppFixtures extends Fixture
 
     public function load(ObjectManager $manager): void
     {
-        $this->release('White Men are the Issue', ReleaseType::Single, '2026-09-25', [self::ALBUM[0]]);
-        $this->release("Don't tell me who to be", ReleaseType::Single, '2026-10-16', [self::ALBUM[1]]);
-        $this->release('This is discrimination', ReleaseType::Single, '2026-11-06', [self::ALBUM[4]], 'https://ffm.to/this-is-discrimination');
-        $album = $this->release('We are fucked', ReleaseType::Album, '2026-12-04', self::ALBUM);
+        $this->release('White Men are the Issue', ReleaseType::Single, '2026-09-25', [self::ALBUM[0]], null, '701518909440');
+        $this->release("Don't tell me who to be", ReleaseType::Single, '2026-10-16', [self::ALBUM[1]], null, '012345678905');
+        $this->release('This is discrimination', ReleaseType::Single, '2026-11-06', [self::ALBUM[4]], 'https://ffm.to/this-is-discrimination', '036000291452');
+        $album = $this->release('We are fucked', ReleaseType::Album, '2026-12-04', self::ALBUM, null, '123456789012');
         ($this->featureRelease)(new FeatureRelease(Ulid::fromString($album), true));
 
         ($this->editMusicText)(new EditMusicText(new LocalizedText('', 'Fuck the system'), new LocalizedText(), new LocalizedText(), self::HOOKS));
@@ -192,7 +195,7 @@ final class AppFixtures extends Fixture
     }
 
     /** @param list<array{string, int}> $tracks */
-    private function release(string $title, ReleaseType $type, string $date, array $tracks, ?string $smartLink = null): string
+    private function release(string $title, ReleaseType $type, string $date, array $tracks, ?string $smartLink = null, ?string $upc = null): string
     {
         $view = ($this->addRelease)(new AddRelease(new ReleaseDetails(
             $title,
@@ -204,7 +207,12 @@ final class AppFixtures extends Fixture
             [],
             $smartLink,
             null,
+            $upc,
         )));
+
+        if (null !== $upc) {
+            ($this->refreshReleaseLinks)(new RefreshReleaseLinks(Ulid::fromString($view->id)));
+        }
 
         return $view->id;
     }

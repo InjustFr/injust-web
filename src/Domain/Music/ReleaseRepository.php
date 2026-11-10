@@ -18,4 +18,10 @@ interface ReleaseRepository
     public function all(): array;
 
     public function slugTaken(string $slug, ?Ulid $except): bool;
+
+    public function upcTaken(string $upc, ?Ulid $except): bool;
+
+    public function bySlug(string $slug): Release;
+
+    public function countClick(Ulid $id, Platform $platform): void;
 }

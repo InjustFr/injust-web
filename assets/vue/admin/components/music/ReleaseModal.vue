@@ -1,6 +1,6 @@
 <script setup>
 import { Plus, Trash2 } from '@lucide/vue';
-import { reactive, ref, watch } from 'vue';
+import { computed, reactive, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import BaseButton from '../../../components/ui/BaseButton.vue';
 import BaseModal from '../../../components/ui/BaseModal.vue';
@@ -11,9 +11,11 @@ import IconButton from '../../../components/ui/IconButton.vue';
 import { useApi } from '../../../composables/useApi.js';
 import { useToast } from '../../../composables/useToast.js';
 import { imageUpload, imageUrl } from '../../settingsForm.js';
+import { isValidUpc, normalizeUpc } from '../../releaseLinks.js';
+import ReleaseLinksPanel from './ReleaseLinksPanel.vue';
 import { PLATFORMS, RELEASE_TYPES, parseTracks, releaseForm, releasePayload } from '../../musicForm.js';
 
-const props = defineProps({ release: { type: Object, default: null } });
+const props = defineProps({ release: { type: Object, default: null }, finders: { type: Array, default: () => [] } });
 const emit = defineEmits(['saved']);
 const open = defineModel('open', { type: Boolean, required: true });
 const { t } = useI18n();
@@ -23,6 +25,7 @@ const form = reactive(releaseForm(null));
 const errors = ref({});
 const saving = ref(false);
 const paste = ref('');
+const upcError = computed(() => form.upc.trim() !== '' && !isValidUpc(normalizeUpc(form.upc)) ? t('admin.music.releases.upcInvalid') : null);
 const LANGUAGES = ['fr', 'en'];
 const types = RELEASE_TYPES.map((value) => ({ value, label: t(`admin.music.releases.types.${value}`) }));
 const platforms = PLATFORMS.map((value) => ({ value, label: t(`admin.music.platforms.${value}`) }));
@@ -99,6 +102,12 @@ const removeCover = () => toast.attempt(() => api.del(`/api/admin/music/releases
                 <BaseButton variant="ghost" @click="form.tracks.push({ title: '', duration: '' })"><Plus size="1rem" aria-hidden="true" />{{ t('admin.music.releases.addTrack') }}</BaseButton>
             </fieldset>
 
+            <FormField :label="t('admin.music.releases.upc')" :hint="t('admin.music.releases.upcHint')" :error="upcError ?? errors.upc ?? null">
+                <input v-model="form.upc" type="text" name="upc" inputmode="numeric" maxlength="20" />
+            </FormField>
+
+            <ReleaseLinksPanel v-if="release" :release="release" :finders="finders" />
+
             <fieldset class="release__group">
                 <legend>{{ t('admin.music.releases.links') }}</legend>
                 <div v-for="(link, index) in form.links" :key="index" class="release__row">
@@ -125,7 +134,7 @@ const removeCover = () => toast.attempt(() => api.del(`/api/admin/music/releases
                 <ConfirmButton v-if="release.cover" :label="t('admin.music.remove')" @confirm="removeCover" />
             </div>
 
-            <BaseButton type="submit" :loading="saving">{{ t('admin.music.save') }}</BaseButton>
+            <BaseButton type="submit" :loading="saving" :disabled="upcError !== null">{{ t('admin.music.save') }}</BaseButton>
         </form>
     </BaseModal>
 </template>

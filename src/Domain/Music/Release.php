@@ -6,6 +6,8 @@ namespace App\Domain\Music;
 
 use App\Domain\Shared\LocalizedText;
 use App\Domain\Shared\Positioned;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Types\UlidType;
 use Symfony\Component\Uid\Ulid;
@@ -17,6 +19,8 @@ class Release implements Positioned
     public const int MAX_TITLE = 200;
     public const int MAX_URL = 255;
     public const string TIMEZONE = 'Europe/Paris';
+    public const int FRESH_DAYS = 120;
+    public const int RECHECK_DAYS = 7;
 
     #[ORM\Id]
     #[ORM\Column(type: UlidType::NAME, unique: true)]
@@ -44,9 +48,24 @@ class Release implements Positioned
     #[ORM\Column(type: 'json')]
     private array $tracks;
 
-    /** @var list<array{platform: string, url: string}> */
+    /** @var list<array{platform: string, url: string, source: string}> */
     #[ORM\Column(type: 'json')]
-    private array $links;
+    private array $links = [];
+
+    #[ORM\Column(length: Upc::MAX, unique: true, nullable: true)]
+    private ?string $upc = null;
+
+    #[ORM\Column(type: 'datetimetz_immutable', nullable: true)]
+    private ?\DateTimeImmutable $linksCheckedAt = null;
+
+    /** @var list<string> */
+    #[ORM\Column(type: 'json')]
+    private array $hiddenPlatforms = [];
+
+    /** @var Collection<int, ReleaseLinkClick> */
+    #[ORM\OneToMany(targetEntity: ReleaseLinkClick::class, mappedBy: 'release', fetch: 'EAGER')]
+    #[ORM\OrderBy(['platform' => 'ASC'])]
+    private Collection $clicks;
 
     #[ORM\Column(length: self::MAX_URL, nullable: true)]
     private ?string $smartLinkUrl;
@@ -63,6 +82,7 @@ class Release implements Positioned
     private function __construct(ReleaseDetails $details, int $position)
     {
         $this->id = new Ulid();
+        $this->clicks = new ArrayCollection();
         $this->position = $position;
         $this->edit($details);
     }
@@ -80,9 +100,51 @@ class Release implements Positioned
         $this->releaseDate = $details->releaseDate;
         $this->description = $details->description;
         $this->tracks = array_map(static fn (Track $track): array => ['position' => $track->position, 'title' => $track->title, 'durationSeconds' => $track->durationSeconds], $details->tracks);
-        $this->links = array_map(static fn (PlatformLink $link): array => ['platform' => $link->platform->value, 'url' => $link->url], $details->links);
+        $auto = $this->linksFrom(LinkSource::Auto);
+        if ($details->upc !== $this->upc) {
+            $this->upc = $details->upc;
+            $this->linksCheckedAt = null;
+            $auto = [];
+        }
+        $this->storeLinks(array_map(static fn (PlatformLink $link): PlatformLink => new PlatformLink($link->platform, $link->url), $details->links), $auto);
         $this->smartLinkUrl = $details->smartLinkUrl;
         $this->spotifyEmbed = $details->spotifyEmbed?->uri();
+    }
+
+    /** @param list<FoundLink> $found */
+    public function applyFoundLinks(array $found, \DateTimeImmutable $now): void
+    {
+        $answered = array_map(static fn (FoundLink $link): Platform => $link->platform, $found);
+        $auto = array_filter($this->linksFrom(LinkSource::Auto), static fn (PlatformLink $link): bool => !\in_array($link->platform, $answered, true));
+        foreach ($found as $link) {
+            if (null !== $link->url && !\in_array($link->platform, $this->hiddenPlatforms(), true)) {
+                $auto[] = new PlatformLink($link->platform, $link->url, LinkSource::Auto);
+            }
+        }
+        $this->storeLinks($this->linksFrom(LinkSource::Manual), $auto);
+        $this->linksCheckedAt = $now;
+    }
+
+    /** @param list<Platform> $platforms */
+    public function hidePlatforms(array $platforms): void
+    {
+        $this->hiddenPlatforms = array_values(array_unique(array_map(static fn (Platform $platform): string => $platform->value, $platforms)));
+        $this->storeLinks($this->linksFrom(LinkSource::Manual), array_filter($this->linksFrom(LinkSource::Auto), static fn (PlatformLink $link): bool => !\in_array($link->platform, $platforms, true)));
+    }
+
+    /** @param list<Platform> $findable */
+    public function linksDue(\DateTimeImmutable $now, array $findable): bool
+    {
+        if (null === $this->upc) {
+            return false;
+        }
+        if (null === $this->linksCheckedAt || $this->releaseDate->format('Y-m-d') >= $now->setTimezone(new \DateTimeZone(self::TIMEZONE))->modify('-'.self::FRESH_DAYS.' days')->format('Y-m-d')) {
+            return true;
+        }
+        $covered = [...array_map(static fn (PlatformLink $link): Platform => $link->platform, $this->links()), ...$this->hiddenPlatforms()];
+
+        return [] !== array_filter($findable, static fn (Platform $platform): bool => !\in_array($platform, $covered, true))
+            && $this->linksCheckedAt <= $now->modify('-'.self::RECHECK_DAYS.' days');
     }
 
     public function feature(): void
@@ -170,7 +232,62 @@ class Release implements Positioned
     /** @return list<PlatformLink> */
     public function links(): array
     {
-        return array_map(static fn (array $link): PlatformLink => new PlatformLink(Platform::from($link['platform']), $link['url']), $this->links);
+        return array_map(static fn (array $link): PlatformLink => new PlatformLink(Platform::from($link['platform']), $link['url'], LinkSource::from($link['source'])), $this->links);
+    }
+
+    /** @return array<int, PlatformLink> */
+    private function linksFrom(LinkSource $source): array
+    {
+        return array_filter($this->links(), static fn (PlatformLink $link): bool => $link->source === $source);
+    }
+
+    /**
+     * @param array<int, PlatformLink> $manual
+     * @param array<int, PlatformLink> $auto
+     */
+    private function storeLinks(array $manual, array $auto): void
+    {
+        $taken = array_map(static fn (PlatformLink $link): Platform => $link->platform, $manual);
+        $kept = array_filter($auto, static fn (PlatformLink $link): bool => !\in_array($link->platform, $taken, true));
+        $this->links = array_map(static fn (PlatformLink $link): array => ['platform' => $link->platform->value, 'url' => $link->url, 'source' => $link->source->value], [...$manual, ...$kept]);
+    }
+
+    public function linkTo(Platform $platform): ?string
+    {
+        foreach ($this->links() as $link) {
+            if ($link->platform === $platform) {
+                return $link->url;
+            }
+        }
+
+        return null;
+    }
+
+    public function upc(): ?string
+    {
+        return $this->upc;
+    }
+
+    public function linksCheckedAt(): ?\DateTimeImmutable
+    {
+        return $this->linksCheckedAt;
+    }
+
+    /** @return list<Platform> */
+    public function hiddenPlatforms(): array
+    {
+        return array_map(Platform::from(...), $this->hiddenPlatforms);
+    }
+
+    /** @return array<string, int> */
+    public function clicks(): array
+    {
+        $clicks = [];
+        foreach ($this->clicks as $click) {
+            $clicks[$click->platform()->value] = $click->clicks();
+        }
+
+        return $clicks;
     }
 
     public function smartLinkUrl(): ?string

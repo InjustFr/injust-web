@@ -23,6 +23,10 @@ music:
     invalid_slug: '“{slug}” cannot become a web address: use at least one letter or digit.'
     slug_taken: 'Another release already uses the address “{slug}”: choose another slug.'
     invalid_hooks: 'Keep up to {max} hooks, each {length} characters at most.'
+    invalid_upc: '“{upc}” is not a valid UPC or EAN: type the 12 or 13 digits printed under the barcode.'
+    upc_taken: 'Another release already uses the UPC {upc}.'
+    missing_upc: 'Set the UPC of this release first: the links are found from it.'
+    duplicate_platform: 'Keep one link per platform: {platform} is listed twice.'
 lessons:
     untitled_offer: 'An offer needs a title in at least one language.'
     invalid_sessions: '{kind, select, single {A single lesson has exactly 1 session.} other {A pack has at least 2 sessions.}}'

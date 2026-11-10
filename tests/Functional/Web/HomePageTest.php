@@ -84,6 +84,45 @@ final class HomePageTest extends WebTestCase
         self::assertSame('Voir le clip', $hero->filter('a[href="#videos"]')->text());
     }
 
+    public function testAReleaseWithLinksIsListenedToOnItsOwnListenPage(): void
+    {
+        $client = self::createClient();
+        self::feature(self::release('This is discrimination', '2026-11-06', links: [new PlatformLink(Platform::Spotify, 'https://open.spotify.com/album/abc')], smartLinkUrl: 'https://ffm.to/discrimination'));
+
+        $crawler = $client->request('GET', '/fr');
+
+        $cta = $crawler->filter('.hero-release a.button');
+        self::assertSame(['Écouter', '/fr/listen/this-is-discrimination', null], [$cta->text(), $cta->attr('href'), $cta->attr('rel')]);
+        $everywhere = $crawler->filter('#release-this-is-discrimination .release-listen a.button');
+        self::assertSame(['Toutes les plateformes', '/fr/listen/this-is-discrimination'], [$everywhere->text(), $everywhere->attr('href')]);
+    }
+
+    public function testAnUpcomingReleaseWithAUpcIsPreSavedFromItsListenPage(): void
+    {
+        $client = self::createClient();
+        self::feature(self::release('We are fucked', '2026-12-04', ReleaseType::Album, smartLinkUrl: 'https://ffm.to/wearefucked', upc: '701518909440'));
+        self::release('Silent', '2026-09-25', upc: '012345678905');
+
+        $crawler = $client->request('GET', '/');
+
+        $cta = $crawler->filter('.hero-release a.button');
+        self::assertSame(['Pre-save', '/listen/we-are-fucked'], [$cta->text(), $cta->attr('href')]);
+        self::assertSame('Pre-save', $crawler->filter('#release-we-are-fucked .release-listen a.button')->text());
+        $silent = $crawler->filter('#release-silent .release-listen a.button');
+        self::assertSame(['All platforms', '/listen/silent'], [$silent->text(), $silent->attr('href')]);
+    }
+
+    public function testAFeaturedReleaseWithAUpcButNoPreSaveIsListenedTo(): void
+    {
+        $client = self::createClient();
+        self::feature(self::release('Draft', '2026-12-01', upc: '701518909440'));
+
+        $crawler = $client->request('GET', '/');
+
+        $cta = $crawler->filter('.hero-release a.button');
+        self::assertSame(['Listen', '/listen/draft'], [$cta->text(), $cta->attr('href')]);
+    }
+
     public function testAFeaturedReleaseWithoutASmartLinkHasNoCallToAction(): void
     {
         $client = self::createClient();
@@ -133,7 +172,7 @@ final class HomePageTest extends WebTestCase
         self::assertSame(['Intro', 'Patriarchy', 'Untimed'], $album->filter('.tracklist .track-title')->each(static fn (Crawler $title): string => $title->text()));
         self::assertSame(['1:05', '10:05', ''], $album->filter('.tracklist .track-time')->each(static fn (Crawler $time): string => $time->text()));
         self::assertSame('The first album.', $album->filter('.release-description')->text());
-        self::assertSame([['Spotify', 'https://open.spotify.com/album/abc'], ['Apple Music', 'https://music.apple.com/x']], $album->filter('.release-links a')->each(static fn (Crawler $link): array => [$link->text(), $link->attr('href')]));
+        self::assertSame([['Spotify', '/listen/we-are-fucked/spotify'], ['Apple Music', '/listen/we-are-fucked/apple-music']], $album->filter('.release-links a')->each(static fn (Crawler $link): array => [$link->text(), $link->attr('href')]));
         self::assertSame(['kind' => 'album', 'id' => '4aawyAB9vmqN3uQ7FjRGTy', 'title' => 'We are fucked', 'load' => 'Load the Spotify player', 'notice' => 'Loads a player from Spotify.'], Json::decode((string) $album->filter('[data-island="SpotifyPlayer"]')->attr('data-props')));
         self::assertSame('https://open.spotify.com/album/4aawyAB9vmqN3uQ7FjRGTy', $album->filter('[data-island="SpotifyPlayer"] a')->attr('href'));
         self::assertCount(0, $releases->eq(0)->filter('.tracklist, .release-links, [data-island="SpotifyPlayer"], .release-description'));
@@ -276,6 +315,7 @@ final class HomePageTest extends WebTestCase
         ?string $spotify = null,
         LocalizedText $description = new LocalizedText(),
         bool $cover = false,
+        ?string $upc = null,
     ): ReleaseView {
         $release = self::getContainer()->get(AddReleaseHandler::class)(new AddRelease(new ReleaseDetails(
             $title,
@@ -287,6 +327,7 @@ final class HomePageTest extends WebTestCase
             $links,
             $smartLinkUrl,
             null === $spotify ? null : SpotifyEmbed::parse($spotify),
+            $upc,
         )));
         if ($cover) {
             self::getContainer()->get(UploadReleaseCoverHandler::class)(new UploadReleaseCover(Ulid::fromString($release->id), self::fern()));

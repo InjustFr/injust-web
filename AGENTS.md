@@ -108,3 +108,5 @@ things up in the project instead of relying on memory:
 - Read the installed source and docblocks under `vendor/`.
 - Docs: https://symfony.com/doc/current/ (switch to the version matching
   `composer.json` if it differs).
+
+The M8 section of `CLAUDE.md` describes the release smart links (`/listen/{slug}`, UPC lookup on Deezer, Apple Music, Spotify and Tidal, daily `app:music:refresh-links`).

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Presentation\Web\Site;
 
+use App\Application\Music\ListenView;
 use App\Application\Music\ReleaseView;
 use App\Domain\Music\PlatformLink;
 use App\Domain\Music\Track;
@@ -29,6 +30,32 @@ final readonly class MusicStructuredData
         return array_map(fn (ReleaseView $release): array => $this->release($release, $home), $releases);
     }
 
+    /** @return list<array<string, mixed>> */
+    public function listen(ListenView $listen): array
+    {
+        $release = $listen->release;
+        $home = $this->urls->generate('home', [], UrlGeneratorInterface::ABSOLUTE_URL);
+        $url = $this->urls->generate('listen', ['slug' => $release->slug], UrlGeneratorInterface::ABSOLUTE_URL);
+        $node = [
+            '@type' => 'single' === $release->type ? 'MusicRecording' : 'MusicAlbum',
+            '@id' => $url.'#release',
+            'name' => $release->title,
+            'url' => $url,
+            'byArtist' => ['@id' => $home.'#band'],
+            'datePublished' => $release->releaseDate,
+            'sameAs' => array_map(static fn (PlatformLink $link): string => $link->url, $listen->links),
+        ];
+        if ('single' !== $release->type) {
+            $node += [
+                'albumReleaseType' => 'https://schema.org/'.self::RELEASE_TYPES[$release->type],
+                'numTracks' => \count($release->tracks),
+                'track' => array_map(self::track(...), $release->tracks),
+            ];
+        }
+
+        return [$this->withImage($node, $release)];
+    }
+
     /** @return array<string, mixed> */
     private function release(ReleaseView $release, string $home): array
     {
@@ -45,6 +72,17 @@ final readonly class MusicStructuredData
             'track' => array_map(self::track(...), $release->tracks),
             'sameAs' => array_map(static fn (PlatformLink $link): string => $link->url, $release->links),
         ];
+
+        return $this->withImage($node, $release);
+    }
+
+    /**
+     * @param array<string, mixed> $node
+     *
+     * @return array<string, mixed>
+     */
+    private function withImage(array $node, ReleaseView $release): array
+    {
         if (null !== $release->cover) {
             $node['image'] = $this->urls->generate('media_image', ['file' => $release->cover.'.webp'], UrlGeneratorInterface::ABSOLUTE_URL);
         }

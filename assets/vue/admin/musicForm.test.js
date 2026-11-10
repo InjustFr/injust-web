@@ -57,7 +57,7 @@ describe('releaseForm and releasePayload', () => {
     it('starts empty for a new release', () => {
         expect(releaseForm(null)).toEqual({
             title: '', slug: '', type: 'single', releaseDate: '', description: { fr: '', en: '' },
-            tracks: [], links: [], smartLinkUrl: '', spotifyUrl: '',
+            tracks: [], links: [], upc: '', smartLinkUrl: '', spotifyUrl: '',
         });
     });
 
@@ -66,7 +66,8 @@ describe('releaseForm and releasePayload', () => {
             title: 'Riot', slug: 'riot', type: 'ep', releaseDate: '2026-05-01',
             description: { fr: 'a', en: 'b' },
             tracks: [{ position: 1, title: 'One', durationSeconds: 225 }, { position: 2, title: 'Two', durationSeconds: null }],
-            links: [{ platform: 'spotify', url: 'https://s.test' }],
+            links: [{ platform: 'spotify', url: 'https://s.test', source: 'manual' }, { platform: 'deezer', url: 'https://d.test', source: 'auto' }],
+            upc: '701518909440',
             smartLinkUrl: 'https://ffm.to/x',
             spotifyEmbed: { url: 'https://open.spotify.com/album/abc' },
         };
@@ -78,6 +79,7 @@ describe('releaseForm and releasePayload', () => {
             description: { fr: 'a', en: 'b' },
             tracks: [{ title: 'One', durationSeconds: 225 }, { title: 'Two', durationSeconds: null }],
             links: [{ platform: 'spotify', url: 'https://s.test' }],
+            upc: '701518909440',
             smartLinkUrl: 'https://ffm.to/x',
             spotifyUrl: 'https://open.spotify.com/album/abc',
         });
@@ -95,7 +97,9 @@ describe('releaseForm and releasePayload', () => {
         expect(payload.tracks).toEqual([{ title: 'A', durationSeconds: null }]);
         expect(payload.links).toEqual([{ platform: 'deezer', url: 'https://d.test' }]);
         expect(payload.smartLinkUrl).toBeNull();
+        expect(payload.upc).toBeNull();
         expect(payload.spotifyUrl).toBeNull();
+        expect(releasePayload({ ...releaseForm(null), upc: ' 7015-1890 9440 ' }).upc).toBe('701518909440');
     });
 
     it('trims the optional urls it keeps', () => {

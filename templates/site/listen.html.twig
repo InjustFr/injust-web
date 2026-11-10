@@ -1,0 +1,55 @@
+{% extends 'site.html.twig' %}
+{% import 'site/_image.html.twig' as media %}
+
+{% block main %}
+    <article class="listen">
+        <div class="listen-cover">
+            {%- if release.cover -%}
+                {{- media.img(release.cover, '', null, 'priority') -}}
+            {%- else -%}
+                <span class="cover-blank" aria-hidden="true">{{ release.title }}</span>
+            {%- endif -%}
+        </div>
+        <div class="listen-body">
+            <header class="listen-head">
+                <p class="listen-meta">{{ brand }} · {{ ('site.types.' ~ release.type)|trans }} · {{ release.releaseDate|date('Y') }}</p>
+                <h1 class="listen-title">{{ release.title }}</h1>
+            </header>
+            {% if release.upcoming %}
+                <div class="countdown listen-countdown" data-island="Countdown" data-props="{{ {
+                    target: release.releaseAt,
+                    labels: {
+                        days: 'site.countdown.days'|trans,
+                        hours: 'site.countdown.hours'|trans,
+                        minutes: 'site.countdown.minutes'|trans,
+                        seconds: 'site.countdown.seconds'|trans,
+                        done: 'site.countdown.done'|trans,
+                    },
+                }|json_encode }}">{{ 'site.hero.out'|trans({date: release.releaseDate|date('d.m.Y')}) }}</div>
+                {% if release.smartLinkUrl %}
+                    <a class="button listen-presave" href="{{ release.smartLinkUrl }}" rel="noopener">{{ 'site.hero.presave'|trans }}</a>
+                {% endif %}
+            {% endif %}
+            {% if links is not empty %}
+                <section class="listen-platforms" aria-labelledby="listen-on">
+                    <h2 class="listen-on" id="listen-on">{{ 'site.listen.on'|trans }}</h2>
+                    <ul class="listen-links">
+                        {% for link in links %}
+                            {% set platform = link.platform.value %}
+                            <li>
+                                <a class="listen-link" href="{{ path('listen_click', {slug: release.slug, platform: platform}) }}">
+                                    {%- include 'site/_links_icon.html.twig' with {network: platform} only -%}
+                                    <span class="listen-platform">{{ ('site.platforms.' ~ platform)|trans }}</span>
+                                    <span class="listen-cta" aria-hidden="true">{{ (platform == 'youtube' ? 'site.listen.watch' : 'site.listen.play')|trans }}</span>
+                                </a>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </section>
+            {% else %}
+                <p class="listen-soon">{{ 'site.listen.soon'|trans }}</p>
+            {% endif %}
+            <a class="listen-more" href="{{ path('home') }}">{{ 'site.listen.more'|trans }}</a>
+        </div>
+    </article>
+{% endblock %}

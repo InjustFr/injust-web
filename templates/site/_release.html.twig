@@ -36,7 +36,8 @@
                 </ol>
             {% endif %}
         </div>
-        {% if release.links is not empty or release.smartLinkUrl or release.spotifyEmbed %}
+        {% set listen_page = release.links is not empty or release.upc %}
+        {% if listen_page or release.smartLinkUrl or release.spotifyEmbed %}
             <div class="release-listen">
                 {% if release.spotifyEmbed %}
                     {% set embed = release.spotifyEmbed %}
@@ -48,11 +49,13 @@
                     <p class="release-listen-title">{{ 'site.music.listen_on'|trans }}</p>
                     <ul class="release-links">
                         {% for link in release.links %}
-                            <li><a href="{{ link.url }}" rel="noopener">{{ ('site.platforms.' ~ link.platform.value)|trans }}</a></li>
+                            <li><a href="{{ path('listen_click', {slug: release.slug, platform: link.platform.value}) }}">{{ ('site.platforms.' ~ link.platform.value)|trans }}</a></li>
                         {% endfor %}
                     </ul>
                 {% endif %}
-                {% if release.smartLinkUrl %}
+                {% if listen_page %}
+                    <a class="button" href="{{ path('listen', {slug: release.slug}) }}">{{ (release.upcoming and release.smartLinkUrl ? 'site.hero.presave' : 'site.music.everywhere')|trans }}</a>
+                {% elseif release.smartLinkUrl %}
                     <a class="button" href="{{ release.smartLinkUrl }}" rel="noopener">{{ (release.upcoming ? 'site.hero.presave' : 'site.music.everywhere')|trans }}</a>
                 {% endif %}
             </div>

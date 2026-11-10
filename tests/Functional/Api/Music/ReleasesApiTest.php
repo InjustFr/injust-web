@@ -55,11 +55,16 @@ final class ReleasesApiTest extends WebTestCase
             'cover' => null,
             'description' => ['fr' => 'Premier album', 'en' => 'First album'],
             'tracks' => [['position' => 1, 'title' => 'Intro', 'durationSeconds' => 61], ['position' => 2, 'title' => 'Riot', 'durationSeconds' => null]],
-            'links' => [['platform' => 'bandcamp', 'url' => 'https://injust.bandcamp.com'], ['platform' => 'apple-music', 'url' => 'https://music.apple.com/album/1']],
+            'links' => [['platform' => 'bandcamp', 'url' => 'https://injust.bandcamp.com', 'source' => 'manual'], ['platform' => 'apple-music', 'url' => 'https://music.apple.com/album/1', 'source' => 'manual']],
             'smartLinkUrl' => 'https://ffm.to/nogods',
             'spotifyEmbed' => ['kind' => 'album', 'id' => self::SPOTIFY_ID, 'url' => 'https://open.spotify.com/album/'.self::SPOTIFY_ID, 'embedUrl' => 'https://open.spotify.com/embed/album/'.self::SPOTIFY_ID],
             'featured' => false,
             'position' => 0,
+            'upc' => null,
+            'linksCheckedAt' => null,
+            'hiddenPlatforms' => [],
+            'clicks' => [],
+            'listenUrl' => 'http://localhost/listen/no-gods-no-masters',
         ], array_diff_key($release, ['id' => true]));
     }
 
@@ -292,7 +297,7 @@ final class ReleasesApiTest extends WebTestCase
 
         $music = self::send($client, 'GET', '/api/admin/music');
 
-        self::assertSame(['releases', 'videos', 'text', 'socialLinks'], array_keys($music));
+        self::assertSame(['releases', 'videos', 'text', 'socialLinks', 'finders'], array_keys($music));
         self::assertSame('no-gods-no-masters', Json::string($music, 'releases', 0, 'slug'));
         self::assertTrue(Json::at($music, 'releases', 0, 'upcoming'));
         self::assertSame([[], []], [Json::array($music, 'videos'), Json::array($music, 'socialLinks')]);

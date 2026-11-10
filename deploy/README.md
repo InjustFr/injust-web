@@ -37,7 +37,21 @@ Messages are kept three years, as the privacy text says: the entrypoint runs `ap
 ```cron
 17 4 * * * cd "$DEPLOY_DIR" && docker compose exec -T app php bin/console app:contact:purge
 19 4 * * * cd "$DEPLOY_DIR" && docker compose exec -T app php bin/console app:sales:purge
+23 4 * * * cd "$DEPLOY_DIR" && docker compose exec -T app php bin/console app:music:refresh-links
 ```
+
+## Release smart links (`/listen/<slug>`)
+
+Set the UPC of a release in the admin (Music): the server looks the release up on Deezer and Apple Music (no key needed) and, when configured, Spotify and Tidal, then stores the links and shows them on `/listen/<slug>`. `app:music:refresh-links` (the cron above) refreshes every due release daily: recent or upcoming releases every day, older ones weekly while a platform is still missing. It is not run on start-up. YouTube Music, YouTube, Amazon Music, Bandcamp and SoundCloud have no UPC lookup: paste them as manual links. Empty keys mean the platform is skipped.
+
+| Variable | Purpose |
+| --- | --- |
+| `SPOTIFY_CLIENT_ID`, `SPOTIFY_CLIENT_SECRET` | Spotify app (client credentials, catalogue search by UPC) |
+| `TIDAL_CLIENT_ID`, `TIDAL_CLIENT_SECRET` | TIDAL developer app (client credentials, album lookup by barcode) |
+
+Spotify: sign in at developer.spotify.com/dashboard (the account owner needs Spotify Premium to use an app), Create app, any redirect URI (for example `https://injustmusic.com`), tick Web API. Development Mode is enough: copy the Client ID and Client secret.
+
+TIDAL: register an app at developer.tidal.com, create a client, copy the Client ID and Client secret (no user scopes needed).
 
 ## Online payments (Stripe)
 

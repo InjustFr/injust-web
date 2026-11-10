@@ -187,7 +187,10 @@
             "addLink": "Ajouter un lien",
             "smartLink": "Smart link",
             "spotify": "URL ou URI Spotify",
-            "cover": "Pochette"
+            "cover": "Pochette",
+            "upc": "UPC / code-barres",
+            "upcHint": "12 ou 13 chiffres. Les liens des plateformes en sont déduits.",
+            "upcInvalid": "UPC invalide (12 ou 13 chiffres, clé de contrôle incorrecte)."
         },
         "platforms": {
             "spotify": "Spotify",
@@ -235,6 +238,32 @@
         "portrait": {
             "title": "Portrait",
             "none": "Aucun portrait."
+        },
+        "listen": {
+            "title": "Page d’écoute",
+            "url": "Adresse publique de la page d’écoute",
+            "copy": "Copier le lien",
+            "copied": "Lien copié.",
+            "source": {
+                "auto": "Auto",
+                "manual": "Manuel"
+            },
+            "none": "Pas encore de lien",
+            "hidden": "Masqué",
+            "hide": "Masquer ce lien",
+            "restore": "Afficher à nouveau",
+            "clicks": "{count} clic | {count} clics",
+            "fetch": "Chercher les liens maintenant",
+            "checked": "Dernière vérification : {date}",
+            "neverChecked": "Jamais vérifié",
+            "needsUpc": "Enregistre d’abord un UPC : les liens en sont déduits.",
+            "notConfigured": "Ces plateformes demandent des clés API dans l’environnement du serveur (vide = ignorée) :",
+            "report": {
+                "found": "trouvé",
+                "notFound": "pas encore trouvé",
+                "failed": "échec",
+                "notConfigured": "clé API requise"
+            }
         }
     },
     "lessons": {

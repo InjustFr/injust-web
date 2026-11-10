@@ -24,7 +24,7 @@ await useApi().load('/api/admin/music', music);
                 {{ t(`admin.music.tabs.${name}`) }}
             </button>
         </nav>
-        <ReleasesPanel v-if="tab === 'releases'" :releases="music.releases" />
+        <ReleasesPanel v-if="tab === 'releases'" :releases="music.releases" :finders="music.finders" />
         <VideosPanel v-else-if="tab === 'videos'" :videos="music.videos" />
         <TextsPanel v-else-if="tab === 'texts'" :text="music.text" />
         <LinksPanel v-else :links="music.socialLinks" />

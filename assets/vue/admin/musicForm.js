@@ -1,3 +1,5 @@
+import { normalizeUpc } from './releaseLinks.js';
+
 export const RELEASE_TYPES = ['single', 'ep', 'album'];
 export const PLATFORMS = ['spotify', 'apple-music', 'deezer', 'youtube-music', 'youtube', 'bandcamp', 'tidal', 'amazon-music', 'soundcloud', 'other'];
 export const NETWORKS = ['instagram', 'tiktok', 'youtube', 'spotify', 'facebook', 'bandcamp', 'soundcloud', 'linktree', 'x', 'threads', 'other'];
@@ -28,7 +30,7 @@ const orNull = (value) => value.trim() === '' ? null : value.trim();
 
 const NEW_RELEASE = {
     title: '', slug: '', type: 'single', releaseDate: '', description: { fr: '', en: '' },
-    tracks: [], links: [], smartLinkUrl: null, spotifyEmbed: null,
+    tracks: [], links: [], upc: null, smartLinkUrl: null, spotifyEmbed: null,
 };
 
 export function releaseForm(release) {
@@ -40,7 +42,8 @@ export function releaseForm(release) {
         releaseDate: source.releaseDate,
         description: { fr: source.description.fr, en: source.description.en },
         tracks: source.tracks.map((track) => ({ title: track.title, duration: formatDuration(track.durationSeconds) })),
-        links: source.links.map((link) => ({ platform: link.platform, url: link.url })),
+        links: source.links.filter((link) => link.source !== 'auto').map((link) => ({ platform: link.platform, url: link.url })),
+        upc: source.upc ?? '',
         smartLinkUrl: source.smartLinkUrl ?? '',
         spotifyUrl: source.spotifyEmbed?.url ?? '',
     };
@@ -59,6 +62,7 @@ export function releasePayload(form) {
         links: form.links
             .filter((link) => link.url.trim() !== '')
             .map((link) => ({ platform: link.platform, url: link.url.trim() })),
+        upc: orNull(normalizeUpc(form.upc)),
         smartLinkUrl: orNull(form.smartLinkUrl),
         spotifyUrl: orNull(form.spotifyUrl),
     };

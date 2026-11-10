@@ -9,6 +9,7 @@ import './styles/site/beats.css';
 import './styles/site/contact.css';
 import './styles/site/checkout.css';
 import './styles/site/withdrawal.css';
+import './styles/site/listen.css';
 
 const islands = import.meta.glob('./vue/site/islands/*.vue');
 

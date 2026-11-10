@@ -29,8 +29,12 @@ final readonly class SitemapController
     public function __invoke(): Response
     {
         $settings = $this->queries->current();
-        $covers = array_filter(array_map(static fn (ReleaseView $release): ?string => $release->cover, $this->music->releases($this->clock->now())));
+        $releases = $this->music->releases($this->clock->now());
+        $covers = array_filter(array_map(static fn (ReleaseView $release): ?string => $release->cover, $releases));
         $pages = [new SitemapPage('home', images: $covers)];
+        foreach ($releases as $release) {
+            $pages[] = new SitemapPage('listen', ['slug' => $release->slug], images: array_filter([$release->cover]));
+        }
         foreach ($settings->enabledSections() as $section) {
             $pages[] = new SitemapPage($section->value);
         }

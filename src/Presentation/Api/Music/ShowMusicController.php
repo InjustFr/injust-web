@@ -20,6 +20,7 @@ final class ShowMusicController extends AbstractController
             'videos' => $queries->videos(),
             'text' => $queries->text(),
             'socialLinks' => $queries->socialLinks(),
+            'finders' => $queries->finders(),
         ]);
     }
 }

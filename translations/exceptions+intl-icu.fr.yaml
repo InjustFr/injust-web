@@ -23,6 +23,10 @@ music:
     invalid_slug: '« {slug} » ne peut pas devenir une adresse web : utilisez au moins une lettre ou un chiffre.'
     slug_taken: 'Une autre sortie utilise déjà l’adresse « {slug} » : choisissez un autre slug.'
     invalid_hooks: 'Gardez au plus {max} phrases, de {length} caractères au maximum chacune.'
+    invalid_upc: '« {upc} » n’est pas un UPC ou EAN valide : saisissez les 12 ou 13 chiffres imprimés sous le code-barres.'
+    upc_taken: 'Une autre sortie utilise déjà l’UPC {upc}.'
+    missing_upc: 'Renseignez d’abord l’UPC de cette sortie : c’est à partir de lui que les liens sont trouvés.'
+    duplicate_platform: 'Un seul lien par plateforme : {platform} est en double.'
 lessons:
     untitled_offer: 'Une offre a besoin d’un titre dans au moins une langue.'
     invalid_sessions: '{kind, select, single {Un cours à l’unité compte exactement 1 séance.} other {Un pack compte au moins 2 séances.}}'
