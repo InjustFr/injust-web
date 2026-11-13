@@ -215,7 +215,7 @@ final class HomePageTest extends WebTestCase
         }
     }
 
-    public function testTheHooksTaglineManifestoAndBioAreLocalizedWithFallback(): void
+    public function testTheTaglineManifestoAndBioAreLocalizedWithFallbackAndTheHooksAreNotShown(): void
     {
         $client = self::createClient();
         self::text(
@@ -229,8 +229,7 @@ final class HomePageTest extends WebTestCase
         $crawler = $client->request('GET', '/fr');
 
         self::assertSame('Fuck the system', $crawler->filter('.hero-tagline')->text());
-        self::assertSame(['Patriarchy needs to come down', 'No gods, no bosses'], $crawler->filter('#hooks .hook')->each(static fn (Crawler $hook): string => $hook->text()));
-        self::assertSame('en', $crawler->filter('#hooks')->attr('lang'));
+        self::assertCount(0, $crawler->filter('#hooks, .hook'));
         $manifesto = $crawler->filter('#manifesto .manifesto-body');
         self::assertSame('refusons', $manifesto->filter('strong')->text());
         self::assertCount(0, $manifesto->filter('script'));

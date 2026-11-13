@@ -36,7 +36,7 @@ final class HomeLinksTest extends WebTestCase
         Clock::set(new MockClock('2026-11-10 09:00:00'));
     }
 
-    public function testTheLinksComeRightAfterTheHeroUnderAClearHeading(): void
+    public function testTheLinksCloseTheHomePageUnderAClearHeading(): void
     {
         $client = self::createClient();
         self::bioLink('Album', 'Album', 'https://ffm.to/album');
@@ -45,7 +45,7 @@ final class HomeLinksTest extends WebTestCase
         $crawler = $client->request('GET', '/');
 
         self::assertResponseIsSuccessful();
-        self::assertSame(['hero', 'links'], \array_slice($crawler->filter('main > section')->each(static fn (Crawler $section): string => (string) ($section->attr('id') ?? $section->attr('class'))), 0, 2));
+        self::assertSame('links', $crawler->filter('main > section')->last()->attr('id'));
         self::assertSame(['Listen & follow'], $crawler->filter('#links h2')->each(static fn (Crawler $h2): string => $h2->text()));
         self::assertSame('links-title', $crawler->filter('#links')->attr('aria-labelledby'));
         self::assertSame('Écouter & suivre', $client->request('GET', '/fr')->filter('#links h2')->text());

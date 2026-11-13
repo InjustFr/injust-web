@@ -199,54 +199,6 @@
     .hero-actions .button, .hero-actions .button-ghost { flex: 0 0 auto; }
 }
 
-.hooks {
-    display: flex;
-    flex-direction: column;
-    gap: clamp(0.5rem, 2vw, 1.5rem);
-    padding: clamp(4rem, 12vw, 9rem) var(--gutter);
-    overflow: hidden;
-    border-bottom: var(--rule);
-}
-
-.hook {
-    width: fit-content;
-    max-width: 100%;
-    margin: 0;
-    font-family: var(--font-display);
-    font-size: clamp(3rem, 10.5vw, 10rem);
-    line-height: 0.88;
-    letter-spacing: -0.005em;
-    text-transform: uppercase;
-    text-wrap: balance;
-    overflow-wrap: anywhere;
-}
-
-.hook-long { font-size: clamp(2.25rem, 7vw, 6.5rem); }
-
-.hook-0 { transform: rotate(-2deg); }
-
-.hook-1 {
-    align-self: flex-end;
-    text-align: right;
-    color: transparent;
-    -webkit-text-stroke: 2px var(--bone);
-    transform: rotate(1.5deg);
-}
-
-.hook-2 {
-    padding: 0.08em 0.18em 0.02em;
-    background: var(--signal);
-    color: var(--bone);
-    transform: rotate(-1deg) translateX(clamp(0rem, 6vw, 6rem));
-}
-
-.hook-3 {
-    align-self: center;
-    text-align: center;
-    color: var(--fog);
-    transform: rotate(2.5deg);
-}
-
 .section-head { margin-bottom: clamp(1.5rem, 4vw, 3rem); }
 
 .section-title {
@@ -259,7 +211,7 @@
 }
 
 .releases, .videos, .manifesto, .links {
-    padding: clamp(3rem, 8vw, 6rem) var(--gutter);
+    padding: clamp(3rem, 8vw, 6rem) max(var(--gutter), (100% - var(--container)) / 2);
 }
 
 .release-grid {
@@ -269,8 +221,15 @@
     gap: clamp(1rem, 2.5vw, 2rem);
 }
 
+.release { display: contents; }
+
+.release::details-content { grid-column: 1 / -1; }
+.release:not([open])::details-content { display: none; }
+
 .release summary {
     display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    align-content: start;
     gap: 0.75rem;
     list-style: none;
     cursor: pointer;
@@ -313,6 +272,7 @@
     line-height: 1;
 }
 
+.release[open] .release-cover { outline: 2px solid var(--bone); }
 .release[open] .release-cover::after { content: '−'; background: var(--bone); color: var(--ink); }
 
 .release-caption { display: grid; gap: 0.25rem; }
@@ -335,25 +295,12 @@
     text-transform: uppercase;
 }
 
-.release[open] {
-    grid-column: 1 / -1;
-    padding: clamp(1rem, 3vw, 2rem);
-    border: 2px solid var(--bone);
-    background: var(--soot);
-}
-
-.release[open] summary {
-    grid-template-columns: clamp(6rem, 26vw, 15rem) 1fr;
-    align-items: end;
-    gap: 1rem clamp(1rem, 3vw, 2rem);
-}
-
-.release[open] .release-title { font-size: clamp(2rem, 6vw, 5rem); line-height: 0.88; }
-
 .release-panel {
     display: grid;
     gap: 2rem;
-    margin-top: clamp(1.25rem, 3vw, 2rem);
+    padding: clamp(1rem, 3vw, 2rem);
+    border: 2px solid var(--bone);
+    background: var(--soot);
 }
 
 .release-date, .release-description { margin: 0 0 1rem; }
@@ -451,7 +398,6 @@
 @media (min-width: 48rem) {
     .release-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
     .release-panel { grid-template-columns: 3fr 2fr; gap: clamp(2rem, 5vw, 4rem); }
-    .release[open] .release-panel { padding-left: calc(clamp(6rem, 26vw, 15rem) + clamp(1rem, 3vw, 2rem)); }
 }
 
 @media (min-width: 72rem) {
@@ -603,7 +549,10 @@
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(min(100%, 22rem), 1fr));
     gap: 3rem clamp(2rem, 6vw, 6rem);
-    max-width: 72rem;
+}
+
+@media (min-width: 48rem) {
+    .links-columns { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 
 .links-group-title {
