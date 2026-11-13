@@ -1,8 +1,7 @@
 .hero {
     display: flex;
     flex-direction: column;
-    height: calc(100svh - var(--header-height));
-    min-height: min-content;
+    min-height: 100svh;
     border-bottom: var(--rule);
 }
 
@@ -23,6 +22,7 @@
     position: absolute;
     inset: 0;
     background:
+        linear-gradient(180deg, rgb(0 0 0 / 0.55) 0, transparent 9rem),
         radial-gradient(ellipse 70% 75% at 55% 40%, transparent 30%, rgb(0 0 0 / 0.82) 100%),
         linear-gradient(180deg, transparent 45%, rgb(0 0 0 / 0.55) 80%, rgb(0 0 0 / 0.85) 100%);
 }
@@ -188,7 +188,7 @@
 .hero-actions .button-ghost { flex: 1 1 auto; text-align: center; }
 
 @media (min-width: 54rem) {
-    .hero { min-height: 36rem; }
+    .hero { min-height: max(100svh, 36rem); }
     .hero-stage { min-height: 24rem; }
     .hero-content { position: absolute; inset: auto 0 0; margin-top: 0; padding: var(--gutter); gap: 1.25rem; }
     .hero-mark .logo { width: min(40vw, 40rem); }

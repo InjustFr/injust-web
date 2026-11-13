@@ -11,6 +11,13 @@ import './styles/site/checkout.css';
 import './styles/site/withdrawal.css';
 import './styles/site/listen.css';
 
+const overHero = document.querySelector('.site-header-over');
+if (overHero) {
+    const toggle = () => overHero.classList.toggle('is-scrolled', window.scrollY > 8);
+    window.addEventListener('scroll', toggle, { passive: true });
+    toggle();
+}
+
 const islands = import.meta.glob('./vue/site/islands/*.vue');
 
 document.querySelectorAll('[data-island]').forEach(async (element) => {

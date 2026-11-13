@@ -1,6 +1,6 @@
 *, *::before, *::after { box-sizing: border-box; }
 
-html { background: var(--ink); }
+html { background: var(--ink); scroll-padding-top: var(--header-height); }
 
 body {
     margin: 0;
@@ -108,7 +108,8 @@ img { display: block; max-width: 100%; object-position: var(--fx, 50%) var(--fy,
 .hidden-banner span { color: var(--fog); }
 
 .site-header {
-    position: relative;
+    position: sticky;
+    top: 0;
     z-index: 10;
     display: flex;
     flex-wrap: wrap;
@@ -119,6 +120,23 @@ img { display: block; max-width: 100%; object-position: var(--fx, 50%) var(--fy,
     padding: 0.75rem var(--gutter);
     border-bottom: var(--rule);
     background: var(--ink);
+}
+
+.site-header-over {
+    position: fixed;
+    inset: 0 0 auto;
+    border-bottom-color: transparent;
+    background: transparent;
+}
+
+.site-header-over .wordmark { opacity: 0; pointer-events: none; }
+.site-header-over .wordmark:focus-visible { opacity: 1; }
+
+.site-header-over.is-scrolled { border-bottom-color: var(--steel); background: var(--ink); }
+.site-header-over.is-scrolled .wordmark { opacity: 1; pointer-events: auto; }
+
+@media (prefers-reduced-motion: no-preference) {
+    .site-header-over, .site-header-over .wordmark { transition: background-color 200ms ease-out, border-color 200ms ease-out, opacity 200ms ease-out; }
 }
 
 .wordmark {

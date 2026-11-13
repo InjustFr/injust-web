@@ -105,6 +105,17 @@ final class SitePagesTest extends WebTestCase
         self::assertMatchesRegularExpression('#^/media/images/[0-9A-HJKMNP-TV-Z]{26}\.webp$#', (string) $logo->attr('src'));
     }
 
+    public function testOnlyTheHomeHeaderSitsOverTheHero(): void
+    {
+        $client = self::createClient();
+
+        $home = $client->request('GET', '/')->filter('header.site-header');
+        $contact = $client->request('GET', '/contact')->filter('header.site-header');
+
+        self::assertStringContainsString('site-header-over', (string) $home->attr('class'));
+        self::assertStringNotContainsString('site-header-over', (string) $contact->attr('class'));
+    }
+
     public function testTheHeroShowsTheSettingsPhoto(): void
     {
         $client = self::createClient();

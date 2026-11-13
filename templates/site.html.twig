@@ -95,7 +95,7 @@
             <span>{{ 'site.hidden.detail'|trans }}</span>
         </div>
     {% endif %}
-    <header class="site-header">
+    <header class="site-header{{ route == 'home' ? ' site-header-over' }}">
         <a class="wordmark" href="{{ path('home') }}" aria-label="{{ 'site.home'|trans }}">
             {%- if settings.logoImage -%}
                 {{- media.img(settings.logoImage, brand, null, 'eager') -}}
