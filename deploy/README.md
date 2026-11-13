@@ -17,7 +17,7 @@ Fill `.env`:
 |---|---|
 | `IMAGE` / `TAG` | Image to run; `make deploy` sets `TAG` to the commit it deploys |
 | `DEFAULT_URI` | Public address of the site (`https://injustmusic.com`), used for absolute links |
-| `PROXY_NETWORK` | External Docker network of the nginx reverse proxy (`docker network ls`) |
+| `PROXY_NETWORK` | External Docker network of the reverse proxy (`web` on duprat.cloud) |
 | `APP_SECRET` | `openssl rand -hex 16` |
 | `POSTGRES_PASSWORD` | `openssl rand -hex 24` |
 | `OIDC_CLIENT_SECRET` | Secret of the `injust` provider in the shared Authentik (Injust accounts) |
@@ -89,34 +89,28 @@ Search Console: add the domain as a property, choose the HTML tag method, paste 
 ## Reverse proxy
 
 - `compose.override.yaml` puts the app on the reverse proxy network (`PROXY_NETWORK`) with the alias `injust-web`, and opens no host port.
-- The site's server block of the nginx configuration proxies to `http://injust-web` and needs `client_max_body_size 25M` for image uploads, plus `X-Forwarded-Host`/`X-Forwarded-Port` like the other app blocks, and `proxy_set_header X-Forwarded-For $remote_addr;`. The app trusts `X-Forwarded-For` from private addresses, so without that line nginx passes on whatever the visitor sent and the contact rate limit can be dodged.
+- The `injustmusic.com` block of the Caddyfile (repo `duprat-cloud`, `proxy/conf/Caddyfile`) proxies to `injust-web:80` with a 25 MB body limit for image uploads; `www.injustmusic.com` redirects to it. Caddy sets `X-Forwarded-For` to the address that connected and drops what the visitor sent, so the contact rate limit (the app trusts `X-Forwarded-For` from private addresses) cannot be dodged. It also sends `X-Forwarded-Host`/`X-Forwarded-Proto`, and the shared snippet adds `X-Forwarded-Port`.
 - Uploaded images live in the `app_share` volume (`var/share/images`), the data in `database_data`.
 
 ### Beat uploads
 
-Beat files are large (stems up to 2 GB), so only the admin route that receives them gets a bigger limit; every other location keeps `client_max_body_size 25M`. PHP writes a whole upload to disk before the app can check who sent it, so nginx turns away requests without a session cookie and allows three uploads at a time per address (one per file kind). Declare the zone once at `http` level (in `nginx.conf` or a `conf.d/*.conf` file):
+Beat files are large (stems up to 2 GB), so only the admin route that receives them gets a bigger limit; every other path keeps 25 MB. PHP writes a whole upload to disk before the app can check who sent it, so Caddy turns away requests without a session cookie:
 
-```nginx
-limit_conn_zone $binary_remote_addr zone=injust_uploads:1m;
-```
-
-Then add this block next to the site's main `location /`, with the same `proxy_set_header` lines:
-
-```nginx
-location ~ ^/api/admin/beats/.+/files/ {
-    if ($http_cookie !~ "(PHPSESSID|REMEMBERME)=") {
-        return 401;
-    }
-    limit_conn injust_uploads 3;
-    client_max_body_size 2g;
-    proxy_request_buffering off;
-    proxy_read_timeout 1800;
-    proxy_send_timeout 1800;
-    proxy_pass http://injust-web;
+```caddyfile
+injustmusic.com {
+	@beat_upload path_regexp ^/api/admin/beats/.+/files/
+	handle @beat_upload {
+		@anonymous not header_regexp Cookie (PHPSESSID|REMEMBERME)=
+		respond @anonymous 401
+		import app injust-web:80 2GB
+	}
+	handle {
+		import app injust-web:80 25MB
+	}
 }
 ```
 
-`proxy_request_buffering off` streams the upload to the app instead of writing a second copy on the proxy's disk. The app accepts uploads up to 2 GB (`upload_max_filesize`, `post_max_size` 2100M, `max_input_time` 1800, so about 10 Mbit/s of upload is enough for the largest file) and writes them to `var/share/tmp` on the `app_share` volume, so a finished upload is moved into place, never copied. The container empties `var/share/tmp` when it starts, which removes what an interrupted upload left. Limits per file: preview MP3 20 MB, MP3 50 MB, WAV 500 MB, stems ZIP 2 GB (`config/packages/beats.yaml`). Keep at least 10 GB free on the disk that holds the `app_share` volume (`docker system df -v`, `df -h /var/lib/docker`): three uploads in progress plus the files already stored.
+Caddy streams the upload to the app (no copy on the proxy's disk) and has no read timeout, so a slow 2 GB upload is not cut off. It has no built-in cap on parallel uploads per address (nginx's `limit_conn`), so a client sending any session cookie can start several large uploads at once. The app accepts uploads up to 2 GB (`upload_max_filesize`, `post_max_size` 2100M, `max_input_time` 1800, so about 10 Mbit/s of upload is enough for the largest file) and writes them to `var/share/tmp` on the `app_share` volume, so a finished upload is moved into place, never copied. The container empties `var/share/tmp` when it starts, which removes what an interrupted upload left. Limits per file: preview MP3 20 MB, MP3 50 MB, WAV 500 MB, stems ZIP 2 GB (`config/packages/beats.yaml`). Keep at least 10 GB free on the disk that holds the `app_share` volume (`docker system df -v`, `df -h /var/lib/docker`): uploads in progress plus the files already stored.
 
 - Public previews: `var/share/audio`, served on `/media/audio/<id>.mp3`.
 - Sold files (MP3, WAV, stems): `var/share/private`, never served by a public route. Keep it in the backups below.
@@ -134,12 +128,4 @@ docker run --rm -v injust-web_app_share:/share -v "$PWD":/backup alpine tar czf 
 
 ## Beat downloads
 
-`GET /download/...` links are signed with the app secret (`APP_SECRET`) and checked against the scheme and host of the request: the proxy must pass `X-Forwarded-Host` and `X-Forwarded-Proto` so the host the buyer clicks equals the host used to sign (webhook, admin). Rotating `APP_SECRET` invalidates links already sent. Large downloads are streamed by PHP from the `app_share` volume: the controller lifts PHP's `max_execution_time` (30 s in production) for the download, and nginx needs a `location /download/` with `proxy_read_timeout 1800;` and `proxy_buffering off;` (with the same `proxy_set_header` lines as `location /`) so a 2 GB stems ZIP on a slow connection is neither cut off nor buffered to the proxy’s disk:
-
-```nginx
-location /download/ {
-    proxy_pass http://injust-web;
-    proxy_read_timeout 1800;
-    proxy_buffering off;
-}
-```
+`GET /download/...` links are signed with the app secret (`APP_SECRET`) and checked against the scheme and host of the request: the proxy must pass `X-Forwarded-Host` and `X-Forwarded-Proto` so the host the buyer clicks equals the host used to sign (webhook, admin). Rotating `APP_SECRET` invalidates links already sent. Large downloads are streamed by PHP from the `app_share` volume: the controller lifts PHP's `max_execution_time` (30 s in production) for the download. Caddy streams responses without buffering them and has no read timeout, so a 2 GB stems ZIP on a slow connection needs no extra proxy setting.
