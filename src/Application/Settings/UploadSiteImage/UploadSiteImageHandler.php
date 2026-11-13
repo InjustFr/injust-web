@@ -9,9 +9,12 @@ use App\Application\Shared\ImageResizer;
 use App\Application\Shared\Images;
 use App\Application\Transaction;
 use App\Domain\Settings\SettingsRepository;
+use App\Domain\Settings\SiteImage;
 
 final readonly class UploadSiteImageHandler
 {
+    private const int HERO_SIDE = 3200;
+
     public function __construct(
         private SettingsRepository $settings,
         private ImageResizer $resizer,
@@ -22,7 +25,7 @@ final readonly class UploadSiteImageHandler
 
     public function __invoke(UploadSiteImage $command): SettingsView
     {
-        $image = $this->images->store($this->resizer->resize($command->path));
+        $image = $this->images->store($this->resizer->resize($command->path, SiteImage::Hero === $command->slot ? self::HERO_SIDE : ImageResizer::MAX_SIDE));
 
         $settings = $this->settings->current();
         $previous = $settings->useImage($command->slot, $image);

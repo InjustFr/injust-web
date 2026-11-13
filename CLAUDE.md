@@ -41,7 +41,7 @@ Layer-first: `src/{Domain,Application,Infrastructure,Presentation}/<Context>/`, 
 
 - `Domain/Shared/Exception`: `DomainException` (message key + parameters, translated from `translations/exceptions+intl-icu.*.yaml`), `NotFound`, `UnsupportedImage`.
 - `Application`: use cases `<Context>/<UseCase>/{Command, Handler}`, views and ports. Shared ports: `Transaction`, `Shared\ImageStorage`, `Shared\ImageResizer` (+ `ResizedImage`).
-- `Infrastructure`: Doctrine repositories and `DoctrineTransaction`, `Storage\GdImageResizer` (WebP, 1600 px max), `Storage\LocalImageStorage` (`var/share/images`), the Security/Accounts adapters.
+- `Infrastructure`: Doctrine repositories and `DoctrineTransaction`, `Storage\GdImageResizer` (WebP, 1600 px max, 3200 for the hero), `Storage\LocalImageStorage` (`var/share/images`), the Security/Accounts adapters.
 - `Presentation`: controllers. Admin API goes under `/api/admin/…` with `MapRequestPayload` DTOs; `DomainExceptionListener` turns a domain exception into a 422 `problem+json`; `SameOriginGuard` refuses cross-origin writes on `/api/`; `RefreshAfterWrite` + `ApiPreload` return the refreshed GET payloads the admin asks for in `X-Refresh`; `AppShellController` serves the admin SPA on `/admin/{path}` and preloads its first API calls.
 - Public pages: `Presentation/Web/Site/*Controller` render `templates/site/*.html.twig`, which extend `templates/site.html.twig` (SEO head: title, description, canonical, Open Graph, JSON-LD). `robots.txt` and `sitemap.xml` are controllers. Uploaded images are served by `MediaController` (`/media/images/{ulid}.webp`, immutable cache).
 

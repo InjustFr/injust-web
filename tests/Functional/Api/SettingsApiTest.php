@@ -271,6 +271,15 @@ final class SettingsApiTest extends WebTestCase
         self::assertResponseIsSuccessful();
     }
 
+    public function testTheHeroKeepsEnoughPixelsForRetinaScreensWhileTheLogoIsReduced(): void
+    {
+        $client = self::signedInClient();
+        $logo = Json::string(self::upload($client, 'logo'), 'logoImage');
+        $hero = Json::string(self::upload($client, 'hero'), 'heroImage');
+
+        self::assertSame([1600, 2000], [self::servedWidth($client, $logo), self::servedWidth($client, $hero)]);
+    }
+
     public function testAnImageIsRemoved(): void
     {
         $client = self::signedInClient();
@@ -343,6 +352,15 @@ final class SettingsApiTest extends WebTestCase
         self::assertResponseIsSuccessful();
 
         return Json::decode((string) $client->getResponse()->getContent());
+    }
+
+    private static function servedWidth(KernelBrowser $client, string $image): int
+    {
+        $client->request('GET', '/media/images/'.$image.'.webp');
+        $size = getimagesizefromstring($client->getInternalResponse()->getContent());
+        self::assertIsArray($size);
+
+        return $size[0];
     }
 
     private static function copyOf(string $fixture): string
