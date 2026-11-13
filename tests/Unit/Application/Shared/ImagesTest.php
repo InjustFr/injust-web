@@ -22,6 +22,27 @@ final class ImagesTest extends TestCase
         self::assertMatchesRegularExpression('/^[0-9A-HJKMNP-TV-Z]{26}$/', new Images($storage, self::createStub(ImageFocusRepository::class))->store($image));
     }
 
+    public function testVariantsAreStoredUnderTheImageUlid(): void
+    {
+        $small = new ResizedImage('small', 1, 1);
+        $ids = [];
+        $storage = $this->createMock(ImageStorage::class);
+        $storage->expects($this->once())->method('store')->willReturnCallback(static function (Ulid $id) use (&$ids): string {
+            $ids[] = $id->toBase32();
+
+            return 'ignored.webp';
+        });
+        $storage->expects($this->once())->method('storeVariant')->with(self::isInstanceOf(Ulid::class), self::identicalTo($small))->willReturnCallback(static function (Ulid $id) use (&$ids): string {
+            $ids[] = $id->toBase32();
+
+            return 'ignored.webp';
+        });
+
+        $stored = new Images($storage, self::createStub(ImageFocusRepository::class))->store(new ResizedImage('bytes', 2, 1), $small);
+
+        self::assertSame([$stored, $stored], $ids);
+    }
+
     public function testADiscardedImageLosesItsFileAndItsFocus(): void
     {
         $storage = $this->createMock(ImageStorage::class);

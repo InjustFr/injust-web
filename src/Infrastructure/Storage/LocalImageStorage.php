@@ -12,7 +12,7 @@ use Symfony\Component\Uid\Ulid;
 
 final readonly class LocalImageStorage implements ImageStorage
 {
-    private const string FILE_PATTERN = '/^[0-9A-HJKMNP-TV-Z]{26}\.webp$/';
+    private const string FILE_PATTERN = '/^[0-9A-HJKMNP-TV-Z]{26}(-[1-9][0-9]{0,4})?\.webp$/';
 
     public function __construct(
         #[Autowire('%kernel.share_dir%/images')]
@@ -29,12 +29,41 @@ final readonly class LocalImageStorage implements ImageStorage
         return $file;
     }
 
+    public function storeVariant(Ulid $id, ResizedImage $image): string
+    {
+        $file = $id->toBase32().'-'.$image->width.'.'.ResizedImage::EXTENSION;
+        $this->filesystem->dumpFile($this->directory.'/'.$file, $image->bytes);
+
+        return $file;
+    }
+
+    public function widths(string $id): array
+    {
+        $widths = [];
+        foreach ($this->variants($id) as $file) {
+            $widths[] = (int) substr(basename($file, '.'.ResizedImage::EXTENSION), 27);
+        }
+        sort($widths);
+
+        return $widths;
+    }
+
     public function delete(string $file): void
     {
         $path = $this->path($file);
         if (null !== $path) {
-            $this->filesystem->remove($path);
+            $this->filesystem->remove([$path, ...$this->variants(basename($file, '.'.ResizedImage::EXTENSION))]);
         }
+    }
+
+    /** @return list<string> */
+    private function variants(string $id): array
+    {
+        if (1 !== preg_match('/^[0-9A-HJKMNP-TV-Z]{26}$/', $id)) {
+            return [];
+        }
+
+        return array_values(array_filter(glob($this->directory.'/'.$id.'-*.'.ResizedImage::EXTENSION) ?: [], fn (string $path): bool => null !== $this->path(basename($path))));
     }
 
     public function files(): array

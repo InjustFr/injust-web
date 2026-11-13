@@ -15,10 +15,13 @@ final readonly class Images
     ) {
     }
 
-    public function store(ResizedImage $image): string
+    public function store(ResizedImage $image, ResizedImage ...$variants): string
     {
         $id = new Ulid();
         $this->storage->store($id, $image);
+        foreach ($variants as $variant) {
+            $this->storage->storeVariant($id, $variant);
+        }
 
         return $id->toBase32();
     }

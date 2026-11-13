@@ -119,6 +119,21 @@ final class SitePagesTest extends WebTestCase
         self::assertCount(1, $crawler->filter('.hero h1 svg.logo[aria-hidden="true"]'));
     }
 
+    public function testTheHeroOffersSmallerWidthsForSmallerScreens(): void
+    {
+        $client = self::createClient();
+        self::upload(SiteImage::Hero);
+
+        $hero = $client->request('GET', '/')->filter('.hero img');
+
+        self::assertMatchesRegularExpression('#^/media/images/([0-9A-HJKMNP-TV-Z]{26})-800\.webp 800w, /media/images/\1-1600\.webp 1600w, /media/images/\1\.webp 2000w$#', (string) $hero->attr('srcset'));
+        self::assertSame('(min-width: 54rem) 100vw, 167vw', $hero->attr('sizes'));
+        foreach (explode(', ', (string) $hero->attr('srcset')) as $candidate) {
+            $client->request('GET', explode(' ', $candidate)[0]);
+            self::assertResponseIsSuccessful();
+        }
+    }
+
     public function testTheFooterLinksTheLegalPagesOfTheSwitchedOnSectionsAndTheContactEmail(): void
     {
         $client = self::createClient();

@@ -10,6 +10,11 @@ interface ImageStorage
 {
     public function store(Ulid $id, ResizedImage $image): string;
 
+    public function storeVariant(Ulid $id, ResizedImage $image): string;
+
+    /** @return list<int> */
+    public function widths(string $id): array;
+
     public function delete(string $file): void;
 
     public function path(string $file): ?string;

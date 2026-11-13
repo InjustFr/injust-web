@@ -36,6 +36,24 @@ final class LocalImageStorageTest extends TestCase
         self::assertNull($storage->path($file));
     }
 
+    public function testVariantsAreListedByWidthAndDeletedWithTheirImage(): void
+    {
+        $storage = new LocalImageStorage($this->directory);
+        $id = new Ulid();
+        $file = $storage->store($id, new ResizedImage('webp', 2000, 1500));
+
+        $variant = $storage->storeVariant($id, new ResizedImage('webp', 1600, 1200));
+        $storage->storeVariant($id, new ResizedImage('webp', 800, 600));
+
+        self::assertSame($id->toBase32().'-1600.webp', $variant);
+        self::assertSame($this->directory.'/'.$variant, $storage->path($variant));
+        self::assertSame([800, 1600], $storage->widths($id->toBase32()));
+        self::assertSame([], $storage->widths(new Ulid()->toBase32()));
+        $storage->delete($file);
+        self::assertSame([], $storage->widths($id->toBase32()));
+        self::assertNull($storage->path($variant));
+    }
+
     public function testANameOutsideThePatternIsNeverResolved(): void
     {
         new Filesystem()->dumpFile($this->directory.'/secret.webp', 'x');

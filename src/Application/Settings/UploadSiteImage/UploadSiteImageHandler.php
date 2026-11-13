@@ -15,6 +15,8 @@ final readonly class UploadSiteImageHandler
 {
     private const int HERO_SIDE = 3200;
 
+    private const array HERO_VARIANT_SIDES = [800, 1600];
+
     public function __construct(
         private SettingsRepository $settings,
         private ImageResizer $resizer,
@@ -25,7 +27,7 @@ final readonly class UploadSiteImageHandler
 
     public function __invoke(UploadSiteImage $command): SettingsView
     {
-        $image = $this->images->store($this->resizer->resize($command->path, SiteImage::Hero === $command->slot ? self::HERO_SIDE : ImageResizer::MAX_SIDE));
+        $image = SiteImage::Hero === $command->slot ? $this->storeHero($command->path) : $this->images->store($this->resizer->resize($command->path));
 
         $settings = $this->settings->current();
         $previous = $settings->useImage($command->slot, $image);
@@ -34,5 +36,19 @@ final readonly class UploadSiteImageHandler
         $this->images->discard($previous);
 
         return SettingsView::of($settings);
+    }
+
+    private function storeHero(string $path): string
+    {
+        $hero = $this->resizer->resize($path, self::HERO_SIDE);
+        $variants = [];
+        foreach (self::HERO_VARIANT_SIDES as $side) {
+            $variant = $this->resizer->resize($path, $side);
+            if ($variant->width < $hero->width) {
+                $variants[] = $variant;
+            }
+        }
+
+        return $this->images->store($hero, ...$variants);
     }
 }

@@ -11,7 +11,7 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Attribute\Route;
 
 #[AsController]
-#[Route('/media/images/{file}', name: 'media_image', requirements: ['file' => '[0-9A-HJKMNP-TV-Z]{26}\.webp'], methods: ['GET'])]
+#[Route('/media/images/{file}', name: 'media_image', requirements: ['file' => '[0-9A-HJKMNP-TV-Z]{26}(-[1-9][0-9]{0,4})?\.webp'], methods: ['GET'])]
 final readonly class MediaController
 {
     private const int ONE_YEAR = 31536000;

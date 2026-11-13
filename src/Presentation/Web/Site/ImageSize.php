@@ -23,4 +23,11 @@ final readonly class ImageSize
 
         return false === $size ? null : ['width' => $size[0], 'height' => $size[1]];
     }
+
+    /** @return list<int> */
+    #[AsTwigFunction('image_widths')]
+    public function widths(string $id): array
+    {
+        return $this->storage->widths($id);
+    }
 }

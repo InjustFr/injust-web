@@ -4,7 +4,7 @@
     <div class="hero-stage">
         <div class="hero-frame">
             {% if settings.heroImage %}
-                {{ media.img(settings.heroImage, '', 'hero-photo', 'priority') }}
+                {% set hero_size = image_size(settings.heroImage) %}{{ media.img(settings.heroImage, '', 'hero-photo', 'priority', '(min-width: 54rem) 100vw, ' ~ max(100, hero_size ? (125 * hero_size.width / hero_size.height)|round(0, 'ceil') : 100) ~ 'vw') }}
             {% endif %}
         </div>
         <div class="hero-content">
