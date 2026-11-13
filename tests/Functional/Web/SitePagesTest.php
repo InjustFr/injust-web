@@ -20,7 +20,7 @@ final class SitePagesTest extends WebTestCase
         $crawler = $client->request('GET', '/');
 
         self::assertResponseIsSuccessful();
-        self::assertSame('INJUST', $crawler->filter('header .wordmark')->text());
+        self::assertCount(1, $crawler->filter('header .wordmark svg.logo'));
         self::assertSame('en', $crawler->filter('html')->attr('lang'));
         self::assertNull($client->getCookieJar()->get('PHPSESSID'));
     }
@@ -115,7 +115,8 @@ final class SitePagesTest extends WebTestCase
         self::upload(SiteImage::Hero);
         $crawler = $client->request('GET', '/');
         self::assertMatchesRegularExpression('#^/media/images/[0-9A-HJKMNP-TV-Z]{26}\.webp$#', (string) $crawler->filter('.hero img')->attr('src'));
-        self::assertSame('INJUST', $crawler->filter('.hero h1')->text());
+        self::assertSame('Injust', $crawler->filter('.hero h1')->text());
+        self::assertCount(1, $crawler->filter('.hero h1 svg.logo[aria-hidden="true"]'));
     }
 
     public function testTheFooterLinksTheLegalPagesOfTheSwitchedOnSectionsAndTheContactEmail(): void

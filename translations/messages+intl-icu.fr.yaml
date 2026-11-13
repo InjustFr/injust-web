@@ -106,6 +106,8 @@ site:
     faq: 'Questions fréquentes'
     links:
         title: 'Écouter & suivre'
+        listen: 'Écouter'
+        follow: 'Suivre'
         socials: 'Réseaux sociaux'
     listen:
         on: 'Écouter sur'

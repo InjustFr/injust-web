@@ -20,7 +20,7 @@ test('a visitor clicks a link on the home page, it is counted and lands on the t
     await visitorPage.locator('.hero').getByRole('link', { name: 'Links', exact: true }).click();
     await expect(visitorPage).toHaveURL(/#links$/);
     const links = visitorPage.locator('#links');
-    await expect(links.getByRole('heading', { name: 'Listen & follow' })).toBeInViewport();
+    await expect(links.getByRole('heading', { name: 'Listen', exact: true })).toBeInViewport();
     const redirect = visitorPage.waitForResponse((response) => response.url().includes('/go/'));
     await links.getByRole('link', { name: LABEL }).click();
     const response = await redirect;

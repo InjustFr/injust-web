@@ -130,6 +130,9 @@ img { display: block; max-width: 100%; object-position: var(--fx, 50%) var(--fy,
 }
 
 .wordmark img { height: 2.5rem; width: auto; }
+.wordmark .logo { width: 5.5rem; }
+
+.logo { display: block; height: auto; fill: currentColor; }
 
 .site-nav {
     display: flex;

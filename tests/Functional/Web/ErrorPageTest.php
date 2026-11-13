@@ -28,7 +28,7 @@ final class ErrorPageTest extends WebTestCase
         self::assertSame('404', $crawler->filter('main .placeholder-status')->text());
         self::assertSame('Nothing here', $crawler->filter('main h1')->text());
         self::assertSame('/', $crawler->filter('main a.button')->attr('href'));
-        self::assertSame('INJUST', $crawler->filter('header .wordmark')->text());
+        self::assertCount(1, $crawler->filter('header .wordmark svg.logo'));
         self::assertSame('/fr', $crawler->filter('header a.lang-switch')->attr('href'));
         self::assertSame(['/legal/mentions'], $crawler->filter('footer a.legal-link')->each(static fn (Crawler $a): string => (string) $a->attr('href')));
     }

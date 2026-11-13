@@ -106,6 +106,8 @@ site:
     faq: 'FAQ'
     links:
         title: 'Listen & follow'
+        listen: 'Listen'
+        follow: 'Follow'
         socials: 'Social networks'
     listen:
         on: 'Listen on'

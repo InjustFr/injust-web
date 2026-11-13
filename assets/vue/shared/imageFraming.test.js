@@ -49,7 +49,7 @@ describe('needsFraming', () => {
 
 describe('slots', () => {
     it('shows a phone and a desktop frame for the hero', () => {
-        expect(SLOTS.hero.frames).toEqual([{ key: 'phone', ratio: 9 / 19.5 }, { key: 'desktop', ratio: 16 / 9 }]);
+        expect(SLOTS.hero.frames).toEqual([{ key: 'phone', ratio: 4 / 5 }, { key: 'desktop', ratio: 16 / 9 }]);
     });
 
     it('frames covers square and portraits at 4:5', () => {

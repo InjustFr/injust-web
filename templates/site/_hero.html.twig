@@ -1,73 +1,77 @@
 {% import 'site/_image.html.twig' as media %}
 {% set featured = music.featured %}
 <section class="hero">
-    {% if settings.heroImage %}
-        {{ media.img(settings.heroImage, '', 'hero-photo', 'priority') }}
-    {% endif %}
-    <div class="hero-content">
-        <h1 class="hero-mark">{{ brand|upper }}</h1>
-        <div class="hero-intro">
-            <p class="hero-tagline">{{ music.text.tagline.in(locale) ?: 'site.description'|trans }}</p>
-            {% if music.socialLinks is not empty %}
-                <ul class="hero-socials" aria-label="{{ 'site.links.socials'|trans }}">
-                    {% for social in music.socialLinks %}
-                        <li>
-                            <a class="hero-social" href="{{ social.url }}" rel="me noopener" aria-label="{{ social.label ?: ('site.networks.' ~ social.network)|trans }}">
-                                {%- include 'site/_links_icon.html.twig' with {network: social.network} only -%}
-                            </a>
-                        </li>
-                    {% endfor %}
-                </ul>
+    <div class="hero-stage">
+        <div class="hero-frame">
+            {% if settings.heroImage %}
+                {{ media.img(settings.heroImage, '', 'hero-photo', 'priority') }}
             {% endif %}
         </div>
-        {% if featured %}
-            <article class="hero-release">
-                {% if featured.cover %}
-                    {{ media.img(featured.cover, '', 'hero-release-cover', 'eager') }}
-                {% endif %}
-                <div class="hero-release-body">
-                    <p class="hero-release-kicker">{{ 'site.hero.featured'|trans }}</p>
-                    <h2 class="hero-release-title">{{ featured.title }}</h2>
-                    <p class="hero-release-meta">{{ ('site.types.' ~ featured.type)|trans }} · {{ featured.releaseDate|date('d.m.Y') }}</p>
-                </div>
-                {% if featured.upcoming %}
-                    <div class="countdown" data-island="Countdown" data-props="{{ {
-                        target: featured.releaseAt,
-                        labels: {
-                            days: 'site.countdown.days'|trans,
-                            hours: 'site.countdown.hours'|trans,
-                            minutes: 'site.countdown.minutes'|trans,
-                            seconds: 'site.countdown.seconds'|trans,
-                            done: 'site.countdown.done'|trans,
-                        },
-                    }|json_encode }}">{{ 'site.hero.out'|trans({date: featured.releaseDate|date('d.m.Y')}) }}</div>
-                {% endif %}
-                {% set listen_page = featured.links is not empty or featured.upc %}
-                {% if listen_page or featured.smartLinkUrl or music.videos is not empty or has_links %}
-                    <div class="hero-actions">
-                        {% if listen_page %}
-                            <a class="button" href="{{ path('listen', {slug: featured.slug}) }}">{{ (featured.upcoming and featured.smartLinkUrl ? 'site.hero.presave' : 'site.hero.listen')|trans }}</a>
-                        {% elseif featured.smartLinkUrl %}
-                            <a class="button" href="{{ featured.smartLinkUrl }}" rel="noopener">{{ (featured.upcoming ? 'site.hero.presave' : 'site.hero.listen')|trans }}</a>
-                        {% endif %}
-                        {% if music.videos is not empty %}
-                            <a class="button-ghost" href="#videos">{{ 'site.hero.watch'|trans }}</a>
-                        {% endif %}
-                        {% if has_links %}
-                            <a class="button-ghost" href="#links">{{ 'site.hero.links'|trans }}</a>
-                        {% endif %}
-                    </div>
-                {% endif %}
-            </article>
-        {% else %}
-            <div class="hero-release hero-release-empty">
-                <p>{{ 'site.hero.release'|trans }}</p>
-                {% if has_links %}
-                    <div class="hero-actions">
-                        <a class="button-ghost" href="#links">{{ 'site.hero.links'|trans }}</a>
-                    </div>
+        <div class="hero-content">
+            <h1 class="hero-mark"><span class="visually-hidden">{{ brand }}</span>{% include 'site/_logo.html.twig' %}</h1>
+            <div class="hero-intro">
+                <p class="hero-tagline">{{ music.text.tagline.in(locale) ?: 'site.description'|trans }}</p>
+                {% if music.socialLinks is not empty %}
+                    <ul class="hero-socials" aria-label="{{ 'site.links.socials'|trans }}">
+                        {% for social in music.socialLinks %}
+                            <li>
+                                <a class="hero-social" href="{{ social.url }}" rel="me noopener" aria-label="{{ social.label ?: ('site.networks.' ~ social.network)|trans }}">
+                                    {%- include 'site/_links_icon.html.twig' with {network: social.network} only -%}
+                                </a>
+                            </li>
+                        {% endfor %}
+                    </ul>
                 {% endif %}
             </div>
-        {% endif %}
+        </div>
     </div>
+    {% if featured %}
+        <article class="hero-release">
+            {% if featured.cover %}
+                {{ media.img(featured.cover, '', 'hero-release-cover', 'eager') }}
+            {% endif %}
+            <div class="hero-release-body">
+                <p class="hero-release-kicker">{{ 'site.hero.featured'|trans }}</p>
+                <h2 class="hero-release-title">{{ featured.title }}</h2>
+                <p class="hero-release-meta">{{ ('site.types.' ~ featured.type)|trans }} · {{ featured.releaseDate|date('d.m.Y') }}</p>
+            </div>
+            {% if featured.upcoming %}
+                <div class="countdown" data-island="Countdown" data-props="{{ {
+                    target: featured.releaseAt,
+                    labels: {
+                        days: 'site.countdown.days'|trans,
+                        hours: 'site.countdown.hours'|trans,
+                        minutes: 'site.countdown.minutes'|trans,
+                        seconds: 'site.countdown.seconds'|trans,
+                        done: 'site.countdown.done'|trans,
+                    },
+                }|json_encode }}">{{ 'site.hero.out'|trans({date: featured.releaseDate|date('d.m.Y')}) }}</div>
+            {% endif %}
+            {% set listen_page = featured.links is not empty or featured.upc %}
+            {% if listen_page or featured.smartLinkUrl or music.videos is not empty or has_links %}
+                <div class="hero-actions">
+                    {% if listen_page %}
+                        <a class="button" href="{{ path('listen', {slug: featured.slug}) }}">{{ (featured.upcoming and featured.smartLinkUrl ? 'site.hero.presave' : 'site.hero.listen')|trans }}</a>
+                    {% elseif featured.smartLinkUrl %}
+                        <a class="button" href="{{ featured.smartLinkUrl }}" rel="noopener">{{ (featured.upcoming ? 'site.hero.presave' : 'site.hero.listen')|trans }}</a>
+                    {% endif %}
+                    {% if music.videos is not empty %}
+                        <a class="button-ghost" href="#videos">{{ 'site.hero.watch'|trans }}</a>
+                    {% endif %}
+                    {% if has_links %}
+                        <a class="button-ghost" href="#links">{{ 'site.hero.links'|trans }}</a>
+                    {% endif %}
+                </div>
+            {% endif %}
+        </article>
+    {% else %}
+        <div class="hero-release hero-release-empty">
+            <p>{{ 'site.hero.release'|trans }}</p>
+            {% if has_links %}
+                <div class="hero-actions">
+                    <a class="button-ghost" href="#links">{{ 'site.hero.links'|trans }}</a>
+                </div>
+            {% endif %}
+        </div>
+    {% endif %}
 </section>

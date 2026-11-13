@@ -126,20 +126,34 @@ final class HomeLinksTest extends WebTestCase
         self::assertSame(['https://instagram.com/injust', 'https://injust.example/press'], $socials->each(static fn (Crawler $a): string => (string) $a->attr('href')));
         self::assertSame(['me noopener', 'me noopener'], $socials->each(static fn (Crawler $a): string => (string) $a->attr('rel')));
         self::assertCount(2, $socials->filter('svg[aria-hidden="true"]'));
-        self::assertCount(0, $crawler->filter('#links'));
-        self::assertCount(0, $crawler->filter('.hero a[href="#links"]'));
     }
 
-    public function testThereIsNoSeparateFollowSectionAnymore(): void
+    public function testTheSocialLinksAreListedUnderFollowNextToTheBioLinks(): void
+    {
+        $client = self::createClient();
+        self::bioLink('Album', 'Album', 'https://ffm.to/album');
+        self::social(SocialNetwork::Instagram, 'https://instagram.com/injust', null);
+        self::social(SocialNetwork::Other, 'https://injust.example/press', 'Press kit');
+
+        $crawler = $client->request('GET', '/');
+
+        self::assertSame(['Listen', 'Follow'], $crawler->filter('#links h3')->each(static fn (Crawler $h3): string => $h3->text()));
+        self::assertSame(['Album'], $crawler->filter('#links .links-list a')->each(static fn (Crawler $a): string => $a->text()));
+        $follow = $crawler->filter('#links .links-socials a');
+        self::assertSame([['Instagram', 'https://instagram.com/injust', 'me noopener'], ['Press kit', 'https://injust.example/press', 'me noopener']], $follow->each(static fn (Crawler $a): array => [$a->text(), (string) $a->attr('href'), (string) $a->attr('rel')]));
+        self::assertSame(['Écouter', 'Suivre'], $client->request('GET', '/fr')->filter('#links h3')->each(static fn (Crawler $h3): string => $h3->text()));
+    }
+
+    public function testWithOnlySocialLinksTheBlockShowsFollowAndTheHeroLeadsToIt(): void
     {
         $client = self::createClient();
         self::social(SocialNetwork::Instagram, 'https://instagram.com/injust', null);
 
         $crawler = $client->request('GET', '/');
 
-        self::assertCount(1, $crawler->filter('a[href="https://instagram.com/injust"]'));
-        self::assertNotContains('Follow', $crawler->filter('main h2')->each(static fn (Crawler $h2): string => $h2->text()));
-        self::assertCount(0, $crawler->filter('.link-list'));
+        self::assertSame(['Follow'], $crawler->filter('#links h3')->each(static fn (Crawler $h3): string => $h3->text()));
+        self::assertCount(0, $crawler->filter('#links .links-list'));
+        self::assertSame(['Links'], $crawler->filter('.hero a[href="#links"]')->each(static fn (Crawler $a): string => $a->text()));
     }
 
     public function testTheHeroJumpsToTheLinksNextToItsMainCallToAction(): void

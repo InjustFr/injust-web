@@ -3,7 +3,7 @@ import { OUTSIDER, signIn, signInWithAccount } from './support/session.js';
 
 test('the home page needs no account, the admin does', async ({ page }) => {
     await page.goto('/');
-    await expect(page.getByRole('heading', { level: 1 })).toHaveText('INJUST');
+    await expect(page.getByRole('heading', { level: 1 })).toHaveText('Injust');
 
     await page.goto('/admin/');
     await expect(page.locator('input[name="username"]')).toBeVisible();

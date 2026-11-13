@@ -1,7 +1,7 @@
 const TOLERANCE = 0.02;
 
 export const SLOTS = Object.freeze({
-    hero: { always: true, frames: [{ key: 'phone', ratio: 9 / 19.5 }, { key: 'desktop', ratio: 16 / 9 }] },
+    hero: { always: true, frames: [{ key: 'phone', ratio: 4 / 5 }, { key: 'desktop', ratio: 16 / 9 }] },
     cover: { always: false, frames: [{ key: 'square', ratio: 1 }] },
     portrait: { always: false, frames: [{ key: 'portrait', ratio: 4 / 5 }] },
 });

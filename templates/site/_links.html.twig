@@ -1,17 +1,37 @@
 {% if has_links %}
     <section class="links" id="links" aria-labelledby="links-title">
-        {% include 'site/_section_head.html.twig' with {id: 'links-title', title: 'site.links.title'|trans} only %}
-        {% if links is not empty %}
-            <ul class="links-list">
-                {% for link in links %}
-                    <li>
-                        <a class="links-button{{ link.highlighted ? ' links-button-primary' }}" href="{{ path('go', {id: link.id}) }}" rel="noopener">
-                            {%- if link.icon %}{% include 'site/_links_icon.html.twig' with {network: link.icon} only %}{% endif -%}
-                            <span class="links-label">{{ link.label.in(locale) }}</span>
-                        </a>
-                    </li>
-                {% endfor %}
-            </ul>
-        {% endif %}
+        <h2 class="visually-hidden" id="links-title">{{ 'site.links.title'|trans }}</h2>
+        <div class="links-columns">
+            {% if links is not empty %}
+                <div class="links-group">
+                    <h3 class="links-group-title">{{ 'site.links.listen'|trans }}</h3>
+                    <ul class="links-list">
+                        {% for link in links %}
+                            <li>
+                                <a class="links-button{{ link.highlighted ? ' links-button-primary' }}" href="{{ path('go', {id: link.id}) }}" rel="noopener">
+                                    {%- if link.icon %}{% include 'site/_links_icon.html.twig' with {network: link.icon} only %}{% endif -%}
+                                    <span class="links-label">{{ link.label.in(locale) }}</span>
+                                </a>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            {% endif %}
+            {% if music.socialLinks is not empty %}
+                <div class="links-group">
+                    <h3 class="links-group-title">{{ 'site.links.follow'|trans }}</h3>
+                    <ul class="links-socials">
+                        {% for social in music.socialLinks %}
+                            <li>
+                                <a class="links-button" href="{{ social.url }}" rel="me noopener">
+                                    {%- include 'site/_links_icon.html.twig' with {network: social.network} only -%}
+                                    <span class="links-label">{{ social.label ?: ('site.networks.' ~ social.network)|trans }}</span>
+                                </a>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            {% endif %}
+        </div>
     </section>
 {% endif %}

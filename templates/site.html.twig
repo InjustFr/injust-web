@@ -100,7 +100,7 @@
             {%- if settings.logoImage -%}
                 {{- media.img(settings.logoImage, brand, null, 'eager') -}}
             {%- else -%}
-                {{ brand|upper }}
+                {%- include 'site/_logo.html.twig' -%}
             {%- endif -%}
         </a>
         <nav class="site-nav" aria-label="{{ 'site.nav'|trans }}">
