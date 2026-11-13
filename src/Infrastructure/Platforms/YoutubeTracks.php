@@ -10,6 +10,7 @@ use Symfony\Component\DependencyInjection\Attribute\Autowire;
 final class YoutubeTracks
 {
     private const string SEARCH = 'https://www.googleapis.com/youtube/v3/search';
+    private const string VIDEOS = 'https://www.googleapis.com/youtube/v3/videos';
     private const string VIDEO_ID = '/^[A-Za-z0-9_-]{11}$/D';
 
     private ?ReleaseLookup $asked = null;
@@ -52,14 +53,52 @@ final class YoutubeTracks
             throw new \UnexpectedValueException('YouTube answered without items.');
         }
         $title = self::normalized($release->title);
+        $tracks = [];
         foreach (array_keys($items) as $index) {
             $id = PlatformApi::at($items, $index.'.id.videoId');
-            if (\is_string($id) && 1 === preg_match(self::VIDEO_ID, $id) && $this->isTopic(PlatformApi::at($items, $index.'.snippet.channelTitle')) && $title === self::normalized(PlatformApi::at($items, $index.'.snippet.title'))) {
+            if (!self::isVideoId($id) || !$this->isTopic(PlatformApi::at($items, $index.'.snippet.channelTitle'))) {
+                continue;
+            }
+            if ($title === self::normalized(PlatformApi::at($items, $index.'.snippet.title'))) {
+                return $id;
+            }
+            $tracks[] = $id;
+        }
+
+        return [] === $tracks ? null : $this->albumTrack($tracks, $title);
+    }
+
+    /** @param non-empty-list<string> $tracks */
+    private function albumTrack(array $tracks, ?string $title): ?string
+    {
+        $answer = $this->api->json('GET', self::VIDEOS, ['query' => ['part' => 'snippet', 'id' => implode(',', $tracks)], 'headers' => ['X-Goog-Api-Key' => $this->key]]);
+        $items = \is_array($answer['items'] ?? null) ? $answer['items'] : [];
+        foreach (array_keys($items) as $index) {
+            $id = PlatformApi::at($items, $index.'.id');
+            if (\in_array($id, $tracks, true) && $title === self::normalized(self::albumLine(PlatformApi::at($items, $index.'.snippet.description')))) {
                 return $id;
             }
         }
 
         return null;
+    }
+
+    private static function albumLine(mixed $description): ?string
+    {
+        $lines = \is_string($description) ? array_values(array_filter(array_map(trim(...), preg_split('/\R/u', $description) ?: []))) : [];
+        foreach ($lines as $index => $line) {
+            if (str_contains($line, ' · ')) {
+                return $lines[$index + 1] ?? null;
+            }
+        }
+
+        return null;
+    }
+
+    /** @phpstan-assert-if-true string $id */
+    private static function isVideoId(mixed $id): bool
+    {
+        return \is_string($id) && 1 === preg_match(self::VIDEO_ID, $id);
     }
 
     private function isTopic(mixed $channel): bool
