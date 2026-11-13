@@ -114,6 +114,13 @@ final class YoutubeFinderTest extends TestCase
         self::assertSame(LinkSource::Search, $finder->find(self::lookup('white men are the issue.'))->source);
     }
 
+    public function testHtmlEntitiesInTheAnswerAreDecoded(): void
+    {
+        $finder = new YoutubeFinder(new YoutubeTracks($this->api([self::SEARCH => self::answer([self::item('Don&#39;t tell me &quot;who&quot; to be &amp; why')])]), 'fake-key', 'Injust'), Platform::Youtube);
+
+        self::assertSame(LookupOutcome::Found, $finder->find(self::lookup('Don\'t tell me "who" to be & why'))->outcome);
+    }
+
     public function testCaseIsFoldedBeyondAscii(): void
     {
         $finder = new YoutubeFinder(new YoutubeTracks($this->api([self::SEARCH => self::answer([self::item('Été', 'ÉMEUTE - TOPIC')])]), 'fake-key', 'Émeute'), Platform::Youtube);

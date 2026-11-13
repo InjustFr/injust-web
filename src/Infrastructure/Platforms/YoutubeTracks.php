@@ -73,6 +73,6 @@ final class YoutubeTracks
             return null;
         }
 
-        return trim(preg_replace('/[^\p{L}\p{N}]+/u', ' ', mb_strtolower($title)) ?? '');
+        return trim(preg_replace('/[^\p{L}\p{N}]+/u', ' ', mb_strtolower(html_entity_decode($title, \ENT_QUOTES | \ENT_HTML5))) ?? '');
     }
 }
