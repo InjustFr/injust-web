@@ -149,7 +149,7 @@ Layer-first: `src/{Domain,Application,Infrastructure,Presentation}/<Context>/`, 
 
 ## Accounts & security
 
-- Sign-in = mossyleaf accounts (Authentik at `accounts.mossyleaf.studio`, project `~/Sites/mossyleaf-studio/accounts`), OIDC code flow + PKCE, client id `injust`. Only accounts whose `groups` claim contains `OIDC_REQUIRED_GROUP` (`injust`) get in; dev leaves it empty.
+- Sign-in = Injust accounts (the shared Authentik, brand "Injust" at `accounts.injustmusic.com`, project `~/Sites/mossyleaf-studio/accounts`), OIDC code flow + PKCE, client id `injust`. Only accounts whose `groups` claim contains `OIDC_REQUIRED_GROUP` (`injust`) get in; dev leaves it empty.
 - Dev and e2e use the mock OIDC server (`oidc` service, path `/injust`): type any username plus claims such as `{"email": "editor@injust.test", "groups": ["injust"]}`. PHPUnit uses `Tests\Support\FakeAccounts` (decorates `http_client`), `SignsInClient` and `ActsAsUser`.
 - `/`, `/media`, `/robots.txt` and `/sitemap.xml` are public and start no session; `/admin` and `/api/` need `ROLE_USER`.
 

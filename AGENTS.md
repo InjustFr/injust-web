@@ -11,7 +11,7 @@ write comments, SOLID, one use case per handler, one route per controller, one
 exception per file, no setters), tests first, and the definition of done.
 
 The stack is decided: Doctrine ORM with PostgreSQL, server-rendered Twig for the
-public site plus a JSON API for the Vue admin, SecurityBundle with the mossyleaf
+public site plus a JSON API for the Vue admin, SecurityBundle with the Injust
 accounts OIDC authenticator. Don't ask about these.
 
 The M5 section of `CLAUDE.md` describes the withdrawal page, refunds and credit notes (the `charge.refunded` webhook is the only place credit notes are issued).

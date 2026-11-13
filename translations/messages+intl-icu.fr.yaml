@@ -9,7 +9,7 @@ problem:
 login:
     failed: 'Connexion impossible, réessayez.'
     expired: 'Cette connexion a pris trop de temps ou a été ouverte dans un autre onglet, réessayez.'
-    denied: 'Votre compte mossyleaf n’a pas accès à l’admin d’Injust.'
+    denied: 'Votre compte Injust n’a pas accès à l’admin d’Injust.'
 site:
     description: 'Injust : punk de protestation et hard rock.'
     skip: 'Passer au contenu'

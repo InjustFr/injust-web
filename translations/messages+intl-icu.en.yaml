@@ -9,7 +9,7 @@ problem:
 login:
     failed: 'Unable to sign in, please try again.'
     expired: 'This sign-in took too long or was opened in another tab, please try again.'
-    denied: 'Your mossyleaf account does not have access to the Injust admin.'
+    denied: 'Your Injust account does not have access to the Injust admin.'
 site:
     description: 'Injust: protest punk and hard rock.'
     skip: 'Skip to content'

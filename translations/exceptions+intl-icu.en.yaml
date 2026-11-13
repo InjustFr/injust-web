@@ -10,7 +10,7 @@ user:
     invalid_email: '“{email}” is not a valid email address.'
     email_taken: 'An account already uses {email}.'
 identity:
-    access_denied: 'Your mossyleaf account does not have access to the Injust admin.'
+    access_denied: 'Your Injust account does not have access to the Injust admin.'
 settings:
     invalid_siren: '“{siren}” is not a valid SIREN: it has 9 digits and passes the Luhn check.'
     legal_identity_incomplete: 'Fill in every field of the legal identity before switching online checkout on.'

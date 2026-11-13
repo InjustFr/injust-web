@@ -18,7 +18,7 @@ final class AuthenticationTest extends WebTestCase
 
     private const array EDITOR = ['sub' => 'account-1', 'email' => 'fern@example.com', 'name' => 'Fern', 'groups' => ['injust']];
 
-    public function testTheAdminSendsToTheMossyleafAccount(): void
+    public function testTheAdminSendsToTheInjustAccount(): void
     {
         $client = self::createClient();
 
@@ -53,7 +53,7 @@ final class AuthenticationTest extends WebTestCase
         self::assertResponseRedirects('/login');
         $client->followRedirect();
 
-        self::assertSame('Your mossyleaf account does not have access to the Injust admin.', Json::string(self::props($client), 'error'));
+        self::assertSame('Your Injust account does not have access to the Injust admin.', Json::string(self::props($client), 'error'));
         self::assertNull(self::getContainer()->get(UserRepository::class)->findByAccountId('account-1'));
     }
 
@@ -68,7 +68,7 @@ final class AuthenticationTest extends WebTestCase
         self::assertSame('This sign-in took too long or was opened in another tab, please try again.', Json::string(self::props($client), 'error'));
     }
 
-    public function testSigningOutAlsoSignsOutOfTheMossyleafAccount(): void
+    public function testSigningOutAlsoSignsOutOfTheInjustAccount(): void
     {
         $client = self::createClient();
         $client->loginUser(SecurityUser::fromUser(self::createUser()));

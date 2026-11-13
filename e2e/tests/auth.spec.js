@@ -9,7 +9,7 @@ test('the home page needs no account, the admin does', async ({ page }) => {
     await expect(page.locator('input[name="username"]')).toBeVisible();
 });
 
-test('an editor signs in with their mossyleaf account and signs out', async ({ page }) => {
+test('an editor signs in with their Injust account and signs out', async ({ page }) => {
     await signIn(page);
     await expect(page.getByRole('heading', { level: 1, name: 'Dashboard' })).toBeVisible();
 

@@ -20,7 +20,7 @@ Fill `.env`:
 | `PROXY_NETWORK` | External Docker network of the nginx reverse proxy (`docker network ls`) |
 | `APP_SECRET` | `openssl rand -hex 16` |
 | `POSTGRES_PASSWORD` | `openssl rand -hex 24` |
-| `OIDC_CLIENT_SECRET` | Secret of the `injust` provider in mossyleaf accounts (Authentik) |
+| `OIDC_CLIENT_SECRET` | Secret of the `injust` provider in the shared Authentik (Injust accounts) |
 | `MAILER_DSN` | Mail transport, e.g. Resend SMTP: `smtp://resend:<API_KEY>@smtp.resend.com:465` (the key stays in the server `.env`) |
 | `STRIPE_SECRET_KEY` | Stripe secret key (`sk_test_…` first, `sk_live_…` only once the legal texts are reviewed); only in the server `.env`, never in git |
 | `STRIPE_WEBHOOK_SECRET` | Signing secret (`whsec_…`) of the webhook endpoint below; empty refuses every event |
@@ -74,7 +74,7 @@ Online checkout stays off until it is switched on in the admin (Settings), which
 
 ## Who can sign in to `/admin`
 
-Sign-in goes through mossyleaf accounts (`accounts.mossyleaf.studio`). An account needs the **`injust`** group in Authentik: the application is bound to it, and the app checks the `groups` claim again (`OIDC_REQUIRED_GROUP`).
+Sign-in goes through Injust accounts (`accounts.injustmusic.com`, the "Injust" brand of the shared Authentik). An account needs the **`injust`** group in Authentik: the application is bound to it, and the app checks the `groups` claim again (`OIDC_REQUIRED_GROUP`).
 
 ## Search engines
 
