@@ -519,7 +519,6 @@
     height: auto;
     aspect-ratio: 4 / 5;
     object-fit: cover;
-    filter: grayscale(1) contrast(1.1);
     outline: 1px solid var(--steel);
 }
 
