@@ -72,7 +72,7 @@ final class ListenPageTest extends WebTestCase
         $graph = Json::array(Json::decode($crawler->filter('script[type="application/ld+json"]')->text()), '@graph');
         self::assertSame('BreadcrumbList', Json::string($graph, 1, '@type'));
         self::assertSame('MusicRecording', Json::string($graph, 2, '@type'));
-        self::assertSame(['https://open.spotify.com/album/'.FakePlatforms::SPOTIFY_ID, 'https://music.apple.com/album/6804428384', 'https://music.youtube.com/playlist?list='.FakePlatforms::YOUTUBE_ID, 'https://www.deezer.com/album/1061026552', 'https://tidal.com/album/'.FakePlatforms::TIDAL_ID, 'https://www.youtube.com/watch?v=dQw4w9WgXcQ', 'https://injust.bandcamp.com/track/white-men'], Json::at($graph, 2, 'sameAs'));
+        self::assertSame(['https://open.spotify.com/album/'.FakePlatforms::SPOTIFY_ID, 'https://music.apple.com/album/6804428384', 'https://music.youtube.com/watch?v='.FakePlatforms::YOUTUBE_ID, 'https://www.deezer.com/album/1061026552', 'https://tidal.com/album/'.FakePlatforms::TIDAL_ID, 'https://www.youtube.com/watch?v=dQw4w9WgXcQ', 'https://injust.bandcamp.com/track/white-men'], Json::at($graph, 2, 'sameAs'));
     }
 
     public function testTheFrenchPageIsTranslatedAndAnEpIsAnAlbum(): void

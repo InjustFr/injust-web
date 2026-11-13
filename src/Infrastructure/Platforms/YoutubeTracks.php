@@ -7,11 +7,10 @@ namespace App\Infrastructure\Platforms;
 use App\Application\Music\ReleaseLookup;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
-final class YoutubePlaylists
+final class YoutubeTracks
 {
     private const string SEARCH = 'https://www.googleapis.com/youtube/v3/search';
-    private const string ALBUM_ID = '/^OLAK5uy_[A-Za-z0-9_-]{20,40}$/D';
-    private const array RELEASE_MARKS = ['/^(album|single|ep) - /u', '/ - (single|ep)$/u'];
+    private const string VIDEO_ID = '/^[A-Za-z0-9_-]{11}$/D';
 
     private ?ReleaseLookup $asked = null;
 
@@ -31,7 +30,7 @@ final class YoutubePlaylists
         return '' !== $this->key;
     }
 
-    public function albumOf(ReleaseLookup $release): ?string
+    public function trackOf(ReleaseLookup $release): ?string
     {
         if ($release !== $this->asked) {
             $this->asked = $release;
@@ -47,15 +46,15 @@ final class YoutubePlaylists
 
     private function search(ReleaseLookup $release): ?string
     {
-        $answer = $this->api->json('GET', self::SEARCH, ['query' => ['part' => 'snippet', 'type' => 'playlist', 'maxResults' => 10, 'q' => $this->brand.' '.$release->title], 'headers' => ['X-Goog-Api-Key' => $this->key]]);
+        $answer = $this->api->json('GET', self::SEARCH, ['query' => ['part' => 'snippet', 'type' => 'video', 'maxResults' => 10, 'q' => $this->brand.' '.$release->title], 'headers' => ['X-Goog-Api-Key' => $this->key]]);
         $items = $answer['items'] ?? null;
         if (!\is_array($items)) {
             throw new \UnexpectedValueException('YouTube answered without items.');
         }
         $title = self::normalized($release->title);
         foreach (array_keys($items) as $index) {
-            $id = PlatformApi::at($items, $index.'.id.playlistId');
-            if (\is_string($id) && 1 === preg_match(self::ALBUM_ID, $id) && $this->isBand(PlatformApi::at($items, $index.'.snippet.channelTitle')) && $title === self::normalized(PlatformApi::at($items, $index.'.snippet.title'))) {
+            $id = PlatformApi::at($items, $index.'.id.videoId');
+            if (\is_string($id) && 1 === preg_match(self::VIDEO_ID, $id) && $this->isTopic(PlatformApi::at($items, $index.'.snippet.channelTitle')) && $title === self::normalized(PlatformApi::at($items, $index.'.snippet.title'))) {
                 return $id;
             }
         }
@@ -63,11 +62,9 @@ final class YoutubePlaylists
         return null;
     }
 
-    private function isBand(mixed $channel): bool
+    private function isTopic(mixed $channel): bool
     {
-        $band = mb_strtolower($this->brand);
-
-        return \is_string($channel) && \in_array(mb_strtolower($channel), [$band, $band.' - topic'], true);
+        return \is_string($channel) && mb_strtolower($channel) === mb_strtolower($this->brand).' - topic';
     }
 
     private static function normalized(mixed $title): ?string
@@ -75,8 +72,7 @@ final class YoutubePlaylists
         if (!\is_string($title)) {
             return null;
         }
-        $bare = preg_replace(self::RELEASE_MARKS, '', mb_strtolower(trim($title))) ?? '';
 
-        return trim(preg_replace('/[^\p{L}\p{N}]+/u', ' ', $bare) ?? '');
+        return trim(preg_replace('/[^\p{L}\p{N}]+/u', ' ', mb_strtolower($title)) ?? '');
     }
 }

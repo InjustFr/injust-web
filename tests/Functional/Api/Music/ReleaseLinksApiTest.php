@@ -72,8 +72,8 @@ final class ReleaseLinksApiTest extends WebTestCase
             ['platform' => 'apple-music', 'url' => 'https://music.apple.com/album/6804428384', 'source' => 'auto'],
             ['platform' => 'deezer', 'url' => 'https://www.deezer.com/album/1061026552', 'source' => 'auto'],
             ['platform' => 'tidal', 'url' => 'https://tidal.com/album/'.FakePlatforms::TIDAL_ID, 'source' => 'auto'],
-            ['platform' => 'youtube-music', 'url' => 'https://music.youtube.com/playlist?list='.FakePlatforms::YOUTUBE_ID, 'source' => 'search'],
-            ['platform' => 'youtube', 'url' => 'https://www.youtube.com/playlist?list='.FakePlatforms::YOUTUBE_ID, 'source' => 'search'],
+            ['platform' => 'youtube-music', 'url' => 'https://music.youtube.com/watch?v='.FakePlatforms::YOUTUBE_ID, 'source' => 'search'],
+            ['platform' => 'youtube', 'url' => 'https://www.youtube.com/watch?v='.FakePlatforms::YOUTUBE_ID, 'source' => 'search'],
         ], Json::array($answer, 'release', 'links'));
         self::assertSame('2026-11-10T09:00:00+00:00', Json::string($answer, 'release', 'linksCheckedAt'));
         self::assertSame('http://localhost/listen/white-men-are-the-issue', Json::string($answer, 'release', 'listenUrl'));

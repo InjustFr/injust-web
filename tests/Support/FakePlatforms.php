@@ -19,7 +19,7 @@ final class FakePlatforms implements HttpClientInterface
     public const string FAILING = '036000291452';
     public const string SPOTIFY_ID = '4InjustWhiteMenIssue00';
     public const string TIDAL_ID = '470366521';
-    public const string YOUTUBE_ID = 'OLAK5uy_nbWdzQYfxDeG7ADva9IU5qzaNv-W_ZloE';
+    public const string YOUTUBE_ID = '7Q5mn7mihG8';
 
     private const array HOSTS = ['api.deezer.com', 'itunes.apple.com', 'accounts.spotify.com', 'api.spotify.com', 'auth.tidal.com', 'openapi.tidal.com', 'www.googleapis.com'];
 
@@ -85,14 +85,15 @@ final class FakePlatforms implements HttpClientInterface
 
     private static function youtube(string $search): MockResponse
     {
-        $playlist = static fn (string $id, string $title, string $channel): array => ['kind' => 'youtube#searchResult', 'id' => ['kind' => 'youtube#playlist', 'playlistId' => $id], 'snippet' => ['title' => $title, 'channelTitle' => $channel, 'channelId' => 'UC'.md5($channel)]];
+        $video = static fn (string $id, string $title, string $channel): array => ['kind' => 'youtube#searchResult', 'id' => ['kind' => 'youtube#video', 'videoId' => $id], 'snippet' => ['title' => $title, 'channelTitle' => $channel, 'channelId' => 'UC'.md5($channel)]];
 
         return match ($search) {
             'Injust Failing' => self::json(['error' => ['code' => 403, 'message' => 'The request cannot be completed because you have exceeded your quota.', 'errors' => [['reason' => 'quotaExceeded', 'domain' => 'youtube.quota']]]], 403),
             'Injust White Men are the Issue' => self::json(['kind' => 'youtube#searchListResponse', 'items' => [
-                $playlist('OLAK5uy_mDecoyFromAnotherChannel000000', 'Album - White Men are the Issue', 'Punk Covers'),
-                $playlist('OLAK5uy_lInjustLiveAtTheRiot00000000000', 'Album - White Men are the Issue (Live)', 'Injust - Topic'),
-                $playlist(self::YOUTUBE_ID, 'Album - White Men are the Issue', 'Injust - Topic'),
+                $video('dEcoyCover1', 'White Men are the Issue', 'Punk Covers'),
+                $video('LUdoAiwULuk', 'White Men are the Issue', 'Injust'),
+                $video('lIveAtRiot1', 'White Men are the Issue (Live)', 'Injust - Topic'),
+                $video(self::YOUTUBE_ID, 'White Men are the Issue', 'Injust - Topic'),
             ]]),
             default => self::json(['kind' => 'youtube#searchListResponse', 'items' => []]),
         };

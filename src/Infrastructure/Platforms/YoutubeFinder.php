@@ -12,10 +12,10 @@ use App\Domain\Music\Platform;
 
 final readonly class YoutubeFinder implements PlatformFinder
 {
-    private const string MUSIC = 'https://music.youtube.com/playlist?list=';
-    private const string VIDEO = 'https://www.youtube.com/playlist?list=';
+    private const string MUSIC = 'https://music.youtube.com/watch?v=';
+    private const string VIDEO = 'https://www.youtube.com/watch?v=';
 
-    public function __construct(private YoutubePlaylists $playlists, private Platform $platform)
+    public function __construct(private YoutubeTracks $tracks, private Platform $platform)
     {
     }
 
@@ -26,12 +26,12 @@ final readonly class YoutubeFinder implements PlatformFinder
 
     public function configured(): bool
     {
-        return $this->playlists->configured();
+        return $this->tracks->configured();
     }
 
     public function find(ReleaseLookup $release): FinderResult
     {
-        $id = $this->playlists->albumOf($release);
+        $id = $this->tracks->trackOf($release);
         if (null === $id) {
             return FinderResult::notFound();
         }
